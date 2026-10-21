@@ -1,0 +1,3 @@
+# CI pipeline (Phase 1 deliverable).
+# TODO(Arik): lint (ESLint, Black, Ruff) -> unit tests (Jest, pytest) -> Docker build.
+# Runs on every PR.

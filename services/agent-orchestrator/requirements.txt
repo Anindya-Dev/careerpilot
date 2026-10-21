@@ -1,0 +1,14 @@
+# Python dependencies — pin exact versions in Phase 1.
+# fastapi
+# uvicorn[standard]
+# pydantic
+# pydantic-settings
+# redis
+# neo4j
+# chromadb
+# langchain
+# langgraph
+# langchain-groq
+# python-dotenv
+# pytest
+# pytest-asyncio
