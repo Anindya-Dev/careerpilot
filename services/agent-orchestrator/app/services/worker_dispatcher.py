@@ -31,6 +31,8 @@ from agents.career_evidence.worker import run_career_evidence
 from agents.career_health.worker import run_career_health
 from agents.career_vision.worker import run_career_vision
 from agents.interview_readiness.worker import run_interview_readiness
+from agents.opportunity_discovery.worker import run_opportunity_discovery
+from agents.skill_intelligence.worker import run_skill_intelligence
 
 logger = logging.getLogger("orchestrator.dispatcher")
 
@@ -44,6 +46,8 @@ WORKER_DISPATCH_TABLE: Dict[
     AgentName.CAREER_EVIDENCE: run_career_evidence,
     AgentName.INTERVIEW_READINESS: run_interview_readiness,
     AgentName.CAREER_HEALTH: run_career_health,
+    AgentName.SKILL_INTELLIGENCE: run_skill_intelligence,
+    AgentName.OPPORTUNITY_DISCOVERY: run_opportunity_discovery,
 }
 
 

@@ -223,3 +223,45 @@ def test_career_health_agent_end_to_end(client: TestClient) -> None:
         assert "swot_analysis" in result
         assert "strengths" in result["swot_analysis"]
         assert "top_priority_actions" in result
+
+
+def test_skill_intelligence_agent_end_to_end(client: TestClient) -> None:
+    """Test that invoking skill_intelligence calculates ROI and ranks skill gaps."""
+    payload = {
+        "agent": "skill_intelligence",
+        "user_id": "std-test-001",
+        "params": {"target_role": "AI/ML Engineer"},
+    }
+    response = client.post("/api/v1/orchestrator/invoke", json=payload)
+    assert response.status_code == 202
+    job_id = response.json()["job_id"]
+
+    status_response = client.get(f"/api/v1/orchestrator/jobs/{job_id}")
+    assert status_response.status_code == 200
+    data = status_response.json()
+    if data["status"] == "completed":
+        result = data["result"]
+        assert "ranked_skill_gaps" in result
+        assert len(result["ranked_skill_gaps"]) > 0
+        assert "roi_score" in result["ranked_skill_gaps"][0]
+
+
+def test_opportunity_discovery_agent_end_to_end(client: TestClient) -> None:
+    """Test that invoking opportunity_discovery surfaces relevant opportunities."""
+    payload = {
+        "agent": "opportunity_discovery",
+        "user_id": "std-test-001",
+        "params": {"target_role": "AI/ML Engineer"},
+    }
+    response = client.post("/api/v1/orchestrator/invoke", json=payload)
+    assert response.status_code == 202
+    job_id = response.json()["job_id"]
+
+    status_response = client.get(f"/api/v1/orchestrator/jobs/{job_id}")
+    assert status_response.status_code == 200
+    data = status_response.json()
+    if data["status"] == "completed":
+        result = data["result"]
+        assert "opportunities" in result
+        assert len(result["opportunities"]) > 0
+        assert "match_percentage" in result["opportunities"][0]
