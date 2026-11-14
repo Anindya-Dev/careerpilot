@@ -33,19 +33,19 @@ class LLMService:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model_name: str = "mixtral-8x7b-32768",
+        model_name: Optional[str] = None,
         temperature: float = 0.1,
     ) -> None:
         """Initialize the LLM service with configuration.
 
         Args:
             api_key: Groq API key (defaults to settings.groq_api_key).
-            model_name: Model identifier (e.g. 'mixtral-8x7b-32768' or 'llama3-70b-8192').
+            model_name: Model identifier (defaults to settings.groq_model e.g. 'llama-3.3-70b-versatile').
             temperature: Sampling temperature (0.1 for high determinism).
         """
         settings = get_settings()
         self.api_key = api_key or settings.groq_api_key
-        self.model_name = model_name
+        self.model_name = model_name or settings.groq_model
         self.temperature = temperature
         self._llm: Any = None
 

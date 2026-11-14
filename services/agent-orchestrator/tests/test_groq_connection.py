@@ -33,9 +33,10 @@ def verify_groq() -> None:
         print(f"[-] Missing required package: {exc}. Run pip install langchain-groq.")
         sys.exit(1)
 
-    print("[*] Connecting to Groq LPU with model: mixtral-8x7b-32768...")
+    model_name = os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b")
+    print(f"[*] Connecting to Groq LPU with model: {model_name}...")
     llm = ChatGroq(
-        model_name="mixtral-8x7b-32768",
+        model_name=model_name,
         temperature=0.1,
         groq_api_key=api_key,
     )

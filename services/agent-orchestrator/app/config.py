@@ -49,6 +49,7 @@ class Settings(BaseSettings):
 
     # Groq (LLM inference)
     groq_api_key: str = ""
+    groq_model: str = "qwen/qwen3.8-27b"
 
 
 @lru_cache
