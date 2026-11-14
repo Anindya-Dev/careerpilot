@@ -24,6 +24,7 @@ from app.models.requests import InvokeRequest
 from app.models.responses import AgentListResponse, JobStatus, JobStatusResponse
 from app.services.agent_registry import get_all_registered_agents
 from app.services.job_manager import JobManager, get_job_manager
+from app.services.worker_dispatcher import dispatch_background_job
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +67,15 @@ async def invoke_agent(
             agent=request.agent.value,
             user_id=request.user_id,
             params=request.params,
+        )
+
+        # Dispatch background worker execution (non-blocking)
+        dispatch_background_job(
+            job_id=job_id,
+            agent_name=request.agent,
+            user_id=request.user_id,
+            params=request.params,
+            job_manager=job_manager,
         )
     except Exception as exc:
         logger.error("Failed to enqueue agent job: %s", exc, exc_info=True)

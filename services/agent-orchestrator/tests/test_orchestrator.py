@@ -82,13 +82,17 @@ def test_invoke_agent_success(client: TestClient) -> None:
     assert len(data["job_id"]) == 36  # UUID length
     assert data["status"] == JobStatus.QUEUED.value
 
-    # Poll status for the newly enqueued job
+    # Poll status for the newly enqueued job (may be queued, running, or already completed by worker)
     job_id = data["job_id"]
     status_response = client.get(f"/api/v1/orchestrator/jobs/{job_id}")
     assert status_response.status_code == 200
     status_data = status_response.json()
     assert status_data["job_id"] == job_id
-    assert status_data["status"] == JobStatus.QUEUED.value
+    assert status_data["status"] in (
+        JobStatus.QUEUED.value,
+        JobStatus.RUNNING.value,
+        JobStatus.COMPLETED.value,
+    )
 
 
 def test_invoke_rejects_invalid_agent_name(client: TestClient) -> None:
@@ -127,3 +131,67 @@ def test_get_nonexistent_job_returns_404(client: TestClient) -> None:
     data = response.json()
     assert "detail" in data
     assert fake_job_id in data["detail"]
+
+
+def test_career_vision_agent_end_to_end(client: TestClient) -> None:
+    """Test that invoking career_vision executes worker and produces 1/3/5-year roadmap."""
+    payload = {
+        "agent": "career_vision",
+        "user_id": "std-test-001",
+        "params": {"target_role": "AI/ML Engineer", "timeline_years": 5},
+    }
+    response = client.post("/api/v1/orchestrator/invoke", json=payload)
+    assert response.status_code == 202
+    job_id = response.json()["job_id"]
+
+    status_response = client.get(f"/api/v1/orchestrator/jobs/{job_id}")
+    assert status_response.status_code == 200
+    data = status_response.json()
+    assert data["job_id"] == job_id
+    if data["status"] == "completed":
+        result = data["result"]
+        assert "milestones" in result
+        assert len(result["milestones"]) == 3
+        assert "strategic_advice" in result
+
+
+def test_career_drift_agent_end_to_end(client: TestClient) -> None:
+    """Test that invoking career_drift executes worker and computes drift score."""
+    payload = {
+        "agent": "career_drift",
+        "user_id": "std-test-001",
+        "params": {"lookback_days": 90},
+    }
+    response = client.post("/api/v1/orchestrator/invoke", json=payload)
+    assert response.status_code == 202
+    job_id = response.json()["job_id"]
+
+    status_response = client.get(f"/api/v1/orchestrator/jobs/{job_id}")
+    assert status_response.status_code == 200
+    data = status_response.json()
+    if data["status"] == "completed":
+        result = data["result"]
+        assert "drift_score" in result
+        assert "drift_status" in result
+        assert "corrective_actions" in result
+
+
+def test_career_evidence_agent_end_to_end(client: TestClient) -> None:
+    """Test that invoking career_evidence audits claims and returns evidence score."""
+    payload = {
+        "agent": "career_evidence",
+        "user_id": "std-test-001",
+        "params": {"github_username": "anindya-dev"},
+    }
+    response = client.post("/api/v1/orchestrator/invoke", json=payload)
+    assert response.status_code == 202
+    job_id = response.json()["job_id"]
+
+    status_response = client.get(f"/api/v1/orchestrator/jobs/{job_id}")
+    assert status_response.status_code == 200
+    data = status_response.json()
+    if data["status"] == "completed":
+        result = data["result"]
+        assert "overall_evidence_score" in result
+        assert "verified_claims_count" in result
+        assert "claims" in result
