@@ -28,6 +28,7 @@ from app.services.llm_service import get_llm_service
 # Import Agent Worker implementations
 from agents.career_drift.worker import run_career_drift
 from agents.career_evidence.worker import run_career_evidence
+from agents.career_health.worker import run_career_health
 from agents.career_vision.worker import run_career_vision
 from agents.interview_readiness.worker import run_interview_readiness
 
@@ -42,6 +43,7 @@ WORKER_DISPATCH_TABLE: Dict[
     AgentName.CAREER_DRIFT: run_career_drift,
     AgentName.CAREER_EVIDENCE: run_career_evidence,
     AgentName.INTERVIEW_READINESS: run_interview_readiness,
+    AgentName.CAREER_HEALTH: run_career_health,
 }
 
 

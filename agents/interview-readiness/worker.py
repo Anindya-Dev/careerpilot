@@ -127,3 +127,4 @@ async def run_interview_readiness(
             logger.warning("LLM interview generation failed (%s); returning fallback.", exc)
 
     return fallback_output
+

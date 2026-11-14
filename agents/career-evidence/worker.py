@@ -134,3 +134,4 @@ async def run_career_evidence(
             logger.warning("LLM evidence verification failed (%s); returning fallback.", exc)
 
     return fallback_output
+

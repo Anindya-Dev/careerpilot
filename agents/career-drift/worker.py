@@ -124,3 +124,4 @@ async def run_career_drift(
             logger.warning("LLM drift analysis failed (%s); returning fallback.", exc)
 
     return fallback_output
+

@@ -195,3 +195,31 @@ def test_career_evidence_agent_end_to_end(client: TestClient) -> None:
         assert "overall_evidence_score" in result
         assert "verified_claims_count" in result
         assert "claims" in result
+
+
+def test_career_health_agent_end_to_end(client: TestClient) -> None:
+    """Test that invoking career_health computes composite index and SWOT analysis."""
+    payload = {
+        "agent": "career_health",
+        "user_id": "std-test-001",
+        "params": {
+            "skill_market_fit": 80.0,
+            "drift_score": 15.0,
+            "profile_completeness": 90.0,
+        },
+    }
+    response = client.post("/api/v1/orchestrator/invoke", json=payload)
+    assert response.status_code == 202
+    job_id = response.json()["job_id"]
+
+    status_response = client.get(f"/api/v1/orchestrator/jobs/{job_id}")
+    assert status_response.status_code == 200
+    data = status_response.json()
+    if data["status"] == "completed":
+        result = data["result"]
+        assert "composite_index" in result
+        assert result["composite_index"] > 0.0
+        assert "score_breakdown" in result
+        assert "swot_analysis" in result
+        assert "strengths" in result["swot_analysis"]
+        assert "top_priority_actions" in result

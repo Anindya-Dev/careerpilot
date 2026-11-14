@@ -176,3 +176,4 @@ Generate the 1-year, 3-year, and 5-year progression roadmap for this student.
             logger.warning("LLM generation failed: %s; returning structured fallback.", exc)
 
     return fallback_output
+
