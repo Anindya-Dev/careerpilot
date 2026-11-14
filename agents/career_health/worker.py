@@ -180,3 +180,4 @@ async def run_career_health(
             logger.warning("LLM career health synthesis failed (%s); returning fallback.", exc)
 
     return fallback_output
+

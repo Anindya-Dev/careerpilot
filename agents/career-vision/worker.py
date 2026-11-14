@@ -4,7 +4,7 @@ Owner: Anindya Bhattacharya (Member 2)
 
 Responsibilities:
 1. Queries student's current verified competencies and aspirational target role from Neo4j.
-2. Identifies ontological skill gaps via GraphRAG traversal.
+2. Identifies ontological skill gaps via GraphRAG traversal against role prerequisites.
 3. Invokes Groq LPU inference to generate structured 1-year, 3-year, and 5-year milestones.
 4. Validates output against CareerVisionOutput Pydantic schema.
 """
@@ -41,21 +41,44 @@ class CareerVisionOutput(BaseModel):
     strategic_advice: str
 
 
-# System prompt enforcing role-specific reasoning and strict JSON schema
+# Ontological role prerequisites for GraphRAG skill gap resolution
+ROLE_PREREQUISITES: Dict[str, List[str]] = {
+    "AI/ML Engineer": ["Docker", "Kubernetes", "MLOps", "Model Packaging"],
+    "Full Stack Engineer": ["PostgreSQL", "Docker", "Redis", "GraphQL"],
+    "DevOps & Cloud Engineer": ["Go", "Prometheus", "Grafana", "CI/CD Security"],
+    "Data Scientist": ["SQL", "PyTorch", "Feature Engineering", "A/B Testing"],
+    "Embedded Systems Engineer": ["Embedded Linux", "Device Drivers", "Rust", "Git"],
+    "Frontend Engineer": ["TypeScript", "Next.js", "State Management", "Jest"],
+    "Backend Engineer": ["Kafka", "Microservices Design", "Redis", "Docker"],
+    "Cybersecurity Analyst": ["SIEM Tools", "Metasploit", "Cryptography", "SOC Procedures"],
+    "Cloud Architect": ["Kubernetes", "Cost Optimization", "Terraform", "Security IAM"],
+    "Data Analyst": ["Pandas", "PowerBI", "Statistical Analysis", "Data Cleaning"],
+    "Software Development Engineer": ["Git", "Object-Oriented Design", "Databases", "Web Fundamentals"],
+    "IoT Solutions Architect": ["C/C++", "Cloud IoT Core", "Security Protocols", "PCB Design"],
+    "Mobile App Developer": ["State Management (Bloc)", "Native Android/iOS", "CI/CD App Stores", "SQLite"],
+    "QA Automation Engineer": ["Postman/Newman", "CI/CD Jenkins", "Playwright", "Docker"],
+    "Blockchain Developer": ["Hardhat/Foundry", "Smart Contract Security", "Rust", "EVM Internals"],
+    "NLP Research Engineer": ["LangChain/LangGraph", "Vector DBs", "Model Quantization", "CUDA Optimization"],
+    "Site Reliability Engineer": ["Kubernetes", "Terraform", "Prometheus/Alertmanager", "Chaos Engineering"],
+    "Robotics Software Engineer": ["Computer Vision", "Sensor Fusion", "Kalman Filters", "Docker/Deployment"],
+}
+
+
 CAREER_VISION_SYSTEM_PROMPT = """You are CareerPilot's Career Vision Agent, an expert AI career architect.
 Your mission is to map a rigorous, highly actionable 1-year, 3-year, and 5-year career roadmap for an engineering student.
-
-You will be given:
-1. Student Profile & Verified Skills (from Knowledge Graph).
-2. Aspirational Target Role.
-3. Identified Skill Gaps.
-
-Rules:
-- Ground all recommendations in real software industry engineering ladders.
-- Sequence dependencies logically (e.g. Master Linux networking before Kubernetes; Master Python fundamentals before PyTorch distributed training).
-- Suggest concrete, verifiable portfolio projects (e.g. 'Build an LSM-tree storage engine in C++' rather than vague advice like 'Learn databases').
-- Return ONLY valid JSON matching the required schema.
+Ground all recommendations in real software industry engineering ladders.
+Return ONLY valid JSON matching the schema.
 """
+
+
+def get_role_gaps(target_role: str, verified_skills: List[str]) -> List[str]:
+    """Calculate ontological skill gap difference for target role."""
+    # Find closest role in prerequisites
+    for role_name, reqs in ROLE_PREREQUISITES.items():
+        if role_name.lower() in target_role.lower() or target_role.lower() in role_name.lower():
+            return [r for r in reqs if r.lower() not in {v.lower() for v in verified_skills}]
+    # Default fallback prerequisites
+    return ["Docker", "Kubernetes", "System Design", "Cloud Infrastructure"]
 
 
 async def run_career_vision(
@@ -64,30 +87,17 @@ async def run_career_vision(
     neo4j_client: Optional[Any] = None,
     llm_service: Optional[Any] = None,
 ) -> Dict[str, Any]:
-    """Execute the Career Vision Agent workflow.
-
-    Args:
-        user_id: Unique student identifier.
-        params: Optional dictionary specifying 'target_role', 'timeline_years', etc.
-        neo4j_client: Injected Neo4jClient instance.
-        llm_service: Injected LLMService instance.
-
-    Returns:
-        Dict[str, Any]: Validated CareerVisionOutput dictionary.
-    """
+    """Execute the Career Vision Agent workflow."""
     params_dict = params or {}
     target_role = params_dict.get("target_role", "AI/ML Engineer")
 
     logger.info("Executing Career Vision Agent for student %s targeting '%s'", user_id, target_role)
 
-    # 1. Fetch Student Context & Skills (from Neo4j or Fallback Seed)
     student_name = "Student"
     verified_skills: List[str] = []
-    missing_skills: List[str] = ["Docker", "Kubernetes", "Distributed Systems"]
 
     if neo4j_client is not None:
         try:
-            # Query student and verified skills
             query = """
             MATCH (s:Student { student_id: $user_id })
             OPTIONAL MATCH (s)-[r:HAS_SKILL]->(sk:Skill)
@@ -100,71 +110,52 @@ async def run_career_vision(
                 if not params_dict.get("target_role") and records[0].get("role"):
                     target_role = records[0]["role"]
         except Exception as exc:
-            logger.debug("Neo4j query failed (%s); using baseline profile context.", exc)
+            logger.debug("Neo4j query failed: %s", exc)
 
     if not verified_skills:
-        # Default baseline profile (e.g. Aarav Sharma from seed data)
-        verified_skills = ["Python", "FastAPI", "PyTorch", "SQL"]
+        verified_skills = ["Python", "FastAPI"]
 
-    # 2. Assemble Context for LLM
-    user_prompt = f"""
-Student Name: {student_name}
-User ID: {user_id}
-Target Role: {target_role}
-Current Verified Skills: {', '.join(verified_skills)}
-Identified Skill Gaps to Bridge: {', '.join(missing_skills)}
+    # Compute missing skills dynamically based on role ontology
+    missing_skills = get_role_gaps(target_role, verified_skills)
 
-Generate the 1-year, 3-year, and 5-year progression roadmap for this student.
-"""
-
-    # 3. High-quality Deterministic Fallback Data
     fallback_output = {
         "user_id": user_id,
         "target_role": target_role,
-        "current_match_score": 68.5,
+        "current_match_score": 72.0,
         "verified_skills_count": len(verified_skills),
         "missing_prerequisites": missing_skills,
         "milestones": [
             {
                 "timeframe": "Year 1",
-                "target_title": "Associate AI Backend Engineer",
-                "key_competencies": ["FastAPI", "Docker", "PyTorch", "Model Packaging"],
-                "recommended_projects": [
-                    "High-Throughput Model Inference Service with FastAPI & Redis Queue",
-                    "Automated GitHub CI/CD Pipeline with Docker Containerization",
-                ],
-                "key_deliverables": ["Production Docker images deployed to cloud", "Benchmarked latency < 50ms"],
+                "target_title": f"Junior {target_role}",
+                "key_competencies": missing_skills[:2],
+                "recommended_projects": [f"Full-stack {target_role} Starter Portfolio"],
+                "key_deliverables": ["Production code deployed to cloud"],
             },
             {
                 "timeframe": "Year 3",
                 "target_title": f"Mid-Level {target_role}",
-                "key_competencies": ["Kubernetes (K8s)", "MLOps Pipelines", "Triton Inference Server", "Distributed Training"],
-                "recommended_projects": [
-                    "Kubernetes Multi-Pod Agent Cluster with Horizontal Pod Autoscaling (HPA)",
-                    "Knowledge Graph RAG Retrieval Service using Neo4j and Vector Embeddings",
-                ],
-                "key_deliverables": ["CKA Certification", "Lead author on high-traffic open source microservice"],
+                "key_competencies": missing_skills[2:] + ["Distributed Systems"],
+                "recommended_projects": [f"High-Scale {target_role} Architecture"],
+                "key_deliverables": ["Industry Certification attained"],
             },
             {
                 "timeframe": "Year 5",
-                "target_title": f"Senior {target_role} / Technical Lead",
-                "key_competencies": ["System Architecture", "Large-Scale Distributed Systems", "Team Mentorship", "Cross-Functional Leadership"],
-                "recommended_projects": [
-                    "End-to-End Enterprise Agentic Intelligence Orchestration Platform",
-                ],
-                "key_deliverables": ["Architectural Decision Records (ADRs) accepted for production platforms"],
+                "target_title": f"Senior {target_role} / Tech Lead",
+                "key_competencies": ["System Architecture", "Team Leadership"],
+                "recommended_projects": ["Enterprise Platform Lead"],
+                "key_deliverables": ["Architectural Decision Records"],
             },
         ],
         "strategic_advice": (
-            f"You possess strong core foundations in {', '.join(verified_skills[:2])}. "
-            "To break into Tier-1 roles, prioritize infrastructure verification (Docker & Kubernetes) "
-            "and build verifiable evidence in public repositories."
+            f"You possess strong foundational capabilities in {', '.join(verified_skills[:2])}. "
+            f"Bridge the primary ontological gaps ({', '.join(missing_skills[:2])}) through verified portfolio builds."
         ),
     }
 
-    # 4. Invoke LLM Inference Service
     if llm_service is not None:
         try:
+            user_prompt = f"Student: {student_name}\nTarget: {target_role}\nVerified: {verified_skills}\nGaps: {missing_skills}"
             result = await llm_service.generate_json(
                 system_prompt=CAREER_VISION_SYSTEM_PROMPT,
                 user_prompt=user_prompt,
@@ -173,7 +164,6 @@ Generate the 1-year, 3-year, and 5-year progression roadmap for this student.
             )
             return result
         except Exception as exc:
-            logger.warning("LLM generation failed: %s; returning structured fallback.", exc)
+            logger.warning("LLM generation fallback: %s", exc)
 
     return fallback_output
-
