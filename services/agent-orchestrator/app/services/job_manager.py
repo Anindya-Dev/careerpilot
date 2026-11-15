@@ -56,10 +56,13 @@ class JobManager:
         """Lazily initialize and return the asynchronous Redis client.
 
         Returns:
-            An active redis.asyncio.Redis client, or None if redis module is unavailable.
+            An active redis.asyncio.Redis client, or None if redis is offline or unavailable.
         """
         if self._redis_client is not None:
             return self._redis_client
+
+        if not self._is_redis_port_open():
+            return None
 
         try:
             import redis.asyncio as aioredis
