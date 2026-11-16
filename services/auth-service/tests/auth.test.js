@@ -269,3 +269,62 @@ describe('POST /api/v1/auth/logout', () => {
     expect(res.body.success).toBe(true);
   });
 });
+
+describe('POST /api/v1/auth/forgot-password & reset-password', () => {
+  test('Generates reset token and allows updating password', async () => {
+    const regRes = await request(app).post('/api/v1/auth/register').send({
+      email: 'resetme@careerpilot.io',
+      password: 'OldPassword123!',
+      name: 'Reset User'
+    });
+
+    const forgotRes = await request(app)
+      .post('/api/v1/auth/forgot-password')
+      .send({ email: 'resetme@careerpilot.io' });
+
+    expect(forgotRes.status).toBe(200);
+    expect(forgotRes.body.success).toBe(true);
+    expect(forgotRes.body.resetToken).toBeDefined();
+
+    const resetRes = await request(app)
+      .post('/api/v1/auth/reset-password')
+      .send({
+        token: forgotRes.body.resetToken,
+        newPassword: 'BrandNewPassword2026!'
+      });
+
+    expect(resetRes.status).toBe(200);
+    expect(resetRes.body.success).toBe(true);
+
+    // Verify login with new password works
+    const loginRes = await request(app)
+      .post('/api/v1/auth/login')
+      .send({
+        email: 'resetme@careerpilot.io',
+        password: 'BrandNewPassword2026!'
+      });
+
+    expect(loginRes.status).toBe(200);
+    expect(loginRes.body.accessToken).toBeDefined();
+  });
+});
+
+describe('Rate Limiting Protection', () => {
+  test('Blocks more than 10 attempts from same IP within 15 mins (HTTP 429)', async () => {
+    for (let i = 0; i < 10; i++) {
+      await request(app)
+        .post('/api/v1/auth/login')
+        .set('x-test-rate-limit', 'true')
+        .send({ email: 'ratelimit@careerpilot.io', password: 'Password123!' });
+    }
+
+    const blockedRes = await request(app)
+      .post('/api/v1/auth/login')
+      .set('x-test-rate-limit', 'true')
+      .send({ email: 'ratelimit@careerpilot.io', password: 'Password123!' });
+
+    expect(blockedRes.status).toBe(429);
+    expect(blockedRes.body.success).toBe(false);
+    expect(blockedRes.body.error.code).toBe('TOO_MANY_REQUESTS');
+  });
+});
