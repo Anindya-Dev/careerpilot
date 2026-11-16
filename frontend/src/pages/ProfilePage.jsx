@@ -418,22 +418,78 @@ export default function ProfilePage() {
 
             {/* Sidebar Column: Goals, Linked Accounts, Completeness */}
             <div className="space-y-6">
-              {/* Linked Accounts */}
-              <Card title="External Evidence Links">
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <Github className="w-5 h-5 text-slate-700" />
+              {/* Linked Accounts with OAuth Stubs */}
+              <Card
+                title="External Evidence Links"
+                subtitle="OAuth 2.0 integrations for Career Evidence Agent"
+              >
+                <div className="space-y-4">
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Github className="w-5 h-5 text-slate-800" />
+                        <span className="text-sm font-medium text-slate-800">GitHub</span>
+                      </div>
+                      {formData.linked_accounts.github ? (
+                        <span className="text-xs px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold flex items-center">
+                          <CheckCircle className="w-3 h-3 mr-1" /> Connected
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const handle = window.prompt('Simulating GitHub OAuth 2.0 flow. Enter your GitHub username:', 'hussain-ansari');
+                            if (handle) {
+                              setFormData((prev) => ({
+                                ...prev,
+                                linked_accounts: { ...prev.linked_accounts, github: handle }
+                              }));
+                            }
+                          }}
+                          className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
+                        >
+                          + Connect OAuth
+                        </button>
+                      )}
+                    </div>
                     <Input
-                      placeholder="GitHub username"
+                      placeholder="e.g. hussain-ansari"
                       name="github"
                       value={formData.linked_accounts.github}
                       onChange={handleLinkedAccountChange}
                     />
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Linkedin className="w-5 h-5 text-blue-600" />
+
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Linkedin className="w-5 h-5 text-blue-600" />
+                        <span className="text-sm font-medium text-slate-800">LinkedIn</span>
+                      </div>
+                      {formData.linked_accounts.linkedin ? (
+                        <span className="text-xs px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold flex items-center">
+                          <CheckCircle className="w-3 h-3 mr-1" /> Connected
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const handle = window.prompt('Simulating LinkedIn OAuth flow. Enter your LinkedIn handle:', 'hussainansari');
+                            if (handle) {
+                              setFormData((prev) => ({
+                                ...prev,
+                                linked_accounts: { ...prev.linked_accounts, linkedin: handle }
+                              }));
+                            }
+                          }}
+                          className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
+                        >
+                          + Connect OAuth
+                        </button>
+                      )}
+                    </div>
                     <Input
-                      placeholder="LinkedIn profile handle"
+                      placeholder="e.g. linkedin.com/in/hussainansari"
                       name="linkedin"
                       value={formData.linked_accounts.linkedin}
                       onChange={handleLinkedAccountChange}
