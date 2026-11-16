@@ -319,6 +319,43 @@ async function resetPassword(req, res, next) {
   }
 }
 
+/**
+ * Verify student email using verification token or automated stub confirmation.
+ * Endpoint: POST /api/v1/auth/verify-email
+ */
+async function verifyEmail(req, res, next) {
+  try {
+    const { token, email } = req.body;
+
+    let query = {};
+    if (token) {
+      const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+      query.emailVerificationToken = hashedToken;
+    } else if (email) {
+      query.email = email.toLowerCase().trim();
+    } else {
+      return next(new AppError('INVALID_INPUT', 'Verification token or email is required', 400));
+    }
+
+    const user = await User.findOne(query);
+    if (!user) {
+      return next(new AppError('INVALID_TOKEN', 'Verification token or email is invalid', 400));
+    }
+
+    user.isEmailVerified = true;
+    user.emailVerificationToken = null;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Email address verified successfully.',
+      isEmailVerified: true
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   register,
   login,
@@ -326,5 +363,6 @@ module.exports = {
   logout,
   getMe,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  verifyEmail
 };

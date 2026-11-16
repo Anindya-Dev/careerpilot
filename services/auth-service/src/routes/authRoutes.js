@@ -22,6 +22,7 @@ router.post('/login', authRateLimiter, validateLogin, authController.login);
 router.post('/refresh', authController.refresh);
 router.post('/forgot-password', authRateLimiter, validateForgotPassword, authController.forgotPassword);
 router.post('/reset-password', authRateLimiter, validateResetPassword, authController.resetPassword);
+router.post('/verify-email', authController.verifyEmail);
 
 // Authenticated session routes
 router.post('/logout', authenticateJWT, authController.logout);
