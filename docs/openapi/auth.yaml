@@ -201,6 +201,26 @@ paths:
         '400':
           description: Token invalid or expired.
 
+  /api/v1/auth/verify-email:
+    post:
+      summary: Verify student email address
+      description: Validates email verification token or performs stubbed email confirmation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Email verified successfully.
+
 components:
   securitySchemes:
     BearerAuth:

@@ -309,6 +309,27 @@ describe('POST /api/v1/auth/forgot-password & reset-password', () => {
   });
 });
 
+describe('POST /api/v1/auth/verify-email', () => {
+  test('Verifies student email stub successfully', async () => {
+    await request(app).post('/api/v1/auth/register').send({
+      email: 'verifytest@careerpilot.io',
+      password: 'Password123!',
+      name: 'Verify User'
+    });
+
+    const res = await request(app)
+      .post('/api/v1/auth/verify-email')
+      .send({ email: 'verifytest@careerpilot.io' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.isEmailVerified).toBe(true);
+
+    const user = await User.findOne({ email: 'verifytest@careerpilot.io' });
+    expect(user.isEmailVerified).toBe(true);
+  });
+});
+
 describe('Rate Limiting Protection', () => {
   test('Blocks more than 10 attempts from same IP within 15 mins (HTTP 429)', async () => {
     for (let i = 0; i < 10; i++) {
