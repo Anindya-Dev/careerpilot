@@ -24,6 +24,7 @@ import {
   GitBranch
 } from 'lucide-react';
 import Button from '../components/Button';
+import AuthModal from '../components/AuthModal';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -41,6 +42,9 @@ export default function LandingPage() {
   const [displayText, setDisplayText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [activeTab, setActiveTab] = useState('skills');
+
+  // Pop-up modal state (blurred background)
+  const [authModal, setAuthModal] = useState({ isOpen: false, mode: 'login' });
 
   useEffect(() => {
     const currentFullText = roles[roleIndex];
@@ -81,8 +85,14 @@ export default function LandingPage() {
       <div className="absolute -top-32 -left-40 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none -z-0" />
       <div className="absolute top-1/2 -right-40 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl pointer-events-none -z-0" />
 
-      {/* Top Navigation Bar */}
-      <header className="relative z-20 border-b border-slate-800/80 backdrop-blur-md bg-slate-900/60 sticky top-0">
+      {/* Main Content Wrapper (Smoothly blurs when AuthModal is active) */}
+      <div
+        className={`flex-1 flex flex-col transition-all duration-300 ${
+          authModal.isOpen ? 'filter blur-[5px] scale-[0.99] pointer-events-none select-none' : ''
+        }`}
+      >
+        {/* Top Navigation Bar */}
+        <header className="relative z-20 border-b border-slate-800/80 backdrop-blur-md bg-slate-900/60 sticky top-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* Brand Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
@@ -107,16 +117,15 @@ export default function LandingPage() {
               <span>Multi-Agent Swarm Online</span>
             </div>
 
-            <Link to="/login">
-              <Button
-                variant="primary"
-                size="md"
-                className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-lg shadow-indigo-600/30 px-5 py-2.5 rounded-xl border border-indigo-400/30"
-              >
-                <LogIn className="w-4 h-4 mr-2" />
-                Student Login
-              </Button>
-            </Link>
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => setAuthModal({ isOpen: true, mode: 'login' })}
+              className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-lg shadow-indigo-600/30 px-5 py-2.5 rounded-xl border border-indigo-400/30"
+            >
+              <LogIn className="w-4 h-4 mr-2" />
+              Student Login
+            </Button>
           </div>
         </div>
       </header>
@@ -146,27 +155,25 @@ export default function LandingPage() {
             your real-time Career Intelligence Index.
           </p>
 
-          {/* Action CTAs */}
+          {/* Action CTAs (Trigger Pop-up Modal) */}
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/login" className="w-full sm:w-auto">
-              <button
-                type="button"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-base shadow-xl shadow-indigo-600/30 hover:shadow-indigo-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center group"
-              >
-                <span>Student Login</span>
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </Link>
+            <button
+              type="button"
+              onClick={() => setAuthModal({ isOpen: true, mode: 'login' })}
+              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-base shadow-xl shadow-indigo-600/30 hover:shadow-indigo-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center group"
+            >
+              <span>Student Login</span>
+              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+            </button>
 
-            <Link to="/register" className="w-full sm:w-auto">
-              <button
-                type="button"
-                className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 text-slate-200 font-semibold text-base border border-slate-700 hover:border-slate-600 transition-all flex items-center justify-center"
-              >
-                <span>Create Student Profile</span>
-                <ChevronRight className="w-4 h-4 ml-1.5 text-slate-400" />
-              </button>
-            </Link>
+            <button
+              type="button"
+              onClick={() => setAuthModal({ isOpen: true, mode: 'register' })}
+              className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 text-slate-200 font-semibold text-base border border-slate-700 hover:border-slate-600 transition-all flex items-center justify-center"
+            >
+              <span>Create Student Profile</span>
+              <ChevronRight className="w-4 h-4 ml-1.5 text-slate-400" />
+            </button>
           </div>
 
           {/* Key Metrics Strip */}
@@ -296,15 +303,14 @@ export default function LandingPage() {
                     </div>
                   </div>
 
-                  <Link to="/login">
-                    <button
-                      type="button"
-                      className="px-4 py-2 rounded-lg bg-indigo-600/90 hover:bg-indigo-600 text-white text-xs font-semibold transition-colors flex items-center"
-                    >
-                      <span>View Your Score</span>
-                      <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
-                    </button>
-                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setAuthModal({ isOpen: true, mode: 'login' })}
+                    className="px-4 py-2 rounded-lg bg-indigo-600/90 hover:bg-indigo-600 text-white text-xs font-semibold transition-colors flex items-center"
+                  >
+                    <span>View Your Score</span>
+                    <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                  </button>
                 </div>
               )}
 
@@ -341,6 +347,14 @@ export default function LandingPage() {
         <p>CareerPilot • Multi-Agent AI Career Intelligence Platform • B.Tech Final Year Engineering Project</p>
         <p className="mt-1 text-slate-600">Built by Md Hussain Ansari (Member 1), Anindya, Arik & Sargam</p>
       </footer>
+      </div>
+
+      {/* Pop-up Authentication & Registration Modal with Deep Blurred Background */}
+      <AuthModal
+        isOpen={authModal.isOpen}
+        initialMode={authModal.mode}
+        onClose={() => setAuthModal((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }
