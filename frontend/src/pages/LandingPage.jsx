@@ -165,26 +165,6 @@ export default function LandingPage() {
                 <ChevronRight className="w-4 h-4 ml-1.5 text-slate-400" />
               </button>
             </div>
-
-            {/* Key Metrics Strip */}
-            <div className="pt-10 grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-slate-800/80 max-w-2xl mx-auto text-left">
-              <div className="p-3">
-                <div className="text-2xl font-bold text-white">7 Agents</div>
-                <div className="text-xs text-slate-400 font-medium">LangGraph DAG</div>
-              </div>
-              <div className="p-3">
-                <div className="text-2xl font-bold text-indigo-400">Neo4j</div>
-                <div className="text-xs text-slate-400 font-medium">Knowledge Graph</div>
-              </div>
-              <div className="p-3">
-                <div className="text-2xl font-bold text-purple-400">12-Round</div>
-                <div className="text-xs text-slate-400 font-medium">Bcrypt Security</div>
-              </div>
-              <div className="p-3">
-                <div className="text-2xl font-bold text-emerald-400">Live ROI</div>
-                <div className="text-xs text-slate-400 font-medium">Skill Intelligence</div>
-              </div>
-            </div>
           </div>
         </main>
 
