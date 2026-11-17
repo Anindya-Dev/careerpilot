@@ -28,7 +28,7 @@ import Button from '../components/Button';
 export default function LandingPage() {
   const navigate = useNavigate();
 
-  // Dynamic cycling target roles
+  // Dynamic cycling target roles with typewriter animation
   const roles = [
     'AI & Machine Learning Engineers',
     'Full-Stack Cloud Architects',
@@ -37,15 +37,42 @@ export default function LandingPage() {
     'Autonomous Systems Developers'
   ];
 
-  const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
+  const [roleIndex, setRoleIndex] = useState(0);
+  const [displayText, setDisplayText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
   const [activeTab, setActiveTab] = useState('skills');
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentRoleIndex((prev) => (prev + 1) % roles.length);
-    }, 2800);
-    return () => clearInterval(interval);
-  }, [roles.length]);
+    const currentFullText = roles[roleIndex];
+    let timer;
+
+    if (!isDeleting) {
+      // Typing forward
+      if (displayText.length < currentFullText.length) {
+        timer = setTimeout(() => {
+          setDisplayText(currentFullText.slice(0, displayText.length + 1));
+        }, 65); // Natural typing rhythm
+      } else {
+        // Finished typing word, hold on screen for readability
+        timer = setTimeout(() => {
+          setIsDeleting(true);
+        }, 2000);
+      }
+    } else {
+      // Deleting backward
+      if (displayText.length > 0) {
+        timer = setTimeout(() => {
+          setDisplayText(currentFullText.slice(0, displayText.length - 1));
+        }, 35); // Snappy delete rhythm
+      } else {
+        // Finished deleting, switch to next role
+        setIsDeleting(false);
+        setRoleIndex((prev) => (prev + 1) % roles.length);
+      }
+    }
+
+    return () => clearTimeout(timer);
+  }, [displayText, isDeleting, roleIndex, roles]);
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white relative overflow-hidden">
@@ -106,8 +133,9 @@ export default function LandingPage() {
           {/* Dynamic Headline */}
           <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight">
             Autonomous AI Career Intelligence for{' '}
-            <span className="block mt-2 bg-gradient-to-r from-indigo-400 via-purple-300 to-indigo-200 bg-clip-text text-transparent transition-all duration-300 min-h-[1.3em]">
-              {roles[currentRoleIndex]}
+            <span className="block mt-2 bg-gradient-to-r from-indigo-400 via-purple-300 to-indigo-200 bg-clip-text text-transparent min-h-[1.3em]">
+              <span>{displayText}</span>
+              <span className="inline-block w-[3px] h-[0.85em] ml-1.5 bg-indigo-400 align-middle animate-pulse rounded-full" />
             </span>
           </h1>
 
