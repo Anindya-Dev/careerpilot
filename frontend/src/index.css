@@ -4,12 +4,12 @@
 
 @layer base {
   body {
-    @apply antialiased text-slate-900 bg-slate-50 selection:bg-indigo-500 selection:text-white;
+    @apply antialiased text-slate-100 bg-[#07090e] selection:bg-cyan-500 selection:text-black;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }
 
-/* Subtle architectural dot grid */
+/* Hallmark architectural coordinate grid */
 .tech-grid {
   background-image: 
     linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),

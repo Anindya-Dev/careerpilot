@@ -1,6 +1,7 @@
 /**
  * @file Card.jsx
- * @description Flexible container card component for dashboard panels and widgets.
+ * @description Hallmark architectural card component for dashboard panels and telemetry widgets.
+ * Features high-contrast dark surfaces, precision border outlines, and crisp typography.
  * @author Md Hussain Ansari (Member 1)
  */
 
@@ -15,12 +16,20 @@ export default function Card({
   bodyClassName = 'p-6'
 }) {
   return (
-    <div className={`bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden ${className}`}>
+    <div
+      className={`bg-[#0d111a] border border-slate-800/90 rounded-xl shadow-lg overflow-hidden text-slate-100 ${className}`}
+    >
       {(title || subtitle || actions) && (
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-slate-800/80 flex items-center justify-between">
           <div>
-            {title && <h3 className="text-base font-semibold text-slate-800">{title}</h3>}
-            {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
+            {title && (
+              <h3 className="text-sm font-semibold tracking-tight text-white flex items-center gap-2">
+                {title}
+              </h3>
+            )}
+            {subtitle && (
+              <p className="text-[11px] font-mono text-slate-400 mt-0.5">{subtitle}</p>
+            )}
           </div>
           {actions && <div className="flex items-center space-x-2">{actions}</div>}
         </div>

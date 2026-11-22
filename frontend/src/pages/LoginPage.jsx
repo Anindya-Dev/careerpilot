@@ -1,17 +1,15 @@
 /**
  * @file LoginPage.jsx
- * @description Authentication login view featuring client-side validation, error handling banner,
- * and seamless redirect to dashboard upon successful session establishment.
+ * @description Hallmark-crafted authentication login view featuring client-side validation,
+ * error handling banner, architectural dark aesthetic, and seamless redirect to dashboard.
  * @author Md Hussain Ansari (Member 1)
  */
 
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import Input from '../components/Input';
-import Button from '../components/Button';
 import Alert from '../components/Alert';
-import { Compass, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Compass, ArrowRight, ShieldCheck, Terminal } from 'lucide-react';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -59,84 +57,100 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="inline-flex w-14 h-14 rounded-2xl bg-indigo-600 items-center justify-center text-white shadow-lg shadow-indigo-100 mb-4">
-          <Compass className="w-8 h-8" />
+    <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
+      <div className="absolute inset-0 tech-grid pointer-events-none opacity-60" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-slate-800/20 blur-[130px] rounded-full pointer-events-none" />
+
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center relative z-10">
+        <Link to="/" className="inline-flex items-center justify-center space-x-2.5 mb-5 group">
+          <div className="w-10 h-10 rounded-lg bg-white text-slate-950 flex items-center justify-center font-bold shadow-sm transition-transform duration-150 group-hover:scale-105">
+            <Compass className="w-5 h-5 text-slate-950 stroke-[2.2]" />
+          </div>
+        </Link>
+        <div className="inline-flex items-center space-x-2 px-2.5 py-1 rounded-md border border-slate-800 bg-slate-900/90 text-[11px] font-mono text-cyan-400 mb-2">
+          <Terminal className="w-3.5 h-3.5 text-cyan-400" />
+          <span>AUTH_GATEWAY :: SECURE_SESSION</span>
         </div>
-        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-          Welcome back to CareerPilot
+        <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          Sign In to CareerPilot
         </h2>
-        <p className="mt-2 text-sm text-slate-600">
-          Multi-Agent AI Career Intelligence & Roadmap Architecture
+        <p className="mt-1 text-xs text-slate-400 font-mono">
+          Multi-Agent Career Intelligence & Knowledge Graph
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-xl shadow-slate-200/50 rounded-2xl border border-slate-200/60 sm:px-10">
+      <div className="mt-7 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+        <div className="bg-[#0d111a] py-7 px-6 sm:px-8 rounded-xl border border-slate-800 shadow-2xl text-slate-100">
           {serverError && (
             <Alert
               type="error"
               message={serverError}
-              className="mb-6"
+              className="mb-5"
               onClose={() => setServerError('')}
             />
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <Input
-              label="Student Email Address"
-              name="email"
-              type="email"
-              autoComplete="email"
-              placeholder="e.g. hussain@engineering.edu"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (errors.email) setErrors({ ...errors, email: '' });
-              }}
-              error={errors.email}
-              required
-            />
-
-            <Input
-              label="Password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              placeholder="Min. 8 characters"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (errors.password) setErrors({ ...errors, password: '' });
-              }}
-              error={errors.password}
-              required
-            />
-
-            <div className="flex items-center justify-between text-xs">
-              <span className="flex items-center text-slate-500">
-                <ShieldCheck className="w-4 h-4 text-emerald-500 mr-1" />
-                12-round bcrypt encrypted
-              </span>
-              <span className="text-slate-400">Phase 1 Secure Auth</span>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1.5">
+                Student Email Address
+              </label>
+              <input
+                type="email"
+                autoComplete="email"
+                placeholder="e.g. hussain@engineering.edu"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (errors.email) setErrors({ ...errors, email: '' });
+                }}
+                className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                required
+              />
+              {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
             </div>
 
-            <Button
+            <div>
+              <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1.5">
+                Password
+              </label>
+              <input
+                type="password"
+                autoComplete="current-password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (errors.password) setErrors({ ...errors, password: '' });
+                }}
+                className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                required
+              />
+              {errors.password && <p className="mt-1 text-xs text-red-400">{errors.password}</p>}
+            </div>
+
+            <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 pt-1">
+              <span className="flex items-center text-slate-400">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 mr-1" />
+                12-ROUND BCRYPT
+              </span>
+              <span className="text-slate-400">PHASE 1 TOKEN ROTATION</span>
+            </div>
+
+            <button
               type="submit"
-              variant="primary"
-              className="w-full py-2.5 text-base"
-              isLoading={isSubmitting}
+              disabled={isSubmitting}
+              className="w-full py-2.5 mt-2 rounded-lg bg-white text-slate-950 hover:bg-slate-100 font-semibold text-sm transition-colors duration-150 flex items-center justify-center active:scale-[0.99] disabled:opacity-50"
             >
-              Sign In to Dashboard
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+              {isSubmitting ? 'Authenticating...' : 'Sign In to Dashboard'}
+              <ArrowRight className="w-4 h-4 ml-1.5 text-slate-800" />
+            </button>
           </form>
 
-          <div className="mt-6 text-center text-xs text-slate-500 border-t border-slate-100 pt-5">
-            Don't have a profile yet?{' '}
-            <Link to="/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
-              Create an account
+          <div className="mt-6 text-center text-xs font-mono text-slate-500 border-t border-slate-800/80 pt-4">
+            Need an account?{' '}
+            <Link to="/register" className="text-cyan-400 hover:text-cyan-300 transition-colors">
+              Create student profile &rarr;
             </Link>
           </div>
         </div>

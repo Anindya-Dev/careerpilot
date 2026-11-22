@@ -1,6 +1,7 @@
 /**
  * @file Button.jsx
- * @description Atomic button component supporting primary, secondary, outline, and danger variants.
+ * @description Hallmark atomic button component supporting tactile primary, secondary,
+ * outline, and danger variants.
  * @author Md Hussain Ansari (Member 1)
  */
 
@@ -18,19 +19,19 @@ export default function Button({
   ...props
 }) {
   const baseClasses =
-    'inline-flex items-center justify-center font-medium transition-colors duration-150 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+    'inline-flex items-center justify-center font-semibold transition-colors duration-150 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]';
 
   const sizeClasses = {
     sm: 'px-3 py-1.5 text-xs',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-5 py-2.5 text-base'
+    md: 'px-4 py-2 text-xs sm:text-sm',
+    lg: 'px-5 py-2.5 text-sm sm:text-base'
   };
 
   const variantClasses = {
-    primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500 shadow-sm',
-    secondary: 'bg-slate-100 text-slate-800 hover:bg-slate-200 focus:ring-slate-400',
-    outline: 'border border-slate-300 bg-transparent text-slate-700 hover:bg-slate-50 focus:ring-indigo-500',
-    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-sm'
+    primary: 'bg-white text-slate-950 hover:bg-slate-100 shadow-sm',
+    secondary: 'border border-slate-700 bg-slate-900/80 text-slate-200 hover:bg-slate-800 hover:text-white',
+    outline: 'border border-slate-800 bg-transparent text-slate-300 hover:bg-slate-900 hover:text-white',
+    danger: 'bg-red-600 text-white hover:bg-red-500 shadow-sm'
   };
 
   return (
@@ -43,7 +44,7 @@ export default function Button({
     >
       {isLoading && (
         <svg
-          className="animate-spin -ml-1 mr-2 h-4 w-4 text-current"
+          className="animate-spin -ml-1 mr-2 h-3.5 w-3.5 text-current"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
