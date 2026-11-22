@@ -1,7 +1,8 @@
 /**
  * @file AuthModal.jsx
- * @description Blurred backdrop pop-up modal for student authentication and registration on the Landing Page.
- * Allows instant tab switching between Login and Register with live validation.
+ * @description Hallmark-styled pop-up modal for student authentication and registration.
+ * High-contrast dark engineering aesthetics with blurred background, clear typography,
+ * and seamless mode toggling.
  * @author Md Hussain Ansari (Member 1)
  */
 
@@ -11,7 +12,7 @@ import { useAuth } from '../context/AuthContext';
 import Input from './Input';
 import Button from './Button';
 import Alert from './Alert';
-import { Compass, X, ArrowRight, UserPlus, ShieldCheck } from 'lucide-react';
+import { Compass, X, ArrowRight, UserPlus, ShieldCheck, Terminal } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
   const { login, register } = useAuth();
@@ -19,7 +20,6 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
 
   const [mode, setMode] = useState(initialMode); // 'login' | 'register'
 
-  // Sync mode whenever initialMode changes upon modal open
   useEffect(() => {
     if (isOpen) {
       setMode(initialMode);
@@ -28,7 +28,6 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
     }
   }, [isOpen, initialMode]);
 
-  // Form states
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [regData, setRegData] = useState({
     name: '',
@@ -43,7 +42,6 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
   const [serverError, setServerError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Close on Escape key press
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose();
@@ -60,7 +58,6 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
 
   if (!isOpen) return null;
 
-  // Validation
   const validateLogin = () => {
     const errs = {};
     if (!loginData.email.trim()) errs.email = 'Email is required';
@@ -133,40 +130,40 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Blurred Deep Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-950/75 backdrop-blur-md transition-all duration-300"
+        className="fixed inset-0 bg-[#04060a]/80 backdrop-blur-md transition-all duration-200"
         onClick={onClose}
       />
 
       <div className="min-h-screen px-4 text-center flex items-center justify-center py-8">
         {/* Modal Window Card */}
         <div
-          className="relative inline-block w-full max-w-md p-6 sm:p-8 my-8 text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl border border-slate-100 z-10"
+          className="relative inline-block w-full max-w-md p-6 sm:p-7 my-8 text-left align-middle transition-all transform bg-[#0d111a] border border-slate-800 shadow-2xl rounded-xl z-10 text-slate-100"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close Button */}
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-5 right-5 p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            className="absolute top-5 right-5 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
 
           {/* Modal Header */}
-          <div className="flex items-center space-x-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-100">
-              <Compass className="w-5 h-5" />
+          <div className="flex items-center space-x-3 mb-5">
+            <div className="w-8 h-8 rounded-lg bg-white text-slate-950 flex items-center justify-center font-bold shadow-sm">
+              <Compass className="w-4 h-4 text-slate-950 stroke-[2.2]" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-slate-900 tracking-tight">
+              <h3 className="text-base font-semibold text-white tracking-tight">
                 {mode === 'login' ? 'Student Sign In' : 'Create Student Profile'}
               </h3>
-              <p className="text-xs text-slate-500">CareerPilot AI Intelligence Platform</p>
+              <p className="text-[11px] font-mono text-slate-400">AUTH::ACCESS_GATEWAY</p>
             </div>
           </div>
 
-          {/* Switcher Tabs */}
-          <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-xl mb-6 text-xs font-semibold">
+          {/* Segmented Switcher Tabs */}
+          <div className="grid grid-cols-2 p-1 bg-slate-900 border border-slate-800 rounded-lg mb-5 text-xs font-mono">
             <button
               type="button"
               onClick={() => {
@@ -174,13 +171,13 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                 setServerError('');
                 setErrors({});
               }}
-              className={`py-2 rounded-lg transition-all ${
+              className={`py-1.5 rounded transition-colors ${
                 mode === 'login'
-                  ? 'bg-white text-indigo-700 shadow-sm font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-slate-800 text-white font-medium shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              Sign In
+              SIGN_IN
             </button>
             <button
               type="button"
@@ -189,13 +186,13 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                 setServerError('');
                 setErrors({});
               }}
-              className={`py-2 rounded-lg transition-all ${
+              className={`py-1.5 rounded transition-colors ${
                 mode === 'register'
-                  ? 'bg-white text-indigo-700 shadow-sm font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-slate-800 text-white font-medium shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              New Registration
+              REGISTER
             </button>
           </div>
 
@@ -203,7 +200,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
             <Alert
               type="error"
               message={serverError}
-              className="mb-5"
+              className="mb-4"
               onClose={() => setServerError('')}
             />
           )}
@@ -211,32 +208,40 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
           {/* LOGIN FORM */}
           {mode === 'login' && (
             <form onSubmit={handleLoginSubmit} className="space-y-4">
-              <Input
-                label="Student Email Address"
-                name="email"
-                type="email"
-                placeholder="e.g. student@careerpilot.io"
-                value={loginData.email}
-                onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                error={errors.email}
-                required
-              />
+              <div>
+                <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1.5">
+                  Student Email
+                </label>
+                <input
+                  type="email"
+                  placeholder="student@careerpilot.io"
+                  value={loginData.email}
+                  onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                  className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                  required
+                />
+                {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
+              </div>
 
-              <Input
-                label="Password"
-                name="password"
-                type="password"
-                placeholder="Min. 8 characters"
-                value={loginData.password}
-                onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                error={errors.password}
-                required
-              />
+              <div>
+                <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1.5">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={loginData.password}
+                  onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                  className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                  required
+                />
+                {errors.password && <p className="mt-1 text-xs text-red-400">{errors.password}</p>}
+              </div>
 
-              <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
-                <span className="flex items-center">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 mr-1" />
-                  12-round bcrypt secure
+              <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 pt-1">
+                <span className="flex items-center text-slate-400">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 mr-1" />
+                  12-ROUND BCRYPT
                 </span>
                 <button
                   type="button"
@@ -244,56 +249,64 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                     setMode('register');
                     setServerError('');
                   }}
-                  className="text-indigo-600 hover:text-indigo-500 font-semibold"
+                  className="text-cyan-400 hover:text-cyan-300 transition-colors"
                 >
-                  Need an account?
+                  Create account &rarr;
                 </button>
               </div>
 
-              <Button
+              <button
                 type="submit"
-                variant="primary"
-                className="w-full py-2.5 text-base mt-2 shadow-lg shadow-indigo-100"
-                isLoading={isSubmitting}
+                disabled={isSubmitting}
+                className="w-full py-2.5 mt-2 rounded-lg bg-white text-slate-950 hover:bg-slate-100 font-semibold text-sm transition-colors duration-150 flex items-center justify-center active:scale-[0.99] disabled:opacity-50"
               >
-                Sign In to Dashboard
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
+                {isSubmitting ? 'Authenticating...' : 'Sign In to Dashboard'}
+                <ArrowRight className="w-4 h-4 ml-1.5 text-slate-800" />
+              </button>
             </form>
           )}
 
           {/* REGISTER FORM */}
           {mode === 'register' && (
             <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
-              <Input
-                label="Full Name"
-                name="name"
-                placeholder="e.g. Md Hussain Ansari"
-                value={regData.name}
-                onChange={(e) => setRegData({ ...regData, name: e.target.value })}
-                error={errors.name}
-                required
-              />
-
-              <Input
-                label="Student Email"
-                name="email"
-                type="email"
-                placeholder="e.g. hussain@engineering.edu"
-                value={regData.email}
-                onChange={(e) => setRegData({ ...regData, email: e.target.value })}
-                error={errors.email}
-                required
-              />
+              <div>
+                <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Md Hussain Ansari"
+                  value={regData.name}
+                  onChange={(e) => setRegData({ ...regData, name: e.target.value })}
+                  className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                  required
+                />
+                {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name}</p>}
+              </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1">
+                  Student Email
+                </label>
+                <input
+                  type="email"
+                  placeholder="hussain@engineering.edu"
+                  value={regData.email}
+                  onChange={(e) => setRegData({ ...regData, email: e.target.value })}
+                  className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                  required
+                />
+                {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1">
                   Discipline / Major
                 </label>
                 <select
                   value={regData.major}
                   onChange={(e) => setRegData({ ...regData, major: e.target.value })}
-                  className="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition-colors"
                 >
                   <option value="Computer Science & Engineering">Computer Science & Engineering</option>
                   <option value="Information Technology">Information Technology</option>
@@ -303,37 +316,44 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                 </select>
               </div>
 
-              <Input
-                label="Password"
-                name="password"
-                type="password"
-                placeholder="Min. 8 characters"
-                value={regData.password}
-                onChange={(e) => setRegData({ ...regData, password: e.target.value })}
-                error={errors.password}
-                required
-              />
+              <div>
+                <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1">
+                  Password (Min 8 Chars)
+                </label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={regData.password}
+                  onChange={(e) => setRegData({ ...regData, password: e.target.value })}
+                  className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                  required
+                />
+                {errors.password && <p className="mt-1 text-xs text-red-400">{errors.password}</p>}
+              </div>
 
-              <Input
-                label="Confirm Password"
-                name="confirmPassword"
-                type="password"
-                placeholder="Re-enter password"
-                value={regData.confirmPassword}
-                onChange={(e) => setRegData({ ...regData, confirmPassword: e.target.value })}
-                error={errors.confirmPassword}
-                required
-              />
+              <div>
+                <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1">
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={regData.confirmPassword}
+                  onChange={(e) => setRegData({ ...regData, confirmPassword: e.target.value })}
+                  className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                  required
+                />
+                {errors.confirmPassword && <p className="mt-1 text-xs text-red-400">{errors.confirmPassword}</p>}
+              </div>
 
-              <Button
+              <button
                 type="submit"
-                variant="primary"
-                className="w-full py-2.5 text-base mt-2 shadow-lg shadow-indigo-100"
-                isLoading={isSubmitting}
+                disabled={isSubmitting}
+                className="w-full py-2.5 mt-2 rounded-lg bg-white text-slate-950 hover:bg-slate-100 font-semibold text-sm transition-colors duration-150 flex items-center justify-center active:scale-[0.99] disabled:opacity-50"
               >
-                <UserPlus className="w-4 h-4 mr-2" />
-                Complete Registration
-              </Button>
+                <UserPlus className="w-4 h-4 mr-1.5 text-slate-800" />
+                {isSubmitting ? 'Creating Profile...' : 'Complete Registration'}
+              </button>
             </form>
           )}
         </div>
