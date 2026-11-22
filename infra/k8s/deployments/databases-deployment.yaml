@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: careerpilot-mongodb
+  namespace: careerpilot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: careerpilot-mongodb
+  template:
+    metadata:
+      labels:
+        app: careerpilot-mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:7.0
+          ports:
+            - containerPort: 27017
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: careerpilot-secrets
+                  key: MONGO_ROOT_USER
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: careerpilot-secrets
+                  key: MONGO_ROOT_PASSWORD
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1024Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: careerpilot-redis
+  namespace: careerpilot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: careerpilot-redis
+  template:
+    metadata:
+      labels:
+        app: careerpilot-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7.2-alpine
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: careerpilot-neo4j
+  namespace: careerpilot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: careerpilot-neo4j
+  template:
+    metadata:
+      labels:
+        app: careerpilot-neo4j
+    spec:
+      containers:
+        - name: neo4j
+          image: neo4j:5.20-community
+          ports:
+            - containerPort: 7474
+            - containerPort: 7687
+          env:
+            - name: NEO4J_AUTH
+              value: "neo4j/changeme"
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1536Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: careerpilot-chromadb
+  namespace: careerpilot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: careerpilot-chromadb
+  template:
+    metadata:
+      labels:
+        app: careerpilot-chromadb
+    spec:
+      containers:
+        - name: chromadb
+          image: chromadb/chroma:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: IS_PERSISTENT
+              value: "TRUE"
+            - name: ANONYMIZED_TELEMETRY
+              value: "FALSE"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1024Mi
