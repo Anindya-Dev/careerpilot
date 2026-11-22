@@ -1,0 +1,2292 @@
+[
+  {
+    "id": "job-001",
+    "title": "Senior AI Platform Engineer",
+    "target_role": "AI Engineer",
+    "domain": "Artificial Intelligence & Machine Learning",
+    "company": "OpenScale Technologies",
+    "location": "Austin, TX",
+    "remote_status": "On-site",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 130000,
+      "max": 185000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "PyTorch",
+      "LangChain",
+      "LangGraph",
+      "Transformers",
+      "FastAPI"
+    ],
+    "preferred_skills": [
+      "Docker",
+      "Vector Databases",
+      "RAG Architecture",
+      "Fine-tuning"
+    ],
+    "yoy_demand_growth": "+46%",
+    "description": "OpenScale Technologies is hiring a Senior AI Platform Engineer (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and PyTorch.",
+    "posted_date": "2026-11-02T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-002",
+    "title": "Senior AI Platform Engineer",
+    "target_role": "AI Engineer",
+    "domain": "Artificial Intelligence & Machine Learning",
+    "company": "Anthropic Labs Partner",
+    "location": "London, UK",
+    "remote_status": "Hybrid",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 130000,
+      "max": 185000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "PyTorch",
+      "LangChain",
+      "LangGraph",
+      "Transformers",
+      "FastAPI"
+    ],
+    "preferred_skills": [
+      "Docker",
+      "Vector Databases",
+      "RAG Architecture",
+      "Fine-tuning"
+    ],
+    "yoy_demand_growth": "+46%",
+    "description": "Anthropic Labs Partner is hiring a Senior AI Platform Engineer (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and PyTorch.",
+    "posted_date": "2026-11-03T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-003",
+    "title": "Lead LLM Application Engineer",
+    "target_role": "AI Engineer",
+    "domain": "Artificial Intelligence & Machine Learning",
+    "company": "OpenScale Technologies",
+    "location": "San Francisco, CA",
+    "remote_status": "On-site",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 145000,
+      "max": 210000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "PyTorch",
+      "LangChain",
+      "LangGraph",
+      "Transformers",
+      "FastAPI"
+    ],
+    "preferred_skills": [
+      "Docker",
+      "Vector Databases",
+      "RAG Architecture",
+      "Fine-tuning"
+    ],
+    "yoy_demand_growth": "+46%",
+    "description": "OpenScale Technologies is hiring a Lead LLM Application Engineer (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and PyTorch.",
+    "posted_date": "2026-11-04T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-004",
+    "title": "Lead LLM Application Engineer",
+    "target_role": "AI Engineer",
+    "domain": "Artificial Intelligence & Machine Learning",
+    "company": "Anthropic Labs Partner",
+    "location": "Seattle, WA",
+    "remote_status": "Hybrid",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 145000,
+      "max": 210000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "PyTorch",
+      "LangChain",
+      "LangGraph",
+      "Transformers",
+      "FastAPI"
+    ],
+    "preferred_skills": [
+      "Docker",
+      "Vector Databases",
+      "RAG Architecture",
+      "Fine-tuning"
+    ],
+    "yoy_demand_growth": "+46%",
+    "description": "Anthropic Labs Partner is hiring a Lead LLM Application Engineer (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and PyTorch.",
+    "posted_date": "2026-11-05T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-005",
+    "title": "AI Research & Deployment Engineer",
+    "target_role": "AI Engineer",
+    "domain": "Artificial Intelligence & Machine Learning",
+    "company": "OpenScale Technologies",
+    "location": "Remote, Global",
+    "remote_status": "Remote",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 120000,
+      "max": 170000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "PyTorch",
+      "LangChain",
+      "LangGraph",
+      "Transformers",
+      "FastAPI"
+    ],
+    "preferred_skills": [
+      "Docker",
+      "Vector Databases",
+      "RAG Architecture",
+      "Fine-tuning"
+    ],
+    "yoy_demand_growth": "+46%",
+    "description": "OpenScale Technologies is hiring a AI Research & Deployment Engineer (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and PyTorch.",
+    "posted_date": "2026-11-06T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-006",
+    "title": "AI Research & Deployment Engineer",
+    "target_role": "AI Engineer",
+    "domain": "Artificial Intelligence & Machine Learning",
+    "company": "Anthropic Labs Partner",
+    "location": "New York, NY",
+    "remote_status": "Hybrid",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 120000,
+      "max": 170000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "PyTorch",
+      "LangChain",
+      "LangGraph",
+      "Transformers",
+      "FastAPI"
+    ],
+    "preferred_skills": [
+      "Docker",
+      "Vector Databases",
+      "RAG Architecture",
+      "Fine-tuning"
+    ],
+    "yoy_demand_growth": "+46%",
+    "description": "Anthropic Labs Partner is hiring a AI Research & Deployment Engineer (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and PyTorch.",
+    "posted_date": "2026-11-07T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-007",
+    "title": "Generative AI Solutions Architect",
+    "target_role": "AI Engineer",
+    "domain": "Artificial Intelligence & Machine Learning",
+    "company": "OpenScale Technologies",
+    "location": "Bengaluru, India",
+    "remote_status": "On-site",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 160000,
+      "max": 230000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "PyTorch",
+      "LangChain",
+      "LangGraph",
+      "Transformers",
+      "FastAPI"
+    ],
+    "preferred_skills": [
+      "Docker",
+      "Vector Databases",
+      "RAG Architecture",
+      "Fine-tuning"
+    ],
+    "yoy_demand_growth": "+46%",
+    "description": "OpenScale Technologies is hiring a Generative AI Solutions Architect (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and PyTorch.",
+    "posted_date": "2026-11-08T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-008",
+    "title": "Generative AI Solutions Architect",
+    "target_role": "AI Engineer",
+    "domain": "Artificial Intelligence & Machine Learning",
+    "company": "Anthropic Labs Partner",
+    "location": "Remote, US",
+    "remote_status": "Remote",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 160000,
+      "max": 230000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "PyTorch",
+      "LangChain",
+      "LangGraph",
+      "Transformers",
+      "FastAPI"
+    ],
+    "preferred_skills": [
+      "Docker",
+      "Vector Databases",
+      "RAG Architecture",
+      "Fine-tuning"
+    ],
+    "yoy_demand_growth": "+46%",
+    "description": "Anthropic Labs Partner is hiring a Generative AI Solutions Architect (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and PyTorch.",
+    "posted_date": "2026-11-09T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-009",
+    "title": "Machine Learning Infrastructure Engineer",
+    "target_role": "AI Engineer",
+    "domain": "Artificial Intelligence & Machine Learning",
+    "company": "OpenScale Technologies",
+    "location": "Austin, TX",
+    "remote_status": "On-site",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 135000,
+      "max": 195000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "PyTorch",
+      "LangChain",
+      "LangGraph",
+      "Transformers",
+      "FastAPI"
+    ],
+    "preferred_skills": [
+      "Docker",
+      "Vector Databases",
+      "RAG Architecture",
+      "Fine-tuning"
+    ],
+    "yoy_demand_growth": "+46%",
+    "description": "OpenScale Technologies is hiring a Machine Learning Infrastructure Engineer (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and PyTorch.",
+    "posted_date": "2026-11-10T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-010",
+    "title": "Machine Learning Infrastructure Engineer",
+    "target_role": "AI Engineer",
+    "domain": "Artificial Intelligence & Machine Learning",
+    "company": "Anthropic Labs Partner",
+    "location": "London, UK",
+    "remote_status": "Hybrid",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 135000,
+      "max": 195000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "PyTorch",
+      "LangChain",
+      "LangGraph",
+      "Transformers",
+      "FastAPI"
+    ],
+    "preferred_skills": [
+      "Docker",
+      "Vector Databases",
+      "RAG Architecture",
+      "Fine-tuning"
+    ],
+    "yoy_demand_growth": "+46%",
+    "description": "Anthropic Labs Partner is hiring a Machine Learning Infrastructure Engineer (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and PyTorch.",
+    "posted_date": "2026-11-11T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-011",
+    "title": "Full Stack React/Node Engineer",
+    "target_role": "Full Stack Developer",
+    "domain": "Web & Cloud Applications",
+    "company": "Vercel Ecosystems",
+    "location": "San Francisco, CA",
+    "remote_status": "On-site",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 110000,
+      "max": 155000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "TypeScript",
+      "React",
+      "Node.js",
+      "Next.js",
+      "PostgreSQL",
+      "Tailwind CSS"
+    ],
+    "preferred_skills": [
+      "GraphQL",
+      "REST APIs",
+      "Docker",
+      "Redis"
+    ],
+    "yoy_demand_growth": "+24%",
+    "description": "Vercel Ecosystems is hiring a Full Stack React/Node Engineer (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in TypeScript and React.",
+    "posted_date": "2026-11-12T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-012",
+    "title": "Full Stack React/Node Engineer",
+    "target_role": "Full Stack Developer",
+    "domain": "Web & Cloud Applications",
+    "company": "Stripe Developer Partner",
+    "location": "Seattle, WA",
+    "remote_status": "Hybrid",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 110000,
+      "max": 155000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "TypeScript",
+      "React",
+      "Node.js",
+      "Next.js",
+      "PostgreSQL",
+      "Tailwind CSS"
+    ],
+    "preferred_skills": [
+      "GraphQL",
+      "REST APIs",
+      "Docker",
+      "Redis"
+    ],
+    "yoy_demand_growth": "+24%",
+    "description": "Stripe Developer Partner is hiring a Full Stack React/Node Engineer (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in TypeScript and React.",
+    "posted_date": "2026-11-13T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-013",
+    "title": "Senior Full Stack Product Engineer",
+    "target_role": "Full Stack Developer",
+    "domain": "Web & Cloud Applications",
+    "company": "Vercel Ecosystems",
+    "location": "Remote, Global",
+    "remote_status": "Remote",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 125000,
+      "max": 175000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "TypeScript",
+      "React",
+      "Node.js",
+      "Next.js",
+      "PostgreSQL",
+      "Tailwind CSS"
+    ],
+    "preferred_skills": [
+      "GraphQL",
+      "REST APIs",
+      "Docker",
+      "Redis"
+    ],
+    "yoy_demand_growth": "+24%",
+    "description": "Vercel Ecosystems is hiring a Senior Full Stack Product Engineer (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in TypeScript and React.",
+    "posted_date": "2026-11-14T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-014",
+    "title": "Senior Full Stack Product Engineer",
+    "target_role": "Full Stack Developer",
+    "domain": "Web & Cloud Applications",
+    "company": "Stripe Developer Partner",
+    "location": "New York, NY",
+    "remote_status": "Hybrid",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 125000,
+      "max": 175000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "TypeScript",
+      "React",
+      "Node.js",
+      "Next.js",
+      "PostgreSQL",
+      "Tailwind CSS"
+    ],
+    "preferred_skills": [
+      "GraphQL",
+      "REST APIs",
+      "Docker",
+      "Redis"
+    ],
+    "yoy_demand_growth": "+24%",
+    "description": "Stripe Developer Partner is hiring a Senior Full Stack Product Engineer (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in TypeScript and React.",
+    "posted_date": "2026-11-15T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-015",
+    "title": "Frontend-Heavy Full Stack Architect",
+    "target_role": "Full Stack Developer",
+    "domain": "Web & Cloud Applications",
+    "company": "Vercel Ecosystems",
+    "location": "Bengaluru, India",
+    "remote_status": "On-site",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 105000,
+      "max": 150000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "TypeScript",
+      "React",
+      "Node.js",
+      "Next.js",
+      "PostgreSQL",
+      "Tailwind CSS"
+    ],
+    "preferred_skills": [
+      "GraphQL",
+      "REST APIs",
+      "Docker",
+      "Redis"
+    ],
+    "yoy_demand_growth": "+24%",
+    "description": "Vercel Ecosystems is hiring a Frontend-Heavy Full Stack Architect (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in TypeScript and React.",
+    "posted_date": "2026-11-16T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-016",
+    "title": "Frontend-Heavy Full Stack Architect",
+    "target_role": "Full Stack Developer",
+    "domain": "Web & Cloud Applications",
+    "company": "Stripe Developer Partner",
+    "location": "Remote, US",
+    "remote_status": "Remote",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 105000,
+      "max": 150000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "TypeScript",
+      "React",
+      "Node.js",
+      "Next.js",
+      "PostgreSQL",
+      "Tailwind CSS"
+    ],
+    "preferred_skills": [
+      "GraphQL",
+      "REST APIs",
+      "Docker",
+      "Redis"
+    ],
+    "yoy_demand_growth": "+24%",
+    "description": "Stripe Developer Partner is hiring a Frontend-Heavy Full Stack Architect (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in TypeScript and React.",
+    "posted_date": "2026-11-17T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-017",
+    "title": "Full Stack TypeScript Developer",
+    "target_role": "Full Stack Developer",
+    "domain": "Web & Cloud Applications",
+    "company": "Vercel Ecosystems",
+    "location": "Austin, TX",
+    "remote_status": "On-site",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 135000,
+      "max": 190000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "TypeScript",
+      "React",
+      "Node.js",
+      "Next.js",
+      "PostgreSQL",
+      "Tailwind CSS"
+    ],
+    "preferred_skills": [
+      "GraphQL",
+      "REST APIs",
+      "Docker",
+      "Redis"
+    ],
+    "yoy_demand_growth": "+24%",
+    "description": "Vercel Ecosystems is hiring a Full Stack TypeScript Developer (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in TypeScript and React.",
+    "posted_date": "2026-11-18T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-018",
+    "title": "Full Stack TypeScript Developer",
+    "target_role": "Full Stack Developer",
+    "domain": "Web & Cloud Applications",
+    "company": "Stripe Developer Partner",
+    "location": "London, UK",
+    "remote_status": "Hybrid",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 135000,
+      "max": 190000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "TypeScript",
+      "React",
+      "Node.js",
+      "Next.js",
+      "PostgreSQL",
+      "Tailwind CSS"
+    ],
+    "preferred_skills": [
+      "GraphQL",
+      "REST APIs",
+      "Docker",
+      "Redis"
+    ],
+    "yoy_demand_growth": "+24%",
+    "description": "Stripe Developer Partner is hiring a Full Stack TypeScript Developer (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in TypeScript and React.",
+    "posted_date": "2026-11-19T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-019",
+    "title": "Cloud Application Full Stack Engineer",
+    "target_role": "Full Stack Developer",
+    "domain": "Web & Cloud Applications",
+    "company": "Vercel Ecosystems",
+    "location": "San Francisco, CA",
+    "remote_status": "On-site",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 115000,
+      "max": 160000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "TypeScript",
+      "React",
+      "Node.js",
+      "Next.js",
+      "PostgreSQL",
+      "Tailwind CSS"
+    ],
+    "preferred_skills": [
+      "GraphQL",
+      "REST APIs",
+      "Docker",
+      "Redis"
+    ],
+    "yoy_demand_growth": "+24%",
+    "description": "Vercel Ecosystems is hiring a Cloud Application Full Stack Engineer (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in TypeScript and React.",
+    "posted_date": "2026-11-20T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-020",
+    "title": "Cloud Application Full Stack Engineer",
+    "target_role": "Full Stack Developer",
+    "domain": "Web & Cloud Applications",
+    "company": "Stripe Developer Partner",
+    "location": "Seattle, WA",
+    "remote_status": "Hybrid",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 115000,
+      "max": 160000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "TypeScript",
+      "React",
+      "Node.js",
+      "Next.js",
+      "PostgreSQL",
+      "Tailwind CSS"
+    ],
+    "preferred_skills": [
+      "GraphQL",
+      "REST APIs",
+      "Docker",
+      "Redis"
+    ],
+    "yoy_demand_growth": "+24%",
+    "description": "Stripe Developer Partner is hiring a Cloud Application Full Stack Engineer (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in TypeScript and React.",
+    "posted_date": "2026-11-01T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-021",
+    "title": "Senior Data Scientist - Predictive Modeling",
+    "target_role": "Data Scientist",
+    "domain": "Data Science & Analytics",
+    "company": "Snowflake Intelligence",
+    "location": "Remote, Global",
+    "remote_status": "Remote",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 120000,
+      "max": 165000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "SQL",
+      "Scikit-Learn",
+      "Pandas",
+      "Statistics",
+      "PyTorch"
+    ],
+    "preferred_skills": [
+      "Data Visualization",
+      "Hypothesis Testing",
+      "Spark",
+      "Feature Engineering"
+    ],
+    "yoy_demand_growth": "+28%",
+    "description": "Snowflake Intelligence is hiring a Senior Data Scientist - Predictive Modeling (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and SQL.",
+    "posted_date": "2026-11-02T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-022",
+    "title": "Senior Data Scientist - Predictive Modeling",
+    "target_role": "Data Scientist",
+    "domain": "Data Science & Analytics",
+    "company": "Palantir Advanced Analytics",
+    "location": "New York, NY",
+    "remote_status": "Hybrid",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 120000,
+      "max": 165000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "SQL",
+      "Scikit-Learn",
+      "Pandas",
+      "Statistics",
+      "PyTorch"
+    ],
+    "preferred_skills": [
+      "Data Visualization",
+      "Hypothesis Testing",
+      "Spark",
+      "Feature Engineering"
+    ],
+    "yoy_demand_growth": "+28%",
+    "description": "Palantir Advanced Analytics is hiring a Senior Data Scientist - Predictive Modeling (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and SQL.",
+    "posted_date": "2026-11-03T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-023",
+    "title": "Machine Learning Data Scientist",
+    "target_role": "Data Scientist",
+    "domain": "Data Science & Analytics",
+    "company": "Snowflake Intelligence",
+    "location": "Bengaluru, India",
+    "remote_status": "On-site",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 130000,
+      "max": 180000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "SQL",
+      "Scikit-Learn",
+      "Pandas",
+      "Statistics",
+      "PyTorch"
+    ],
+    "preferred_skills": [
+      "Data Visualization",
+      "Hypothesis Testing",
+      "Spark",
+      "Feature Engineering"
+    ],
+    "yoy_demand_growth": "+28%",
+    "description": "Snowflake Intelligence is hiring a Machine Learning Data Scientist (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and SQL.",
+    "posted_date": "2026-11-04T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-024",
+    "title": "Machine Learning Data Scientist",
+    "target_role": "Data Scientist",
+    "domain": "Data Science & Analytics",
+    "company": "Palantir Advanced Analytics",
+    "location": "Remote, US",
+    "remote_status": "Remote",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 130000,
+      "max": 180000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "SQL",
+      "Scikit-Learn",
+      "Pandas",
+      "Statistics",
+      "PyTorch"
+    ],
+    "preferred_skills": [
+      "Data Visualization",
+      "Hypothesis Testing",
+      "Spark",
+      "Feature Engineering"
+    ],
+    "yoy_demand_growth": "+28%",
+    "description": "Palantir Advanced Analytics is hiring a Machine Learning Data Scientist (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and SQL.",
+    "posted_date": "2026-11-05T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-025",
+    "title": "Applied Data Scientist - Causal Inference",
+    "target_role": "Data Scientist",
+    "domain": "Data Science & Analytics",
+    "company": "Snowflake Intelligence",
+    "location": "Austin, TX",
+    "remote_status": "On-site",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 115000,
+      "max": 160000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "SQL",
+      "Scikit-Learn",
+      "Pandas",
+      "Statistics",
+      "PyTorch"
+    ],
+    "preferred_skills": [
+      "Data Visualization",
+      "Hypothesis Testing",
+      "Spark",
+      "Feature Engineering"
+    ],
+    "yoy_demand_growth": "+28%",
+    "description": "Snowflake Intelligence is hiring a Applied Data Scientist - Causal Inference (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and SQL.",
+    "posted_date": "2026-11-06T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-026",
+    "title": "Applied Data Scientist - Causal Inference",
+    "target_role": "Data Scientist",
+    "domain": "Data Science & Analytics",
+    "company": "Palantir Advanced Analytics",
+    "location": "London, UK",
+    "remote_status": "Hybrid",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 115000,
+      "max": 160000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "SQL",
+      "Scikit-Learn",
+      "Pandas",
+      "Statistics",
+      "PyTorch"
+    ],
+    "preferred_skills": [
+      "Data Visualization",
+      "Hypothesis Testing",
+      "Spark",
+      "Feature Engineering"
+    ],
+    "yoy_demand_growth": "+28%",
+    "description": "Palantir Advanced Analytics is hiring a Applied Data Scientist - Causal Inference (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and SQL.",
+    "posted_date": "2026-11-07T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-027",
+    "title": "NLP Data Scientist",
+    "target_role": "Data Scientist",
+    "domain": "Data Science & Analytics",
+    "company": "Snowflake Intelligence",
+    "location": "San Francisco, CA",
+    "remote_status": "On-site",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 140000,
+      "max": 195000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "SQL",
+      "Scikit-Learn",
+      "Pandas",
+      "Statistics",
+      "PyTorch"
+    ],
+    "preferred_skills": [
+      "Data Visualization",
+      "Hypothesis Testing",
+      "Spark",
+      "Feature Engineering"
+    ],
+    "yoy_demand_growth": "+28%",
+    "description": "Snowflake Intelligence is hiring a NLP Data Scientist (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and SQL.",
+    "posted_date": "2026-11-08T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-028",
+    "title": "NLP Data Scientist",
+    "target_role": "Data Scientist",
+    "domain": "Data Science & Analytics",
+    "company": "Palantir Advanced Analytics",
+    "location": "Seattle, WA",
+    "remote_status": "Hybrid",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 140000,
+      "max": 195000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "SQL",
+      "Scikit-Learn",
+      "Pandas",
+      "Statistics",
+      "PyTorch"
+    ],
+    "preferred_skills": [
+      "Data Visualization",
+      "Hypothesis Testing",
+      "Spark",
+      "Feature Engineering"
+    ],
+    "yoy_demand_growth": "+28%",
+    "description": "Palantir Advanced Analytics is hiring a NLP Data Scientist (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and SQL.",
+    "posted_date": "2026-11-09T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-029",
+    "title": "Quantitative Analytics Scientist",
+    "target_role": "Data Scientist",
+    "domain": "Data Science & Analytics",
+    "company": "Snowflake Intelligence",
+    "location": "Remote, Global",
+    "remote_status": "Remote",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 125000,
+      "max": 175000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "SQL",
+      "Scikit-Learn",
+      "Pandas",
+      "Statistics",
+      "PyTorch"
+    ],
+    "preferred_skills": [
+      "Data Visualization",
+      "Hypothesis Testing",
+      "Spark",
+      "Feature Engineering"
+    ],
+    "yoy_demand_growth": "+28%",
+    "description": "Snowflake Intelligence is hiring a Quantitative Analytics Scientist (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and SQL.",
+    "posted_date": "2026-11-10T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-030",
+    "title": "Quantitative Analytics Scientist",
+    "target_role": "Data Scientist",
+    "domain": "Data Science & Analytics",
+    "company": "Palantir Advanced Analytics",
+    "location": "New York, NY",
+    "remote_status": "Hybrid",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 125000,
+      "max": 175000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Python",
+      "SQL",
+      "Scikit-Learn",
+      "Pandas",
+      "Statistics",
+      "PyTorch"
+    ],
+    "preferred_skills": [
+      "Data Visualization",
+      "Hypothesis Testing",
+      "Spark",
+      "Feature Engineering"
+    ],
+    "yoy_demand_growth": "+28%",
+    "description": "Palantir Advanced Analytics is hiring a Quantitative Analytics Scientist (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in Python and SQL.",
+    "posted_date": "2026-11-11T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-031",
+    "title": "Site Reliability Engineer (SRE)",
+    "target_role": "DevOps Engineer",
+    "domain": "Platform & Infrastructure",
+    "company": "HashiCorp Cloud",
+    "location": "Bengaluru, India",
+    "remote_status": "On-site",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 125000,
+      "max": 175000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Kubernetes",
+      "Docker",
+      "Terraform",
+      "CI/CD Pipelines",
+      "AWS",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Prometheus",
+      "Grafana",
+      "Bash",
+      "Helm"
+    ],
+    "yoy_demand_growth": "+38%",
+    "description": "HashiCorp Cloud is hiring a Site Reliability Engineer (SRE) (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in Kubernetes and Docker.",
+    "posted_date": "2026-11-12T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-032",
+    "title": "Site Reliability Engineer (SRE)",
+    "target_role": "DevOps Engineer",
+    "domain": "Platform & Infrastructure",
+    "company": "AWS Partner Network",
+    "location": "Remote, US",
+    "remote_status": "Remote",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 125000,
+      "max": 175000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Kubernetes",
+      "Docker",
+      "Terraform",
+      "CI/CD Pipelines",
+      "AWS",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Prometheus",
+      "Grafana",
+      "Bash",
+      "Helm"
+    ],
+    "yoy_demand_growth": "+38%",
+    "description": "AWS Partner Network is hiring a Site Reliability Engineer (SRE) (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Kubernetes and Docker.",
+    "posted_date": "2026-11-13T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-033",
+    "title": "Cloud Infrastructure & Kubernetes Engineer",
+    "target_role": "DevOps Engineer",
+    "domain": "Platform & Infrastructure",
+    "company": "HashiCorp Cloud",
+    "location": "Austin, TX",
+    "remote_status": "On-site",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 135000,
+      "max": 190000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Kubernetes",
+      "Docker",
+      "Terraform",
+      "CI/CD Pipelines",
+      "AWS",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Prometheus",
+      "Grafana",
+      "Bash",
+      "Helm"
+    ],
+    "yoy_demand_growth": "+38%",
+    "description": "HashiCorp Cloud is hiring a Cloud Infrastructure & Kubernetes Engineer (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in Kubernetes and Docker.",
+    "posted_date": "2026-11-14T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-034",
+    "title": "Cloud Infrastructure & Kubernetes Engineer",
+    "target_role": "DevOps Engineer",
+    "domain": "Platform & Infrastructure",
+    "company": "AWS Partner Network",
+    "location": "London, UK",
+    "remote_status": "Hybrid",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 135000,
+      "max": 190000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Kubernetes",
+      "Docker",
+      "Terraform",
+      "CI/CD Pipelines",
+      "AWS",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Prometheus",
+      "Grafana",
+      "Bash",
+      "Helm"
+    ],
+    "yoy_demand_growth": "+38%",
+    "description": "AWS Partner Network is hiring a Cloud Infrastructure & Kubernetes Engineer (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in Kubernetes and Docker.",
+    "posted_date": "2026-11-15T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-035",
+    "title": "Senior DevOps Automation Engineer",
+    "target_role": "DevOps Engineer",
+    "domain": "Platform & Infrastructure",
+    "company": "HashiCorp Cloud",
+    "location": "San Francisco, CA",
+    "remote_status": "On-site",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 120000,
+      "max": 165000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Kubernetes",
+      "Docker",
+      "Terraform",
+      "CI/CD Pipelines",
+      "AWS",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Prometheus",
+      "Grafana",
+      "Bash",
+      "Helm"
+    ],
+    "yoy_demand_growth": "+38%",
+    "description": "HashiCorp Cloud is hiring a Senior DevOps Automation Engineer (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Kubernetes and Docker.",
+    "posted_date": "2026-11-16T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-036",
+    "title": "Senior DevOps Automation Engineer",
+    "target_role": "DevOps Engineer",
+    "domain": "Platform & Infrastructure",
+    "company": "AWS Partner Network",
+    "location": "Seattle, WA",
+    "remote_status": "Hybrid",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 120000,
+      "max": 165000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Kubernetes",
+      "Docker",
+      "Terraform",
+      "CI/CD Pipelines",
+      "AWS",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Prometheus",
+      "Grafana",
+      "Bash",
+      "Helm"
+    ],
+    "yoy_demand_growth": "+38%",
+    "description": "AWS Partner Network is hiring a Senior DevOps Automation Engineer (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in Kubernetes and Docker.",
+    "posted_date": "2026-11-17T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-037",
+    "title": "Platform Reliability Architect",
+    "target_role": "DevOps Engineer",
+    "domain": "Platform & Infrastructure",
+    "company": "HashiCorp Cloud",
+    "location": "Remote, Global",
+    "remote_status": "Remote",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 150000,
+      "max": 215000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Kubernetes",
+      "Docker",
+      "Terraform",
+      "CI/CD Pipelines",
+      "AWS",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Prometheus",
+      "Grafana",
+      "Bash",
+      "Helm"
+    ],
+    "yoy_demand_growth": "+38%",
+    "description": "HashiCorp Cloud is hiring a Platform Reliability Architect (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Kubernetes and Docker.",
+    "posted_date": "2026-11-18T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-038",
+    "title": "Platform Reliability Architect",
+    "target_role": "DevOps Engineer",
+    "domain": "Platform & Infrastructure",
+    "company": "AWS Partner Network",
+    "location": "New York, NY",
+    "remote_status": "Hybrid",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 150000,
+      "max": 215000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Kubernetes",
+      "Docker",
+      "Terraform",
+      "CI/CD Pipelines",
+      "AWS",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Prometheus",
+      "Grafana",
+      "Bash",
+      "Helm"
+    ],
+    "yoy_demand_growth": "+38%",
+    "description": "AWS Partner Network is hiring a Platform Reliability Architect (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Kubernetes and Docker.",
+    "posted_date": "2026-11-19T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-039",
+    "title": "DevSecOps & Cloud Security Specialist",
+    "target_role": "DevOps Engineer",
+    "domain": "Platform & Infrastructure",
+    "company": "HashiCorp Cloud",
+    "location": "Bengaluru, India",
+    "remote_status": "On-site",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 130000,
+      "max": 180000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Kubernetes",
+      "Docker",
+      "Terraform",
+      "CI/CD Pipelines",
+      "AWS",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Prometheus",
+      "Grafana",
+      "Bash",
+      "Helm"
+    ],
+    "yoy_demand_growth": "+38%",
+    "description": "HashiCorp Cloud is hiring a DevSecOps & Cloud Security Specialist (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in Kubernetes and Docker.",
+    "posted_date": "2026-11-20T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-040",
+    "title": "DevSecOps & Cloud Security Specialist",
+    "target_role": "DevOps Engineer",
+    "domain": "Platform & Infrastructure",
+    "company": "AWS Partner Network",
+    "location": "Remote, US",
+    "remote_status": "Remote",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 130000,
+      "max": 180000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Kubernetes",
+      "Docker",
+      "Terraform",
+      "CI/CD Pipelines",
+      "AWS",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Prometheus",
+      "Grafana",
+      "Bash",
+      "Helm"
+    ],
+    "yoy_demand_growth": "+38%",
+    "description": "AWS Partner Network is hiring a DevSecOps & Cloud Security Specialist (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Kubernetes and Docker.",
+    "posted_date": "2026-11-01T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-041",
+    "title": "Senior Backend Distributed Systems Engineer",
+    "target_role": "Backend Engineer",
+    "domain": "Distributed Systems & Services",
+    "company": "Confluent Kafka",
+    "location": "Austin, TX",
+    "remote_status": "On-site",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 125000,
+      "max": 180000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Go",
+      "Python",
+      "PostgreSQL",
+      "Redis",
+      "Kafka",
+      "gRPC"
+    ],
+    "preferred_skills": [
+      "Distributed Systems",
+      "Microservices",
+      "Docker",
+      "System Design"
+    ],
+    "yoy_demand_growth": "+31%",
+    "description": "Confluent Kafka is hiring a Senior Backend Distributed Systems Engineer (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Go and Python.",
+    "posted_date": "2026-11-02T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-042",
+    "title": "Senior Backend Distributed Systems Engineer",
+    "target_role": "Backend Engineer",
+    "domain": "Distributed Systems & Services",
+    "company": "CockroachDB Labs",
+    "location": "London, UK",
+    "remote_status": "Hybrid",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 125000,
+      "max": 180000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Go",
+      "Python",
+      "PostgreSQL",
+      "Redis",
+      "Kafka",
+      "gRPC"
+    ],
+    "preferred_skills": [
+      "Distributed Systems",
+      "Microservices",
+      "Docker",
+      "System Design"
+    ],
+    "yoy_demand_growth": "+31%",
+    "description": "CockroachDB Labs is hiring a Senior Backend Distributed Systems Engineer (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in Go and Python.",
+    "posted_date": "2026-11-03T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-043",
+    "title": "High-Throughput Go Backend Developer",
+    "target_role": "Backend Engineer",
+    "domain": "Distributed Systems & Services",
+    "company": "Confluent Kafka",
+    "location": "San Francisco, CA",
+    "remote_status": "On-site",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 140000,
+      "max": 200000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Go",
+      "Python",
+      "PostgreSQL",
+      "Redis",
+      "Kafka",
+      "gRPC"
+    ],
+    "preferred_skills": [
+      "Distributed Systems",
+      "Microservices",
+      "Docker",
+      "System Design"
+    ],
+    "yoy_demand_growth": "+31%",
+    "description": "Confluent Kafka is hiring a High-Throughput Go Backend Developer (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Go and Python.",
+    "posted_date": "2026-11-04T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-044",
+    "title": "High-Throughput Go Backend Developer",
+    "target_role": "Backend Engineer",
+    "domain": "Distributed Systems & Services",
+    "company": "CockroachDB Labs",
+    "location": "Seattle, WA",
+    "remote_status": "Hybrid",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 140000,
+      "max": 200000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Go",
+      "Python",
+      "PostgreSQL",
+      "Redis",
+      "Kafka",
+      "gRPC"
+    ],
+    "preferred_skills": [
+      "Distributed Systems",
+      "Microservices",
+      "Docker",
+      "System Design"
+    ],
+    "yoy_demand_growth": "+31%",
+    "description": "CockroachDB Labs is hiring a High-Throughput Go Backend Developer (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Go and Python.",
+    "posted_date": "2026-11-05T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-045",
+    "title": "Python / AsyncIO Services Engineer",
+    "target_role": "Backend Engineer",
+    "domain": "Distributed Systems & Services",
+    "company": "Confluent Kafka",
+    "location": "Remote, Global",
+    "remote_status": "Remote",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 115000,
+      "max": 165000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Go",
+      "Python",
+      "PostgreSQL",
+      "Redis",
+      "Kafka",
+      "gRPC"
+    ],
+    "preferred_skills": [
+      "Distributed Systems",
+      "Microservices",
+      "Docker",
+      "System Design"
+    ],
+    "yoy_demand_growth": "+31%",
+    "description": "Confluent Kafka is hiring a Python / AsyncIO Services Engineer (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in Go and Python.",
+    "posted_date": "2026-11-06T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-046",
+    "title": "Python / AsyncIO Services Engineer",
+    "target_role": "Backend Engineer",
+    "domain": "Distributed Systems & Services",
+    "company": "CockroachDB Labs",
+    "location": "New York, NY",
+    "remote_status": "Hybrid",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 115000,
+      "max": 165000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Go",
+      "Python",
+      "PostgreSQL",
+      "Redis",
+      "Kafka",
+      "gRPC"
+    ],
+    "preferred_skills": [
+      "Distributed Systems",
+      "Microservices",
+      "Docker",
+      "System Design"
+    ],
+    "yoy_demand_growth": "+31%",
+    "description": "CockroachDB Labs is hiring a Python / AsyncIO Services Engineer (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Go and Python.",
+    "posted_date": "2026-11-07T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-047",
+    "title": "Core Backend Microservices Architect",
+    "target_role": "Backend Engineer",
+    "domain": "Distributed Systems & Services",
+    "company": "Confluent Kafka",
+    "location": "Bengaluru, India",
+    "remote_status": "On-site",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 155000,
+      "max": 220000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Go",
+      "Python",
+      "PostgreSQL",
+      "Redis",
+      "Kafka",
+      "gRPC"
+    ],
+    "preferred_skills": [
+      "Distributed Systems",
+      "Microservices",
+      "Docker",
+      "System Design"
+    ],
+    "yoy_demand_growth": "+31%",
+    "description": "Confluent Kafka is hiring a Core Backend Microservices Architect (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in Go and Python.",
+    "posted_date": "2026-11-08T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-048",
+    "title": "Core Backend Microservices Architect",
+    "target_role": "Backend Engineer",
+    "domain": "Distributed Systems & Services",
+    "company": "CockroachDB Labs",
+    "location": "Remote, US",
+    "remote_status": "Remote",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 155000,
+      "max": 220000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Go",
+      "Python",
+      "PostgreSQL",
+      "Redis",
+      "Kafka",
+      "gRPC"
+    ],
+    "preferred_skills": [
+      "Distributed Systems",
+      "Microservices",
+      "Docker",
+      "System Design"
+    ],
+    "yoy_demand_growth": "+31%",
+    "description": "CockroachDB Labs is hiring a Core Backend Microservices Architect (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in Go and Python.",
+    "posted_date": "2026-11-09T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-049",
+    "title": "Database Internals & Backend Engineer",
+    "target_role": "Backend Engineer",
+    "domain": "Distributed Systems & Services",
+    "company": "Confluent Kafka",
+    "location": "Austin, TX",
+    "remote_status": "On-site",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 130000,
+      "max": 185000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Go",
+      "Python",
+      "PostgreSQL",
+      "Redis",
+      "Kafka",
+      "gRPC"
+    ],
+    "preferred_skills": [
+      "Distributed Systems",
+      "Microservices",
+      "Docker",
+      "System Design"
+    ],
+    "yoy_demand_growth": "+31%",
+    "description": "Confluent Kafka is hiring a Database Internals & Backend Engineer (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in Go and Python.",
+    "posted_date": "2026-11-10T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-050",
+    "title": "Database Internals & Backend Engineer",
+    "target_role": "Backend Engineer",
+    "domain": "Distributed Systems & Services",
+    "company": "CockroachDB Labs",
+    "location": "London, UK",
+    "remote_status": "Hybrid",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 130000,
+      "max": 185000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "Go",
+      "Python",
+      "PostgreSQL",
+      "Redis",
+      "Kafka",
+      "gRPC"
+    ],
+    "preferred_skills": [
+      "Distributed Systems",
+      "Microservices",
+      "Docker",
+      "System Design"
+    ],
+    "yoy_demand_growth": "+31%",
+    "description": "CockroachDB Labs is hiring a Database Internals & Backend Engineer (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in Go and Python.",
+    "posted_date": "2026-11-11T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-051",
+    "title": "SOC Lead Analyst",
+    "target_role": "Cybersecurity Analyst",
+    "domain": "Information Security & Compliance",
+    "company": "CrowdStrike Intelligence",
+    "location": "San Francisco, CA",
+    "remote_status": "On-site",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 115000,
+      "max": 160000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "SIEM Tools",
+      "Cryptography",
+      "Network Security",
+      "Vulnerability Assessment",
+      "Python",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Incident Response",
+      "AWS Security",
+      "Penetration Testing"
+    ],
+    "yoy_demand_growth": "+41%",
+    "description": "CrowdStrike Intelligence is hiring a SOC Lead Analyst (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in SIEM Tools and Cryptography.",
+    "posted_date": "2026-11-12T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-052",
+    "title": "SOC Lead Analyst",
+    "target_role": "Cybersecurity Analyst",
+    "domain": "Information Security & Compliance",
+    "company": "Palo Alto Networks",
+    "location": "Seattle, WA",
+    "remote_status": "Hybrid",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 115000,
+      "max": 160000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "SIEM Tools",
+      "Cryptography",
+      "Network Security",
+      "Vulnerability Assessment",
+      "Python",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Incident Response",
+      "AWS Security",
+      "Penetration Testing"
+    ],
+    "yoy_demand_growth": "+41%",
+    "description": "Palo Alto Networks is hiring a SOC Lead Analyst (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in SIEM Tools and Cryptography.",
+    "posted_date": "2026-11-13T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-053",
+    "title": "Cloud Security & DevSecOps Engineer",
+    "target_role": "Cybersecurity Analyst",
+    "domain": "Information Security & Compliance",
+    "company": "CrowdStrike Intelligence",
+    "location": "Remote, Global",
+    "remote_status": "Remote",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 130000,
+      "max": 180000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "SIEM Tools",
+      "Cryptography",
+      "Network Security",
+      "Vulnerability Assessment",
+      "Python",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Incident Response",
+      "AWS Security",
+      "Penetration Testing"
+    ],
+    "yoy_demand_growth": "+41%",
+    "description": "CrowdStrike Intelligence is hiring a Cloud Security & DevSecOps Engineer (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in SIEM Tools and Cryptography.",
+    "posted_date": "2026-11-14T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-054",
+    "title": "Cloud Security & DevSecOps Engineer",
+    "target_role": "Cybersecurity Analyst",
+    "domain": "Information Security & Compliance",
+    "company": "Palo Alto Networks",
+    "location": "New York, NY",
+    "remote_status": "Hybrid",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 130000,
+      "max": 180000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "SIEM Tools",
+      "Cryptography",
+      "Network Security",
+      "Vulnerability Assessment",
+      "Python",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Incident Response",
+      "AWS Security",
+      "Penetration Testing"
+    ],
+    "yoy_demand_growth": "+41%",
+    "description": "Palo Alto Networks is hiring a Cloud Security & DevSecOps Engineer (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in SIEM Tools and Cryptography.",
+    "posted_date": "2026-11-15T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-055",
+    "title": "Application Security Penetration Tester",
+    "target_role": "Cybersecurity Analyst",
+    "domain": "Information Security & Compliance",
+    "company": "CrowdStrike Intelligence",
+    "location": "Bengaluru, India",
+    "remote_status": "On-site",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 110000,
+      "max": 155000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "SIEM Tools",
+      "Cryptography",
+      "Network Security",
+      "Vulnerability Assessment",
+      "Python",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Incident Response",
+      "AWS Security",
+      "Penetration Testing"
+    ],
+    "yoy_demand_growth": "+41%",
+    "description": "CrowdStrike Intelligence is hiring a Application Security Penetration Tester (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in SIEM Tools and Cryptography.",
+    "posted_date": "2026-11-16T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-056",
+    "title": "Application Security Penetration Tester",
+    "target_role": "Cybersecurity Analyst",
+    "domain": "Information Security & Compliance",
+    "company": "Palo Alto Networks",
+    "location": "Remote, US",
+    "remote_status": "Remote",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 110000,
+      "max": 155000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "SIEM Tools",
+      "Cryptography",
+      "Network Security",
+      "Vulnerability Assessment",
+      "Python",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Incident Response",
+      "AWS Security",
+      "Penetration Testing"
+    ],
+    "yoy_demand_growth": "+41%",
+    "description": "Palo Alto Networks is hiring a Application Security Penetration Tester (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in SIEM Tools and Cryptography.",
+    "posted_date": "2026-11-17T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-057",
+    "title": "Threat Intelligence Specialist",
+    "target_role": "Cybersecurity Analyst",
+    "domain": "Information Security & Compliance",
+    "company": "CrowdStrike Intelligence",
+    "location": "Austin, TX",
+    "remote_status": "On-site",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 145000,
+      "max": 205000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "SIEM Tools",
+      "Cryptography",
+      "Network Security",
+      "Vulnerability Assessment",
+      "Python",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Incident Response",
+      "AWS Security",
+      "Penetration Testing"
+    ],
+    "yoy_demand_growth": "+41%",
+    "description": "CrowdStrike Intelligence is hiring a Threat Intelligence Specialist (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in SIEM Tools and Cryptography.",
+    "posted_date": "2026-11-18T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-058",
+    "title": "Threat Intelligence Specialist",
+    "target_role": "Cybersecurity Analyst",
+    "domain": "Information Security & Compliance",
+    "company": "Palo Alto Networks",
+    "location": "London, UK",
+    "remote_status": "Hybrid",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 145000,
+      "max": 205000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "SIEM Tools",
+      "Cryptography",
+      "Network Security",
+      "Vulnerability Assessment",
+      "Python",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Incident Response",
+      "AWS Security",
+      "Penetration Testing"
+    ],
+    "yoy_demand_growth": "+41%",
+    "description": "Palo Alto Networks is hiring a Threat Intelligence Specialist (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in SIEM Tools and Cryptography.",
+    "posted_date": "2026-11-19T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-059",
+    "title": "Information Security Architect",
+    "target_role": "Cybersecurity Analyst",
+    "domain": "Information Security & Compliance",
+    "company": "CrowdStrike Intelligence",
+    "location": "San Francisco, CA",
+    "remote_status": "On-site",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 125000,
+      "max": 170000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "SIEM Tools",
+      "Cryptography",
+      "Network Security",
+      "Vulnerability Assessment",
+      "Python",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Incident Response",
+      "AWS Security",
+      "Penetration Testing"
+    ],
+    "yoy_demand_growth": "+41%",
+    "description": "CrowdStrike Intelligence is hiring a Information Security Architect (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in SIEM Tools and Cryptography.",
+    "posted_date": "2026-11-20T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-060",
+    "title": "Information Security Architect",
+    "target_role": "Cybersecurity Analyst",
+    "domain": "Information Security & Compliance",
+    "company": "Palo Alto Networks",
+    "location": "Seattle, WA",
+    "remote_status": "Hybrid",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 125000,
+      "max": 170000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "SIEM Tools",
+      "Cryptography",
+      "Network Security",
+      "Vulnerability Assessment",
+      "Python",
+      "Linux"
+    ],
+    "preferred_skills": [
+      "Incident Response",
+      "AWS Security",
+      "Penetration Testing"
+    ],
+    "yoy_demand_growth": "+41%",
+    "description": "Palo Alto Networks is hiring a Information Security Architect (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in SIEM Tools and Cryptography.",
+    "posted_date": "2026-11-01T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-061",
+    "title": "Senior React Native Mobile Architect",
+    "target_role": "Mobile Application Engineer",
+    "domain": "Mobile Systems",
+    "company": "DoorDash Mobile Team",
+    "location": "Remote, Global",
+    "remote_status": "Remote",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 115000,
+      "max": 165000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "React Native",
+      "TypeScript",
+      "Swift",
+      "Kotlin",
+      "Mobile Architecture",
+      "REST APIs"
+    ],
+    "preferred_skills": [
+      "Offline Storage",
+      "CI/CD for Mobile",
+      "State Management"
+    ],
+    "yoy_demand_growth": "+22%",
+    "description": "DoorDash Mobile Team is hiring a Senior React Native Mobile Architect (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in React Native and TypeScript.",
+    "posted_date": "2026-11-02T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-062",
+    "title": "Senior React Native Mobile Architect",
+    "target_role": "Mobile Application Engineer",
+    "domain": "Mobile Systems",
+    "company": "Uber Rider Systems",
+    "location": "New York, NY",
+    "remote_status": "Hybrid",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 115000,
+      "max": 165000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "React Native",
+      "TypeScript",
+      "Swift",
+      "Kotlin",
+      "Mobile Architecture",
+      "REST APIs"
+    ],
+    "preferred_skills": [
+      "Offline Storage",
+      "CI/CD for Mobile",
+      "State Management"
+    ],
+    "yoy_demand_growth": "+22%",
+    "description": "Uber Rider Systems is hiring a Senior React Native Mobile Architect (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in React Native and TypeScript.",
+    "posted_date": "2026-11-03T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-063",
+    "title": "iOS Swift Core Engineer",
+    "target_role": "Mobile Application Engineer",
+    "domain": "Mobile Systems",
+    "company": "DoorDash Mobile Team",
+    "location": "Bengaluru, India",
+    "remote_status": "On-site",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 130000,
+      "max": 180000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "React Native",
+      "TypeScript",
+      "Swift",
+      "Kotlin",
+      "Mobile Architecture",
+      "REST APIs"
+    ],
+    "preferred_skills": [
+      "Offline Storage",
+      "CI/CD for Mobile",
+      "State Management"
+    ],
+    "yoy_demand_growth": "+22%",
+    "description": "DoorDash Mobile Team is hiring a iOS Swift Core Engineer (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in React Native and TypeScript.",
+    "posted_date": "2026-11-04T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-064",
+    "title": "iOS Swift Core Engineer",
+    "target_role": "Mobile Application Engineer",
+    "domain": "Mobile Systems",
+    "company": "Uber Rider Systems",
+    "location": "Remote, US",
+    "remote_status": "Remote",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 130000,
+      "max": 180000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "React Native",
+      "TypeScript",
+      "Swift",
+      "Kotlin",
+      "Mobile Architecture",
+      "REST APIs"
+    ],
+    "preferred_skills": [
+      "Offline Storage",
+      "CI/CD for Mobile",
+      "State Management"
+    ],
+    "yoy_demand_growth": "+22%",
+    "description": "Uber Rider Systems is hiring a iOS Swift Core Engineer (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in React Native and TypeScript.",
+    "posted_date": "2026-11-05T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-065",
+    "title": "Android Kotlin Systems Developer",
+    "target_role": "Mobile Application Engineer",
+    "domain": "Mobile Systems",
+    "company": "DoorDash Mobile Team",
+    "location": "Austin, TX",
+    "remote_status": "On-site",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 120000,
+      "max": 170000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "React Native",
+      "TypeScript",
+      "Swift",
+      "Kotlin",
+      "Mobile Architecture",
+      "REST APIs"
+    ],
+    "preferred_skills": [
+      "Offline Storage",
+      "CI/CD for Mobile",
+      "State Management"
+    ],
+    "yoy_demand_growth": "+22%",
+    "description": "DoorDash Mobile Team is hiring a Android Kotlin Systems Developer (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in React Native and TypeScript.",
+    "posted_date": "2026-11-06T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-066",
+    "title": "Android Kotlin Systems Developer",
+    "target_role": "Mobile Application Engineer",
+    "domain": "Mobile Systems",
+    "company": "Uber Rider Systems",
+    "location": "London, UK",
+    "remote_status": "Hybrid",
+    "experience_level": "Entry-level",
+    "salary_range": {
+      "min": 120000,
+      "max": 170000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "React Native",
+      "TypeScript",
+      "Swift",
+      "Kotlin",
+      "Mobile Architecture",
+      "REST APIs"
+    ],
+    "preferred_skills": [
+      "Offline Storage",
+      "CI/CD for Mobile",
+      "State Management"
+    ],
+    "yoy_demand_growth": "+22%",
+    "description": "Uber Rider Systems is hiring a Android Kotlin Systems Developer (Entry-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in React Native and TypeScript.",
+    "posted_date": "2026-11-07T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-067",
+    "title": "Cross-Platform Mobile Engineer",
+    "target_role": "Mobile Application Engineer",
+    "domain": "Mobile Systems",
+    "company": "DoorDash Mobile Team",
+    "location": "San Francisco, CA",
+    "remote_status": "On-site",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 140000,
+      "max": 195000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "React Native",
+      "TypeScript",
+      "Swift",
+      "Kotlin",
+      "Mobile Architecture",
+      "REST APIs"
+    ],
+    "preferred_skills": [
+      "Offline Storage",
+      "CI/CD for Mobile",
+      "State Management"
+    ],
+    "yoy_demand_growth": "+22%",
+    "description": "DoorDash Mobile Team is hiring a Cross-Platform Mobile Engineer (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in React Native and TypeScript.",
+    "posted_date": "2026-11-08T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-068",
+    "title": "Cross-Platform Mobile Engineer",
+    "target_role": "Mobile Application Engineer",
+    "domain": "Mobile Systems",
+    "company": "Uber Rider Systems",
+    "location": "Seattle, WA",
+    "remote_status": "Hybrid",
+    "experience_level": "Lead",
+    "salary_range": {
+      "min": 140000,
+      "max": 195000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "React Native",
+      "TypeScript",
+      "Swift",
+      "Kotlin",
+      "Mobile Architecture",
+      "REST APIs"
+    ],
+    "preferred_skills": [
+      "Offline Storage",
+      "CI/CD for Mobile",
+      "State Management"
+    ],
+    "yoy_demand_growth": "+22%",
+    "description": "Uber Rider Systems is hiring a Cross-Platform Mobile Engineer (Lead) to build next-generation scalable platforms. The ideal candidate has deep expertise in React Native and TypeScript.",
+    "posted_date": "2026-11-09T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-069",
+    "title": "Mobile Performance Specialist",
+    "target_role": "Mobile Application Engineer",
+    "domain": "Mobile Systems",
+    "company": "DoorDash Mobile Team",
+    "location": "Remote, Global",
+    "remote_status": "Remote",
+    "experience_level": "Mid-level",
+    "salary_range": {
+      "min": 125000,
+      "max": 175000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "React Native",
+      "TypeScript",
+      "Swift",
+      "Kotlin",
+      "Mobile Architecture",
+      "REST APIs"
+    ],
+    "preferred_skills": [
+      "Offline Storage",
+      "CI/CD for Mobile",
+      "State Management"
+    ],
+    "yoy_demand_growth": "+22%",
+    "description": "DoorDash Mobile Team is hiring a Mobile Performance Specialist (Mid-level) to build next-generation scalable platforms. The ideal candidate has deep expertise in React Native and TypeScript.",
+    "posted_date": "2026-11-10T08:00:00Z",
+    "is_verified": true
+  },
+  {
+    "id": "job-070",
+    "title": "Mobile Performance Specialist",
+    "target_role": "Mobile Application Engineer",
+    "domain": "Mobile Systems",
+    "company": "Uber Rider Systems",
+    "location": "New York, NY",
+    "remote_status": "Hybrid",
+    "experience_level": "Senior",
+    "salary_range": {
+      "min": 125000,
+      "max": 175000,
+      "currency": "USD"
+    },
+    "required_skills": [
+      "React Native",
+      "TypeScript",
+      "Swift",
+      "Kotlin",
+      "Mobile Architecture",
+      "REST APIs"
+    ],
+    "preferred_skills": [
+      "Offline Storage",
+      "CI/CD for Mobile",
+      "State Management"
+    ],
+    "yoy_demand_growth": "+22%",
+    "description": "Uber Rider Systems is hiring a Mobile Performance Specialist (Senior) to build next-generation scalable platforms. The ideal candidate has deep expertise in React Native and TypeScript.",
+    "posted_date": "2026-11-11T08:00:00Z",
+    "is_verified": true
+  }
+]
