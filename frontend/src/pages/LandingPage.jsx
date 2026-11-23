@@ -414,9 +414,9 @@ export default function LandingPage() {
         </section>
 
         {/* SECTION 5: FINAL ACTION BANNER - Scale Reveal */}
-        <section className="pt-2 sm:pt-3 pb-12 sm:pb-16 px-4 sm:px-8 lg:px-12 bg-[#FFE600] text-center border-t-2 border-black">
-          <Reveal delay={0} className="w-full max-w-[1500px] mx-auto space-y-4">
-            <h2 className="whitespace-nowrap text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight text-black leading-none pt-1">
+        <section className="pt-1 sm:pt-2 pb-12 sm:pb-16 px-2 sm:px-4 bg-[#FFE600] text-center border-t-2 border-black overflow-hidden w-full">
+          <Reveal delay={0} className="w-full mx-auto space-y-4">
+            <h2 className="w-full text-center whitespace-nowrap text-[5.3vw] font-black tracking-tighter leading-none neo-outline-text pt-0 select-none block">
               Verify your technical readiness today
             </h2>
             <p className="text-base sm:text-lg md:text-xl font-bold text-slate-900 max-w-2xl mx-auto leading-relaxed">

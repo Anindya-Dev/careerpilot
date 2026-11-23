@@ -92,6 +92,19 @@
   @apply bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000];
 }
 
+/* Neo-brutalist stroked outline text (border only, transparent fill) */
+.neo-outline-text {
+  color: transparent;
+  -webkit-text-stroke: 2px #000000;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (min-width: 768px) {
+  .neo-outline-text {
+    -webkit-text-stroke: 3.5px #000000;
+  }
+}
+
 .neo-box-lg {
   @apply bg-white border-[3px] border-black shadow-[6px_6px_0px_0px_#000000];
 }
