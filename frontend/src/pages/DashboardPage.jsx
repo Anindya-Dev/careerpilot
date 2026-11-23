@@ -1,19 +1,28 @@
 /**
  * @file DashboardPage.jsx
  * @description Authenticated client shell displaying user greetings, profile summary,
- * and modular integration slots specifically structured for Member 4 (Sargam)'s
- * Chart.js / Recharts radar graphs, career health dials, and roadmap widgets.
- * @author Md Hussain Ansari (Member 1)
+ * and live agent telemetry integration (Career Health Dial, Skill Radar Chart,
+ * 6-Month Trajectory, Agent Status Roster, and Actionable AI Recommendations).
+ * @author Md Hussain Ansari (Member 1) & Sargam Banerjee (Member 4)
  */
 
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../context/ProfileContext';
+import { useDashboardTelemetry, useSkillIntelligence } from '../hooks';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import {
+  CareerHealthDial,
+  SkillRadarChart,
+  HealthTrendChart,
+  AgentStatusList,
+  RecommendationFeed,
+  TelemetryStream
+} from '../components/telemetry';
 import {
   Sparkles,
   TrendingUp,
@@ -23,17 +32,25 @@ import {
   ArrowRight,
   Activity,
   Layers,
-  CheckCircle2
+  CheckCircle2,
+  Cpu,
+  Zap,
+  Radio
 } from 'lucide-react';
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { profile, isLoading } = useProfile();
+  const { profile, isLoading: isProfileLoading } = useProfile();
+  const { data: telemetry, isLoading: isTelemetryLoading, latencyMs } = useDashboardTelemetry();
+  const { data: skillIntel } = useSkillIntelligence();
 
   const completeness = profile?.profile_completeness || 0;
   const skillsCount = profile?.skills?.length || 0;
   const projectsCount = profile?.projects?.length || 0;
   const targetRole = profile?.target_role || 'Role not selected';
+
+  const healthScore = telemetry?.healthScore || profile?.career_health_score || 78.5;
+  const healthGrade = telemetry?.healthGrade || 'B+';
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -49,6 +66,11 @@ export default function DashboardPage() {
               <div className="inline-flex items-center space-x-2 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-medium text-indigo-100 mb-2">
                 <Sparkles className="w-3.5 h-3.5 text-indigo-200" />
                 <span>Phase 1 Verified Environment</span>
+                {latencyMs !== null && (
+                  <span className="ml-1 px-1.5 py-0.2 rounded-full bg-emerald-500/30 text-[10px] text-emerald-200">
+                    {latencyMs}ms telemetry
+                  </span>
+                )}
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
                 Welcome, {user?.name}!
@@ -124,48 +146,74 @@ export default function DashboardPage() {
 
           {/* ========================================================================= */}
           {/* SARGAM (MEMBER 4) COMPONENT INTEGRATION SLOTS                             */}
-          {/* The grid below is explicitly partitioned for Member 4's data viz widgets.  */}
+          {/* Live Career Health Dial & Market Skill Alignment Radar Chart              */}
           {/* ========================================================================= */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Slot A: Career Health Score & Dial (Owned by Sargam) */}
+            {/* Slot A: Career Health Score & Dial (Member 4 - Sargam) */}
             <div className="lg:col-span-1">
               <Card
                 title="Career Health Index"
                 subtitle="Aggregated composite score"
                 className="h-full"
               >
-                {/* [SARGAM SLOT: <CareerHealthDial score={profile.career_health_score} />] */}
-                <div className="p-6 flex flex-col items-center justify-center text-center border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50 min-h-[220px]">
-                  <Activity className="w-10 h-10 text-indigo-400 mb-2 animate-pulse" />
-                  <div className="text-2xl font-black text-slate-800">
-                    {profile?.career_health_score || '78.5'}
-                    <span className="text-sm font-normal text-slate-500"> / 100</span>
-                  </div>
-                  <p className="text-xs text-slate-500 mt-1 max-w-[200px]">
-                    Calculated by Career Health Agent. Visualized by Member 4 (Sargam).
-                  </p>
-                </div>
+                <CareerHealthDial
+                  score={healthScore}
+                  grade={healthGrade}
+                  dimensions={telemetry?.dimensions || []}
+                />
               </Card>
             </div>
 
-            {/* Slot B: Skill Coverage Radar Chart (Owned by Sargam) */}
+            {/* Slot B: Skill Coverage Radar Chart (Member 4 - Sargam) */}
             <div className="lg:col-span-2">
               <Card
                 title="Market Skill Alignment Radar"
-                subtitle="Student profile skills vs. market job postings"
+                subtitle={`Student profile skills vs. ${targetRole} market demand`}
                 className="h-full"
               >
-                {/* [SARGAM SLOT: <SkillRadarChart skills={profile.skills} targetRole={profile.target_role} />] */}
-                <div className="p-8 flex flex-col items-center justify-center text-center border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50 min-h-[220px]">
-                  <Layers className="w-10 h-10 text-indigo-400 mb-2" />
-                  <div className="text-sm font-semibold text-slate-700">
-                    Interactive Radar Chart Slot
-                  </div>
-                  <p className="text-xs text-slate-500 mt-1 max-w-sm">
-                    Container ready for Chart.js / Recharts integration. Displays Skill Intelligence
-                    matching against target role demand.
-                  </p>
-                </div>
+                <SkillRadarChart
+                  data={skillIntel?.radarData}
+                  targetRole={targetRole}
+                />
+              </Card>
+            </div>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* SARGAM (MEMBER 4) EXTENDED TELEMETRY & AI ORCHESTRATOR PANELS             */}
+          {/* ========================================================================= */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left 2 Cols: 6-Month Trajectory & Actionable Recommendations */}
+            <div className="lg:col-span-2 space-y-6">
+              <Card
+                title="Career Health Progression"
+                subtitle="6-Month trajectory modeled across completed projects and skill additions"
+              >
+                <HealthTrendChart history={telemetry?.trendHistory} />
+              </Card>
+
+              <Card
+                title="Actionable AI Recommendations"
+                subtitle="High-leverage next steps prioritized by LangGraph reasoning"
+              >
+                <RecommendationFeed recommendations={telemetry?.recommendations || []} />
+              </Card>
+            </div>
+
+            {/* Right 1 Col: Live Agent Microservice Status & Telemetry Activity Stream */}
+            <div className="space-y-6">
+              <Card
+                title="Agent Orchestrator Status"
+                subtitle="Live microservice telemetry"
+              >
+                <AgentStatusList agentStatuses={telemetry?.agentStatuses || []} />
+              </Card>
+
+              <Card
+                title="Recent Telemetry Stream"
+                subtitle="Chronological multi-agent events"
+              >
+                <TelemetryStream events={telemetry?.recentActivity || []} />
               </Card>
             </div>
           </div>

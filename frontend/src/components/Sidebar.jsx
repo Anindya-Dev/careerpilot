@@ -14,8 +14,8 @@ export default function Sidebar() {
     { name: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
     { name: 'Career Profile', to: '/profile', icon: UserCheck },
     { name: 'Skills & Evidence', to: '/profile#skills', icon: Target },
-    { name: 'Career Health', to: '/dashboard#health', icon: Activity, badge: 'Sargam' },
-    { name: 'AI Recommendations', to: '/dashboard#recommendations', icon: Sparkles }
+    { name: 'Career Health', to: '/dashboard#health', icon: Activity, badge: 'Live' },
+    { name: 'AI Recommendations', to: '/dashboard#recommendations', icon: Sparkles, badge: 'Agent' }
   ];
 
   return (
