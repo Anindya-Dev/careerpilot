@@ -141,12 +141,14 @@ export default function LandingPage() {
             
             {/* Prominent Large Headline with Key Highlight Badges */}
             <Reveal delay={0} className="max-w-5xl mx-auto">
-              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.08] text-black">
+              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.15] text-black">
                 Autonomous{' '}
-                <span className="inline-block bg-[#FFE600] px-3 sm:px-4 py-0.5 border-[3px] border-black shadow-[4px_4px_0px_0px_#000] rotate-[-1deg] hover:rotate-0 transition-transform duration-200">
-                  career intelligence
+                <span className="inline-block whitespace-nowrap">
+                  <span className="inline-block bg-[#FFE600] px-3 sm:px-4 py-0.5 border-[3px] border-black shadow-[4px_4px_0px_0px_#000] rotate-[-1deg] hover:rotate-0 transition-transform duration-200">
+                    career intelligence
+                  </span>{' '}
+                  for
                 </span>{' '}
-                for{' '}
                 <span className="inline-block bg-[#38B6FF] px-3 sm:px-4 py-0.5 border-[3px] border-black shadow-[4px_4px_0px_0px_#000] rotate-[1deg] hover:rotate-0 transition-transform duration-200">
                   engineering students
                 </span>
