@@ -2,17 +2,24 @@
  * @file DashboardPage.jsx
  * @description Neo-Brutalist authenticated student intelligence dashboard.
  * Generous full-width layout, balanced spacing, clear section anchors (#overview, #skills, #health, #pipeline),
- * and dedicated integration slots for Member 4 (Sargam)'s data visualizations (CareerHealthDial & SkillRadarChart).
- * @author Md Hussain Ansari (Member 1)
+ * and live Recharts telemetry integration (CareerHealthDial, SkillRadarChart, HealthTrendChart, RecommendationFeed).
+ * @author Md Hussain Ansari (Member 1) & Sargam Banerjee (Member 4)
  */
 
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../context/ProfileContext';
+import { useDashboardTelemetry, useSkillIntelligence } from '../hooks';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Card from '../components/Card';
+import {
+  CareerHealthDial,
+  SkillRadarChart,
+  HealthTrendChart,
+  RecommendationFeed
+} from '../components/telemetry';
 import {
   Terminal,
   Activity,
@@ -22,18 +29,25 @@ import {
   Target,
   FileCode2,
   Database,
-  Cpu
+  Cpu,
+  Sparkles,
+  Zap
 } from 'lucide-react';
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const { profile } = useProfile();
   const location = useLocation();
+  const { data: telemetry, latencyMs } = useDashboardTelemetry();
+  const { data: skillIntel } = useSkillIntelligence();
 
   const completeness = profile?.profile_completeness || 0;
   const skillsCount = profile?.skills?.length || 0;
   const projectsCount = profile?.projects?.length || 0;
   const targetRole = profile?.target_role || 'Target Role Unassigned';
+
+  const healthScore = telemetry?.healthScore || profile?.career_health_score || 84.5;
+  const healthGrade = telemetry?.healthGrade || 'A-';
 
   // Scroll to hash element if navigated with hash
   useEffect(() => {
@@ -78,6 +92,14 @@ export default function DashboardPage() {
               <span className="bg-[#70E000] text-black border border-black px-2 py-0.5 text-[10px]">
                 NEO4J_SYNCED
               </span>
+              {latencyMs !== null && (
+                <>
+                  <span className="hidden sm:inline text-black">/</span>
+                  <span className="bg-[#38B6FF] text-black border border-black px-2 py-0.5 text-[10px]">
+                    LATENCY: {latencyMs}MS
+                  </span>
+                </>
+              )}
             </div>
 
             <div className="flex items-center space-x-2">
@@ -199,11 +221,21 @@ export default function DashboardPage() {
                   )}
                 </Card>
               </div>
+
+              {/* 6-Month Trajectory Projection Card (Member 4 - Sargam) */}
+              <Card
+                title="Career Health Progression (6-Month Trajectory)"
+                subtitle="Historical index modeled across completed projects and skill additions"
+                headerBg="bg-[#38B6FF]"
+                bodyClassName="p-6 sm:p-7"
+              >
+                <HealthTrendChart history={telemetry?.trendHistory} />
+              </Card>
             </div>
 
             {/* Right Column (5 cols): SARGAM (MEMBER 4) DATA VISUALIZATION MODULES & AGENT PIPELINE */}
             <div className="xl:col-span-5 space-y-8">
-              {/* Module A: Career Health Composite Index */}
+              {/* Module A: Career Health Composite Index (Member 4 - Sargam) */}
               <div id="health" className="scroll-mt-24">
                 <Card
                   title="Career Health Index"
@@ -211,28 +243,15 @@ export default function DashboardPage() {
                   headerBg="bg-[#FF70A6]"
                   bodyClassName="p-6 sm:p-7"
                 >
-                  {/* ========================================================================= */}
-                  {/* SARGAM (MEMBER 4) COMPONENT INTEGRATION SLOT: CareerHealthDial            */}
-                  {/* ========================================================================= */}
-                  <div className="p-8 flex flex-col items-center justify-center text-center border-2 border-black bg-[#FAF5E6] shadow-[4px_4px_0px_0px_#000] min-h-[220px]">
-                    <div className="w-14 h-14 bg-[#FFE600] border-2 border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-center mb-4">
-                      <Activity className="w-7 h-7 text-black stroke-[2.5]" />
-                    </div>
-                    <div className="text-5xl font-black font-mono text-black tracking-tight">
-                      {profile?.career_health_score || '84.5'}
-                      <span className="text-lg font-bold text-slate-700 font-mono"> / 100</span>
-                    </div>
-                    <div className="mt-3 text-[11px] font-mono font-black border-2 border-black bg-[#C4A1FF] text-black px-3 py-1 shadow-[2px_2px_0px_0px_#000]">
-                      SLOT: SARGAM_CAREER_HEALTH_DIAL
-                    </div>
-                    <p className="text-xs font-mono font-bold text-slate-700 mt-3 max-w-xs leading-relaxed">
-                      Evaluated by Career Health Agent. Visualized by Member 4 (Sargam).
-                    </p>
-                  </div>
+                  <CareerHealthDial
+                    score={healthScore}
+                    grade={healthGrade}
+                    dimensions={telemetry?.dimensions || []}
+                  />
                 </Card>
               </div>
 
-              {/* Module B: Market Skill Alignment Radar */}
+              {/* Module B: Market Skill Alignment Radar (Member 4 - Sargam) */}
               <div id="radar" className="scroll-mt-24">
                 <Card
                   title="Market Skill Alignment"
@@ -240,27 +259,24 @@ export default function DashboardPage() {
                   headerBg="bg-[#C4A1FF]"
                   bodyClassName="p-6 sm:p-7"
                 >
-                  {/* ========================================================================= */}
-                  {/* SARGAM (MEMBER 4) COMPONENT INTEGRATION SLOT: SkillRadarChart             */}
-                  {/* ========================================================================= */}
-                  <div className="p-8 flex flex-col items-center justify-center text-center border-2 border-black bg-[#FAF5E6] shadow-[4px_4px_0px_0px_#000] min-h-[240px]">
-                    <div className="w-14 h-14 bg-[#70E000] border-2 border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-center mb-4">
-                      <Layers className="w-7 h-7 text-black stroke-[2.5]" />
-                    </div>
-                    <div className="text-sm font-mono font-black uppercase text-black">
-                      Radar Chart Canvas Slot
-                    </div>
-                    <div className="mt-2 text-[11px] font-mono font-black border-2 border-black bg-[#FFE600] text-black px-3 py-1 shadow-[2px_2px_0px_0px_#000]">
-                      SLOT: SARGAM_SKILL_RADAR_VIZ
-                    </div>
-                    <p className="text-xs font-mono font-bold text-slate-700 mt-3 max-w-sm leading-relaxed">
-                      Container reserved for Member 4's Chart.js / Recharts radar graph. Synchronized with target role skill vectors.
-                    </p>
-                  </div>
+                  <SkillRadarChart
+                    data={skillIntel?.radarData}
+                    targetRole={targetRole}
+                  />
                 </Card>
               </div>
 
-              {/* Module C: Agent Pipeline DAG Telemetry */}
+              {/* Module C: AI Actionable Recommendations (Member 4 - Sargam) */}
+              <Card
+                title="AI Remediation Recommendations"
+                subtitle="High-leverage action items prioritized by LangGraph reasoning"
+                headerBg="bg-[#FFE600]"
+                bodyClassName="p-6 sm:p-7"
+              >
+                <RecommendationFeed recommendations={telemetry?.recommendations || []} />
+              </Card>
+
+              {/* Module D: Agent Pipeline DAG Telemetry */}
               <div id="pipeline" className="scroll-mt-24">
                 <Card
                   title="Agent Pipeline Execution Status"

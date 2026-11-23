@@ -1,8 +1,8 @@
 /**
  * @file Sidebar.jsx
- * @description Neo-Brutalist sidebar navigation with real-time status and single active selection.
- * Supports hash-based and path-based navigation with zero duplicate active states.
- * @author Md Hussain Ansari (Member 1)
+ * @description Neo-Brutalist sidebar navigation bar providing single-selection
+ * active states, smooth hash anchor scrolling, and modular telemetry links.
+ * @author Md Hussain Ansari (Member 1) & Sargam Banerjee (Member 4)
  */
 
 import React, { useState, useEffect } from 'react';
@@ -28,7 +28,7 @@ export default function Sidebar() {
     { name: 'Dashboard', path: '/dashboard', hash: '', icon: LayoutDashboard },
     { name: 'Career Profile', path: '/profile', hash: '', icon: UserCheck },
     { name: 'Skills & Evidence', path: '/dashboard', hash: '#skills', icon: Target },
-    { name: 'Career Health', path: '/dashboard', hash: '#health', icon: Activity, badge: 'M4' },
+    { name: 'Career Health', path: '/dashboard', hash: '#health', icon: Activity, badge: 'Live' },
     { name: 'Agent Pipeline', path: '/dashboard', hash: '#pipeline', icon: Cpu }
   ];
 
@@ -87,51 +87,40 @@ export default function Sidebar() {
           const active = isItemActive(item);
 
           return (
-            <button
+            <a
               key={item.name}
-              type="button"
+              href={`${item.path}${item.hash}`}
               onClick={(e) => handleNavClick(e, item)}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 border-2 border-black text-xs font-mono font-bold transition-all duration-75 text-left cursor-pointer ${
+              className={`flex items-center justify-between px-3 py-2.5 border-2 transition-all font-mono text-xs font-bold ${
                 active
-                  ? 'bg-[#FFE600] text-black shadow-[3px_3px_0px_0px_#000] translate-x-0.5'
-                  : 'bg-white text-black shadow-none hover:bg-[#FAF5E6] hover:shadow-[2px_2px_0px_0px_#000]'
+                  ? 'border-black bg-[#FFE600] text-black shadow-[3px_3px_0px_0px_#000] -translate-y-0.5'
+                  : 'border-transparent text-slate-700 hover:border-black hover:bg-[#FAF5E6] hover:text-black hover:shadow-[2px_2px_0px_0px_#000]'
               }`}
             >
               <div className="flex items-center space-x-2.5">
-                <Icon className="w-4 h-4 text-black stroke-[2.2]" />
-                <span>{item.name}</span>
+                <Icon className="w-4 h-4 stroke-[2.5]" />
+                <span className="uppercase tracking-tight">{item.name}</span>
               </div>
               {item.badge && (
-                <span className="text-[10px] font-mono font-black px-1.5 py-0.2 border border-black bg-[#C4A1FF] text-black">
+                <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 border border-black bg-white text-black shadow-[1px_1px_0px_0px_#000]">
                   {item.badge}
                 </span>
               )}
-            </button>
+            </a>
           );
         })}
       </div>
 
-      {/* Services Online Spec Box */}
-      <div className="pt-4 border-t-2 border-black">
-        <div className="bg-[#FAF5E6] border-2 border-black shadow-[3px_3px_0px_0px_#000] p-3 text-xs space-y-1.5">
-          <div className="flex items-center space-x-2 text-black font-mono font-black text-xs">
+      {/* System Telemetry Metadata */}
+      <div className="pt-4 border-t-2 border-black font-mono">
+        <div className="border-2 border-black bg-[#FAF5E6] p-3 shadow-[3px_3px_0px_0px_#000] space-y-1.5">
+          <div className="flex items-center space-x-1.5 text-black font-black text-[11px]">
             <Terminal className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span className="uppercase">SERVICES_STATUS</span>
+            <span>SYS_ENV: PHASE_1</span>
           </div>
-          <div className="text-[11px] font-mono font-bold text-slate-800 space-y-1 pt-1">
-            <div className="flex justify-between items-center">
-              <span>AUTH_SVC</span>
-              <span className="bg-[#70E000] text-black border border-black px-1 text-[10px]">:5001 OK</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span>PROFILE_SVC</span>
-              <span className="bg-[#70E000] text-black border border-black px-1 text-[10px]">:5002 OK</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span>SECURITY</span>
-              <span className="bg-[#FFE600] text-black border border-black px-1 text-[10px]">BCRYPT_12</span>
-            </div>
-          </div>
+          <p className="text-[10px] text-slate-700 leading-tight">
+            Microservices online on ports 5001 & 5002. LangGraph agent orchestrator on 8000.
+          </p>
         </div>
       </div>
     </aside>
