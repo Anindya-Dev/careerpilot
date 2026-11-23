@@ -2,11 +2,11 @@
  * @file LandingPage.jsx
  * @description Neo-Brutalist landing page for CareerPilot.
  * Generous horizontal container width, large impactful typography,
- * and bold neo-brutalist highlights on key technical outcomes.
+ * subheadline and tagline reveal sections cleanly removed per user request.
  * @author Md Hussain Ansari (Member 1)
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Compass,
@@ -62,36 +62,6 @@ export default function LandingPage() {
     return () => clearTimeout(timer);
   }, [displayText, isDeleting, roleIndex, roles]);
 
-  // Tagline Reveal: Words transition from muted to full on scroll
-  const taglineWords = [
-    'Real', 'engineering', 'evidence', 'evaluated', 'by', 'autonomous', 'intelligence',
-    'before', 'your', 'next', 'technical', 'interview.'
-  ];
-  const [activeWordIndex, setActiveWordIndex] = useState(0);
-  const taglineRef = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            taglineWords.forEach((_, i) => {
-              setTimeout(() => {
-                setActiveWordIndex((prev) => Math.max(prev, i + 1));
-              }, i * 75);
-            });
-          }
-        });
-      },
-      { threshold: 0.3 }
-    );
-
-    if (taglineRef.current) {
-      observer.observe(taglineRef.current);
-    }
-    return () => observer.disconnect();
-  }, [taglineWords.length]);
-
   return (
     <div className="min-h-screen bg-[#F4F0EA] text-black flex flex-col font-sans relative selection:bg-[#FFE600] selection:text-black overflow-x-hidden">
       {/* Neo-Brutalist dot grid pattern */}
@@ -125,7 +95,7 @@ export default function LandingPage() {
           </div>
         </header>
 
-        {/* SECTION 1: HERO - Generous horizontal width & prominent typography */}
+        {/* SECTION 1: HERO */}
         <section className="relative z-10 flex flex-col justify-center items-center px-4 sm:px-8 lg:px-12 pt-10 sm:pt-14 pb-16 max-w-7xl mx-auto w-full text-center">
           <div className="space-y-6 w-full flex flex-col items-center">
             
@@ -150,13 +120,6 @@ export default function LandingPage() {
                 <span className="inline-block w-3 sm:w-4 h-[0.85em] ml-2 bg-black align-middle animate-pulse" />
               </div>
             </div>
-
-            {/* Subheadline: Larger, wider, with bold underlined highlights */}
-            <p className="text-lg sm:text-xl md:text-2xl font-medium text-slate-800 max-w-4xl mx-auto leading-relaxed pt-2">
-              Seven coordinated <span className="font-bold underline decoration-[3px] decoration-[#70E000] underline-offset-4">AI agents</span> verify{' '}
-              <span className="font-bold underline decoration-[3px] decoration-[#FFE600] underline-offset-4">code evidence from GitHub</span> and query{' '}
-              <span className="font-bold underline decoration-[3px] decoration-[#38B6FF] underline-offset-4">Neo4j knowledge graphs</span> to calculate your market readiness.
-            </p>
 
             {/* Prominent Action Buttons */}
             <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto w-full">
@@ -217,7 +180,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* SECTION 2: PROBLEM TO SOLUTION - Expanded horizontal width */}
+        {/* SECTION 2: PROBLEM TO SOLUTION */}
         <section className="py-16 px-4 sm:px-8 lg:px-12 max-w-7xl mx-auto w-full">
           <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_#000] p-6 sm:p-10">
             <div className="inline-block border-2 border-black bg-[#FF70A6] px-3.5 py-1 font-mono font-bold text-xs uppercase shadow-[2px_2px_0px_0px_#000] mb-3">
@@ -246,28 +209,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* SECTION 3: TAGLINE REVEAL - Wide text display */}
-        <section ref={taglineRef} className="py-16 px-4 sm:px-8 lg:px-12 bg-[#FAF5E6] border-y-2 border-black text-center">
-          <div className="max-w-5xl mx-auto space-y-4">
-            <div className="inline-block border-2 border-black bg-[#C4A1FF] px-3.5 py-1 font-mono font-bold text-xs uppercase shadow-[2px_2px_0px_0px_#000]">
-              CORE PROMISE
-            </div>
-            <h2 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-snug">
-              {taglineWords.map((word, i) => (
-                <span
-                  key={i}
-                  className={`inline-block mr-3 transition-colors duration-300 ${
-                    i < activeWordIndex ? 'text-black' : 'text-neutral-400'
-                  }`}
-                >
-                  {word}
-                </span>
-              ))}
-            </h2>
-          </div>
-        </section>
-
-        {/* SECTION 4: OUTCOME-DRIVEN BENEFITS - Expanded 2-column cards */}
+        {/* SECTION 3: OUTCOME-DRIVEN BENEFITS */}
         <section className="py-16 px-4 sm:px-8 lg:px-12 max-w-7xl mx-auto w-full">
           <div className="text-center mb-10">
             <div className="inline-block border-2 border-black bg-[#38B6FF] px-3.5 py-1 font-mono font-bold text-xs uppercase shadow-[2px_2px_0px_0px_#000] mb-2">
@@ -329,7 +271,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* SECTION 5: HOW IT WORKS - Wide 3-column steps */}
+        {/* SECTION 4: HOW IT WORKS */}
         <section className="py-16 px-4 sm:px-8 lg:px-12 bg-white border-y-2 border-black">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-10">
@@ -381,7 +323,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* SECTION 6: FINAL ACTION BANNER */}
+        {/* SECTION 5: FINAL ACTION BANNER */}
         <section className="py-16 px-4 sm:px-8 lg:px-12 bg-[#FFE600] text-center border-t-2 border-black">
           <div className="max-w-4xl mx-auto space-y-5">
             <h2 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-black">
