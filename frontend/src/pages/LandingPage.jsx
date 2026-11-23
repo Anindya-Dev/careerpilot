@@ -258,12 +258,12 @@ export default function LandingPage() {
         <section className="py-16 px-4 sm:px-8 lg:px-12 max-w-7xl mx-auto w-full">
           <Reveal delay={0}>
             <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_#000] p-6 sm:p-10 hover:shadow-[10px_10px_0px_0px_#000] transition-shadow duration-150">
-              <div className="inline-block border-2 border-black bg-[#FF70A6] px-3.5 py-1 font-mono font-bold text-xs uppercase shadow-[2px_2px_0px_0px_#000] mb-3">
+              <div className="inline-block border-[3px] border-black bg-[#FF70A6] px-5 sm:px-6 py-2 sm:py-2.5 font-mono font-black text-sm sm:text-base uppercase tracking-wider shadow-[4px_4px_0px_0px_#000] mb-4">
                 THE HIRING DISCONNECT
               </div>
-              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-black leading-tight">
+              <h2 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-black leading-tight">
                 Course grades do not prove hands on capability.{' '}
-                <span className="bg-[#FFE600] px-2 border-2 border-black shadow-[3px_3px_0px_0px_#000]">
+                <span className="bg-[#FFE600] px-2.5 py-0.5 border-[3px] border-black shadow-[4px_4px_0px_0px_#000]">
                   Code evidence does.
                 </span>
               </h2>
@@ -287,11 +287,11 @@ export default function LandingPage() {
 
         {/* SECTION 3: OUTCOME-DRIVEN BENEFITS - Staggered Scroll Reveal Cards */}
         <section className="py-16 px-4 sm:px-8 lg:px-12 max-w-7xl mx-auto w-full">
-          <Reveal delay={0} className="text-center mb-10">
-            <div className="inline-block border-2 border-black bg-[#38B6FF] px-3.5 py-1 font-mono font-bold text-xs uppercase shadow-[2px_2px_0px_0px_#000] mb-2">
+          <Reveal delay={0} className="text-center mb-12">
+            <div className="inline-block border-[3px] border-black bg-[#38B6FF] px-5 sm:px-6 py-2 sm:py-2.5 font-mono font-black text-sm sm:text-base uppercase tracking-wider shadow-[4px_4px_0px_0px_#000] mb-4">
               PLATFORM CAPABILITIES
             </div>
-            <h2 className="text-3xl sm:text-5xl font-black text-black tracking-tight">
+            <h2 className="text-4xl sm:text-6xl md:text-7xl font-black text-black tracking-tight leading-[1.1]">
               Engineered for genuine technical outcomes
             </h2>
           </Reveal>
@@ -358,11 +358,11 @@ export default function LandingPage() {
         {/* SECTION 4: HOW IT WORKS - Step-by-Step Staggered Scroll Reveal */}
         <section className="py-16 px-4 sm:px-8 lg:px-12 bg-white border-y-2 border-black">
           <div className="max-w-7xl mx-auto">
-            <Reveal delay={0} className="text-center mb-10">
-              <div className="inline-block border-2 border-black bg-[#FFE600] px-3.5 py-1 font-mono font-bold text-xs uppercase shadow-[2px_2px_0px_0px_#000] mb-2">
+            <Reveal delay={0} className="text-center mb-12">
+              <div className="inline-block border-[3px] border-black bg-[#FFE600] px-5 sm:px-6 py-2 sm:py-2.5 font-mono font-black text-sm sm:text-base uppercase tracking-wider shadow-[4px_4px_0px_0px_#000] mb-4">
                 WORKFLOW
               </div>
-              <h2 className="text-3xl sm:text-5xl font-black text-black tracking-tight">
+              <h2 className="text-4xl sm:text-6xl md:text-7xl font-black text-black tracking-tight leading-[1.1]">
                 How CareerPilot evaluates readiness in three steps
               </h2>
             </Reveal>
