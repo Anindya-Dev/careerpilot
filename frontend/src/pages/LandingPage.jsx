@@ -414,11 +414,35 @@ export default function LandingPage() {
         </section>
 
         {/* SECTION 5: FINAL ACTION BANNER - Scale Reveal */}
-        <section className="pt-2 sm:pt-3 pb-12 sm:pb-16 px-2 sm:px-4 bg-[#FFE600] text-center border-t-2 border-black overflow-hidden w-full">
+        <section className="pt-1 sm:pt-2 pb-12 sm:pb-16 px-2 sm:px-4 bg-[#FFE600] text-center border-t-2 border-black overflow-hidden w-full">
           <Reveal delay={0} className="w-full mx-auto space-y-4">
-            <h2 className="neo-outline-text whitespace-nowrap text-[5.2vw] font-black tracking-tight leading-none py-1.5 select-none w-full block">
-              Verify your technical readiness today
-            </h2>
+            {/* Edge-to-edge bold black outline text with no black fill (SVG vector for 100% visibility) */}
+            <div className="w-full overflow-hidden select-none pt-0">
+              <svg
+                viewBox="0 0 1600 95"
+                className="w-full h-auto block max-h-[130px] pointer-events-none"
+                aria-hidden="true"
+              >
+                <text
+                  x="50%"
+                  y="52%"
+                  dominantBaseline="central"
+                  textAnchor="middle"
+                  fill="none"
+                  stroke="#000000"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                  fontFamily="'Geist', system-ui, -apple-system, sans-serif"
+                  fontWeight="900"
+                  fontSize="74"
+                  letterSpacing="-0.5"
+                >
+                  Verify your technical readiness today
+                </text>
+              </svg>
+              <h2 className="sr-only">Verify your technical readiness today</h2>
+            </div>
+
             <p className="text-base sm:text-lg md:text-xl font-bold text-slate-900 max-w-2xl mx-auto leading-relaxed">
               Connect your GitHub repository links to generate your Career Intelligence Index in seconds.
             </p>
