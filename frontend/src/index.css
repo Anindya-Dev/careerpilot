@@ -87,22 +87,31 @@
   }
 }
 
-/* Neo-brutalism reusable utilities */
-.neo-box {
-  @apply bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000];
+/* Outlined / hollow Neo-Brutalism typography: bold black border only, no fill */
+.neo-outline-text {
+  color: #000000; /* Fallback so text is NEVER invisible */
 }
 
-/* Neo-brutalist stroked outline text (border only, transparent fill) */
-.neo-outline-text {
-  color: transparent;
-  -webkit-text-stroke: 2px #000000;
-  -webkit-text-fill-color: transparent;
+@supports (-webkit-text-stroke: 1px black) or (-webkit-text-stroke: 1px #000) {
+  .neo-outline-text {
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 2.5px #000000;
+    paint-order: stroke fill;
+  }
 }
 
 @media (min-width: 768px) {
-  .neo-outline-text {
-    -webkit-text-stroke: 3.5px #000000;
+  @supports (-webkit-text-stroke: 1px black) or (-webkit-text-stroke: 1px #000) {
+    .neo-outline-text {
+      -webkit-text-stroke: 3.5px #000000;
+    }
   }
+}
+
+/* Neo-brutalism reusable utilities */
+.neo-box {
+  @apply bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000];
 }
 
 .neo-box-lg {
