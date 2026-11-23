@@ -1,7 +1,7 @@
 /**
  * @file Card.jsx
- * @description Hallmark architectural card component for dashboard panels and telemetry widgets.
- * Features high-contrast dark surfaces, precision border outlines, and crisp typography.
+ * @description Neo-Brutalist card container.
+ * Thick black border, hard offset shadow, bold header banner.
  * @author Md Hussain Ansari (Member 1)
  */
 
@@ -13,22 +13,23 @@ export default function Card({
   actions,
   children,
   className = '',
-  bodyClassName = 'p-6'
+  bodyClassName = 'p-5',
+  headerBg = 'bg-[#FAF5E6]'
 }) {
   return (
     <div
-      className={`bg-[#0d111a] border border-slate-800/90 rounded-xl shadow-lg overflow-hidden text-slate-100 ${className}`}
+      className={`bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] text-black ${className}`}
     >
       {(title || subtitle || actions) && (
-        <div className="px-6 py-4 border-b border-slate-800/80 flex items-center justify-between">
+        <div className={`px-4 py-3 border-b-2 border-black flex items-center justify-between ${headerBg}`}>
           <div>
             {title && (
-              <h3 className="text-sm font-semibold tracking-tight text-white flex items-center gap-2">
+              <h3 className="text-xs font-mono font-black uppercase tracking-wider text-black">
                 {title}
               </h3>
             )}
             {subtitle && (
-              <p className="text-[11px] font-mono text-slate-400 mt-0.5">{subtitle}</p>
+              <p className="text-[11px] font-mono text-slate-700 mt-0.5">{subtitle}</p>
             )}
           </div>
           {actions && <div className="flex items-center space-x-2">{actions}</div>}

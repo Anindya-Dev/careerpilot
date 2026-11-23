@@ -1,18 +1,15 @@
 /**
  * @file AuthModal.jsx
- * @description Hallmark-styled pop-up modal for student authentication and registration.
- * High-contrast dark engineering aesthetics with blurred background, clear typography,
- * and seamless mode toggling.
+ * @description Neo-Brutalist authentication popup modal.
+ * Chunky black borders, vibrant accent headers, and hard offset shadows.
  * @author Md Hussain Ansari (Member 1)
  */
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import Input from './Input';
-import Button from './Button';
 import Alert from './Alert';
-import { Compass, X, ArrowRight, UserPlus, ShieldCheck, Terminal } from 'lucide-react';
+import { Compass, X, ArrowRight, UserPlus, Shield } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
   const { login, register } = useAuth();
@@ -60,11 +57,11 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
 
   const validateLogin = () => {
     const errs = {};
-    if (!loginData.email.trim()) errs.email = 'Email is required';
+    if (!loginData.email.trim()) errs.email = 'Email required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginData.email.trim())) {
-      errs.email = 'Please enter a valid email address';
+      errs.email = 'Invalid email address';
     }
-    if (!loginData.password) errs.password = 'Password is required';
+    if (!loginData.password) errs.password = 'Password required';
     else if (loginData.password.length < 8) errs.password = 'Min. 8 characters';
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -72,13 +69,13 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
 
   const validateRegister = () => {
     const errs = {};
-    if (!regData.name.trim()) errs.name = 'Full name is required';
-    if (!regData.email.trim()) errs.email = 'Email is required';
+    if (!regData.name.trim()) errs.name = 'Full name required';
+    if (!regData.email.trim()) errs.email = 'Email required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(regData.email.trim())) {
-      errs.email = 'Please enter a valid email address';
+      errs.email = 'Invalid email address';
     }
-    if (!regData.password) errs.password = 'Password is required';
-    else if (regData.password.length < 8) errs.password = 'Must be at least 8 characters';
+    if (!regData.password) errs.password = 'Password required';
+    else if (regData.password.length < 8) errs.password = 'Min. 8 characters';
     if (regData.password !== regData.confirmPassword) {
       errs.confirmPassword = 'Passwords do not match';
     }
@@ -128,234 +125,233 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Blurred Deep Backdrop */}
+      {/* Solid Black Dim Overlay */}
       <div
-        className="fixed inset-0 bg-[#04060a]/80 backdrop-blur-md transition-all duration-200"
+        className="fixed inset-0 bg-black/70"
         onClick={onClose}
       />
 
       <div className="min-h-screen px-4 text-center flex items-center justify-center py-8">
-        {/* Modal Window Card */}
+        {/* Neo-Brutalist Modal Card */}
         <div
-          className="relative inline-block w-full max-w-md p-6 sm:p-7 my-8 text-left align-middle transition-all transform bg-[#0d111a] border border-slate-800 shadow-2xl rounded-xl z-10 text-slate-100"
+          className="relative inline-block w-full max-w-md my-8 text-left align-middle bg-[#FFFDF9] border-[3px] border-black shadow-[8px_8px_0px_0px_#000] z-10 text-black overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Close Button */}
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute top-5 right-5 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-
-          {/* Modal Header */}
-          <div className="flex items-center space-x-3 mb-5">
-            <div className="w-8 h-8 rounded-lg bg-white text-slate-950 flex items-center justify-center font-bold shadow-sm">
-              <Compass className="w-4 h-4 text-slate-950 stroke-[2.2]" />
-            </div>
-            <div>
-              <h3 className="text-base font-semibold text-white tracking-tight">
-                {mode === 'login' ? 'Student Sign In' : 'Create Student Profile'}
+          {/* Header Bar */}
+          <div className="bg-[#FFE600] border-b-[3px] border-black p-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2.5">
+              <div className="w-7 h-7 bg-white border-2 border-black flex items-center justify-center font-bold">
+                <Compass className="w-4 h-4 text-black stroke-[2.5]" />
+              </div>
+              <h3 className="text-sm font-mono font-black uppercase tracking-wider text-black">
+                {mode === 'login' ? 'STUDENT AUTHENTICATION' : 'CREATE PROFILE'}
               </h3>
-              <p className="text-[11px] font-mono text-slate-400">AUTH::ACCESS_GATEWAY</p>
             </div>
-          </div>
-
-          {/* Segmented Switcher Tabs */}
-          <div className="grid grid-cols-2 p-1 bg-slate-900 border border-slate-800 rounded-lg mb-5 text-xs font-mono">
             <button
               type="button"
-              onClick={() => {
-                setMode('login');
-                setServerError('');
-                setErrors({});
-              }}
-              className={`py-1.5 rounded transition-colors ${
-                mode === 'login'
-                  ? 'bg-slate-800 text-white font-medium shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
+              onClick={onClose}
+              className="p-1 border-2 border-black bg-white hover:bg-black hover:text-white transition-colors duration-75 shadow-[2px_2px_0px_0px_#000]"
             >
-              SIGN_IN
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setMode('register');
-                setServerError('');
-                setErrors({});
-              }}
-              className={`py-1.5 rounded transition-colors ${
-                mode === 'register'
-                  ? 'bg-slate-800 text-white font-medium shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              REGISTER
+              <X className="w-4 h-4 stroke-[2.5]" />
             </button>
           </div>
 
-          {serverError && (
-            <Alert
-              type="error"
-              message={serverError}
-              className="mb-4"
-              onClose={() => setServerError('')}
-            />
-          )}
+          <div className="p-6">
+            {/* Segmented Mode Tabs */}
+            <div className="grid grid-cols-2 p-1 bg-[#F4F0EA] border-2 border-black mb-5 text-xs font-mono font-bold">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('login');
+                  setServerError('');
+                  setErrors({});
+                }}
+                className={`py-1.5 transition-all duration-75 ${
+                  mode === 'login'
+                    ? 'bg-[#38B6FF] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000]'
+                    : 'text-black hover:bg-white'
+                }`}
+              >
+                SIGN_IN
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('register');
+                  setServerError('');
+                  setErrors({});
+                }}
+                className={`py-1.5 transition-all duration-75 ${
+                  mode === 'register'
+                    ? 'bg-[#38B6FF] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000]'
+                    : 'text-black hover:bg-white'
+                }`}
+              >
+                REGISTER
+              </button>
+            </div>
 
-          {/* LOGIN FORM */}
-          {mode === 'login' && (
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1.5">
-                  Student Email
-                </label>
-                <input
-                  type="email"
-                  placeholder="student@careerpilot.io"
-                  value={loginData.email}
-                  onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                  className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
-                  required
-                />
-                {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
-              </div>
+            {serverError && (
+              <Alert
+                type="error"
+                message={serverError}
+                className="mb-4"
+                onClose={() => setServerError('')}
+              />
+            )}
 
-              <div>
-                <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1.5">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  value={loginData.password}
-                  onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                  className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
-                  required
-                />
-                {errors.password && <p className="mt-1 text-xs text-red-400">{errors.password}</p>}
-              </div>
+            {/* LOGIN FORM */}
+            {mode === 'login' && (
+              <form onSubmit={handleLoginSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1.5">
+                    Student Email
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="student@university.edu"
+                    value={loginData.email}
+                    onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                    className="w-full px-3 py-2 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-[#FFFDF0]"
+                    required
+                  />
+                  {errors.email && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.email}</p>}
+                </div>
 
-              <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 pt-1">
-                <span className="flex items-center text-slate-400">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 mr-1" />
-                  12-ROUND BCRYPT
-                </span>
+                <div>
+                  <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1.5">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    value={loginData.password}
+                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                    className="w-full px-3 py-2 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-[#FFFDF0]"
+                    required
+                  />
+                  {errors.password && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.password}</p>}
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] font-mono text-black font-bold pt-1">
+                  <span className="flex items-center">
+                    <Shield className="w-3.5 h-3.5 mr-1 stroke-[2.5]" />
+                    BCRYPT_12
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('register');
+                      setServerError('');
+                    }}
+                    className="underline hover:bg-[#FFE600] px-1"
+                  >
+                    Need profile? Register &rarr;
+                  </button>
+                </div>
+
                 <button
-                  type="button"
-                  onClick={() => {
-                    setMode('register');
-                    setServerError('');
-                  }}
-                  className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-2.5 mt-2 border-2 border-black bg-[#70E000] text-black hover:bg-[#85FF0A] font-mono font-black text-xs uppercase tracking-wider shadow-[4px_4px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center disabled:opacity-50"
                 >
-                  Create account &rarr;
+                  {isSubmitting ? 'Authenticating...' : 'Sign In to Workspace'}
+                  <ArrowRight className="w-4 h-4 ml-1.5 stroke-[2.5]" />
                 </button>
-              </div>
+              </form>
+            )}
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-2.5 mt-2 rounded-lg bg-white text-slate-950 hover:bg-slate-100 font-semibold text-sm transition-colors duration-150 flex items-center justify-center active:scale-[0.99] disabled:opacity-50"
-              >
-                {isSubmitting ? 'Authenticating...' : 'Sign In to Dashboard'}
-                <ArrowRight className="w-4 h-4 ml-1.5 text-slate-800" />
-              </button>
-            </form>
-          )}
+            {/* REGISTER FORM */}
+            {mode === 'register' && (
+              <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
+                <div>
+                  <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Md Hussain Ansari"
+                    value={regData.name}
+                    onChange={(e) => setRegData({ ...regData, name: e.target.value })}
+                    className="w-full px-3 py-2 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-[#FFFDF0]"
+                    required
+                  />
+                  {errors.name && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.name}</p>}
+                </div>
 
-          {/* REGISTER FORM */}
-          {mode === 'register' && (
-            <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
-              <div>
-                <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  placeholder="Md Hussain Ansari"
-                  value={regData.name}
-                  onChange={(e) => setRegData({ ...regData, name: e.target.value })}
-                  className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
-                  required
-                />
-                {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name}</p>}
-              </div>
+                <div>
+                  <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">
+                    Student Email
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="hussain@university.edu"
+                    value={regData.email}
+                    onChange={(e) => setRegData({ ...regData, email: e.target.value })}
+                    className="w-full px-3 py-2 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-[#FFFDF0]"
+                    required
+                  />
+                  {errors.email && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.email}</p>}
+                </div>
 
-              <div>
-                <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1">
-                  Student Email
-                </label>
-                <input
-                  type="email"
-                  placeholder="hussain@engineering.edu"
-                  value={regData.email}
-                  onChange={(e) => setRegData({ ...regData, email: e.target.value })}
-                  className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
-                  required
-                />
-                {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
-              </div>
+                <div>
+                  <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">
+                    Discipline / Major
+                  </label>
+                  <select
+                    value={regData.major}
+                    onChange={(e) => setRegData({ ...regData, major: e.target.value })}
+                    className="w-full px-3 py-2 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] text-black focus:outline-none focus:bg-[#FFFDF0]"
+                  >
+                    <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Artificial Intelligence & ML">Artificial Intelligence & ML</option>
+                    <option value="Electronics & Communication">Electronics & Communication</option>
+                    <option value="Data Science">Data Science</option>
+                  </select>
+                </div>
 
-              <div>
-                <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1">
-                  Discipline / Major
-                </label>
-                <select
-                  value={regData.major}
-                  onChange={(e) => setRegData({ ...regData, major: e.target.value })}
-                  className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition-colors"
+                <div>
+                  <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">
+                    Password (Min 8 Chars)
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    value={regData.password}
+                    onChange={(e) => setRegData({ ...regData, password: e.target.value })}
+                    className="w-full px-3 py-2 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-[#FFFDF0]"
+                    required
+                  />
+                  {errors.password && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.password}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">
+                    Confirm Password
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    value={regData.confirmPassword}
+                    onChange={(e) => setRegData({ ...regData, confirmPassword: e.target.value })}
+                    className="w-full px-3 py-2 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-[#FFFDF0]"
+                    required
+                  />
+                  {errors.confirmPassword && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.confirmPassword}</p>}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-2.5 mt-2 border-2 border-black bg-[#70E000] text-black hover:bg-[#85FF0A] font-mono font-black text-xs uppercase tracking-wider shadow-[4px_4px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center disabled:opacity-50"
                 >
-                  <option value="Computer Science & Engineering">Computer Science & Engineering</option>
-                  <option value="Information Technology">Information Technology</option>
-                  <option value="Artificial Intelligence & ML">Artificial Intelligence & ML</option>
-                  <option value="Electronics & Communication">Electronics & Communication</option>
-                  <option value="Data Science">Data Science</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1">
-                  Password (Min 8 Chars)
-                </label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  value={regData.password}
-                  onChange={(e) => setRegData({ ...regData, password: e.target.value })}
-                  className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
-                  required
-                />
-                {errors.password && <p className="mt-1 text-xs text-red-400">{errors.password}</p>}
-              </div>
-
-              <div>
-                <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1">
-                  Confirm Password
-                </label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  value={regData.confirmPassword}
-                  onChange={(e) => setRegData({ ...regData, confirmPassword: e.target.value })}
-                  className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
-                  required
-                />
-                {errors.confirmPassword && <p className="mt-1 text-xs text-red-400">{errors.confirmPassword}</p>}
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-2.5 mt-2 rounded-lg bg-white text-slate-950 hover:bg-slate-100 font-semibold text-sm transition-colors duration-150 flex items-center justify-center active:scale-[0.99] disabled:opacity-50"
-              >
-                <UserPlus className="w-4 h-4 mr-1.5 text-slate-800" />
-                {isSubmitting ? 'Creating Profile...' : 'Complete Registration'}
-              </button>
-            </form>
-          )}
+                  <UserPlus className="w-4 h-4 mr-1.5 stroke-[2.5]" />
+                  {isSubmitting ? 'Registering...' : 'Initialize Student Account'}
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       </div>
     </div>

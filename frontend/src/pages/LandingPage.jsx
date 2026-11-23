@@ -1,31 +1,17 @@
 /**
  * @file LandingPage.jsx
- * @description Hallmark-crafted public landing page for CareerPilot.
- * Follows anti-AI-slop design principles: authentic technical typography,
- * high-contrast architectural canvas, tactile interaction tokens, and dynamic modal auth.
+ * @description Neo-Brutalist public landing page for CareerPilot.
+ * Bold high-contrast typography, thick black outlines, hard offset drop-shadows,
+ * vibrant color blocks, and dynamic typewriter target role hero.
  * @author Md Hussain Ansari (Member 1)
  */
 
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import {
-  Compass,
-  ArrowRight,
-  LogIn,
-  ChevronRight,
-  Terminal,
-  Cpu,
-  Layers,
-  ShieldCheck,
-  Check
-} from 'lucide-react';
-import Button from '../components/Button';
+import { Link } from 'react-router-dom';
+import { Compass, ArrowRight, LogIn, Terminal, Shield, Cpu, Network, Check } from 'lucide-react';
 import AuthModal from '../components/AuthModal';
 
 export default function LandingPage() {
-  const navigate = useNavigate();
-
-  // Dynamic cycling target roles with typewriter cadence
   const roles = [
     'AI & Machine Learning Engineers',
     'Full-Stack Cloud Architects',
@@ -37,8 +23,6 @@ export default function LandingPage() {
   const [roleIndex, setRoleIndex] = useState(0);
   const [displayText, setDisplayText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
-
-  // Pop-up modal state
   const [authModal, setAuthModal] = useState({ isOpen: false, mode: 'login' });
 
   useEffect(() => {
@@ -49,7 +33,7 @@ export default function LandingPage() {
       if (displayText.length < currentFullText.length) {
         timer = setTimeout(() => {
           setDisplayText(currentFullText.slice(0, displayText.length + 1));
-        }, 55);
+        }, 50);
       } else {
         timer = setTimeout(() => {
           setIsDeleting(true);
@@ -59,7 +43,7 @@ export default function LandingPage() {
       if (displayText.length > 0) {
         timer = setTimeout(() => {
           setDisplayText(currentFullText.slice(0, displayText.length - 1));
-        }, 30);
+        }, 25);
       } else {
         setIsDeleting(false);
         setRoleIndex((prev) => (prev + 1) % roles.length);
@@ -70,133 +54,125 @@ export default function LandingPage() {
   }, [displayText, isDeleting, roleIndex, roles]);
 
   return (
-    <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col relative overflow-hidden font-sans">
-      {/* Hallmark Architectural Canvas: Precision grid + Soft top illumination */}
-      <div className="absolute inset-0 tech-grid pointer-events-none opacity-80" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[360px] bg-slate-800/20 blur-[130px] rounded-full pointer-events-none -z-0" />
+    <div className="min-h-screen bg-[#F4F0EA] text-black flex flex-col font-sans relative selection:bg-[#FFE600] selection:text-black">
+      {/* Neo-Brutalist dot grid pattern */}
+      <div className="absolute inset-0 neo-grid pointer-events-none opacity-25 -z-0" />
 
-      {/* Main Content Wrapper (Blurs when AuthModal opens) */}
-      <div
-        className={`min-h-screen flex flex-col justify-between transition-all duration-200 ${
-          authModal.isOpen ? 'filter blur-[5px] scale-[0.99] pointer-events-none select-none' : ''
-        }`}
-      >
-        {/* Architectural Header */}
-        <header className="relative z-20 border-b border-slate-800/80 backdrop-blur-md bg-[#07090e]/80 sticky top-0">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 h-18 py-3 flex items-center justify-between">
-            {/* Brand Identity */}
+      {/* Main Content Layout */}
+      <div className={`min-h-screen flex flex-col justify-between relative z-10 ${authModal.isOpen ? 'pointer-events-none select-none' : ''}`}>
+        {/* Bold Top Navigation */}
+        <header className="bg-white border-b-2 border-black sticky top-0 z-20">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            {/* Identity */}
             <Link to="/" className="flex items-center space-x-3 group">
-              <div className="w-9 h-9 rounded-lg bg-white text-slate-950 flex items-center justify-center font-bold shadow-sm transition-transform duration-150 group-hover:scale-105">
-                <Compass className="w-5 h-5 text-slate-950 stroke-[2.2]" />
+              <div className="w-9 h-9 bg-[#FFE600] border-2 border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-center font-bold transition-transform duration-75 group-hover:-translate-y-0.5">
+                <Compass className="w-5 h-5 text-black stroke-[2.5]" />
               </div>
-              <div className="flex flex-col">
-                <span className="text-base font-semibold tracking-tight text-white flex items-center gap-2">
+              <div className="flex items-baseline space-x-2">
+                <span className="text-base font-black tracking-tight text-black uppercase font-mono">
                   CareerPilot
-                  <span className="font-mono text-[10px] tracking-widest text-slate-400 font-normal px-1.5 py-0.5 rounded border border-slate-800 bg-slate-900">
-                    v1.0
-                  </span>
                 </span>
-                <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider">
-                  Multi-Agent Intelligence
+                <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 border-2 border-black bg-[#C4A1FF] text-black uppercase shadow-[1px_1px_0px_0px_#000]">
+                  v1.0
                 </span>
               </div>
             </Link>
 
-            {/* Telemetry pill & Login Action */}
+            {/* Telemetry pill & Actions */}
             <div className="flex items-center space-x-3 sm:space-x-4">
-              <div className="hidden sm:flex items-center space-x-2 px-3 py-1 rounded-md border border-slate-800 bg-slate-900/90 text-[11px] font-mono text-slate-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>SWARM_STATUS: ACTIVE</span>
+              <div className="hidden sm:flex items-center space-x-2 px-3 py-1 border-2 border-black bg-[#70E000] text-black text-xs font-mono font-bold shadow-[3px_3px_0px_0px_#000]">
+                <span className="w-2 h-2 rounded-full bg-black animate-pulse" />
+                <span>SWARM: 7_NODES_ONLINE</span>
               </div>
 
               <button
                 type="button"
                 onClick={() => setAuthModal({ isOpen: true, mode: 'login' })}
-                className="inline-flex items-center px-4 py-2 rounded-lg bg-slate-100 hover:bg-white text-slate-950 text-xs font-semibold tracking-tight shadow-sm transition-colors duration-150 active:scale-[0.98]"
+                className="inline-flex items-center px-4 py-2 border-2 border-black bg-[#FFE600] text-black text-xs font-mono font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75"
               >
-                <LogIn className="w-3.5 h-3.5 mr-1.5 text-slate-800 stroke-[2.2]" />
+                <LogIn className="w-3.5 h-3.5 mr-1.5 stroke-[2.5]" />
                 Student Login
               </button>
             </div>
           </div>
         </header>
 
-        {/* Hero Section */}
-        <main className="flex-1 relative z-10 flex flex-col justify-center items-center px-4 sm:px-6 py-16 sm:py-24 max-w-4xl mx-auto w-full text-center my-auto">
-          <div className="space-y-7 w-full">
-            {/* System Status Breadcrumb */}
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-md border border-slate-800 bg-slate-900/70 text-slate-400 text-xs font-mono tracking-wide">
-              <Terminal className="w-3.5 h-3.5 text-indigo-400" />
-              <span>AGENT_DAG :: 7 AUTONOMOUS NODES READY</span>
+        {/* Central Hero Terminal Section */}
+        <main className="flex-1 relative z-10 flex flex-col justify-center items-center px-4 sm:px-6 py-12 sm:py-20 max-w-4xl mx-auto w-full text-center my-auto">
+          <div className="space-y-6 w-full">
+            {/* System Status Pill */}
+            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 border-2 border-black bg-white text-black text-xs font-mono font-bold shadow-[3px_3px_0px_0px_#000]">
+              <Terminal className="w-4 h-4 stroke-[2.5]" />
+              <span>DAG_EXECUTION :: 7 AGENT NODES CONNECTED</span>
             </div>
 
-            {/* Dynamic Headline with Typewriter Animation */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.15]">
+            {/* Editorial Headline with Neo-Brutalist Highlight Box */}
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-black leading-[1.15]">
               Autonomous AI Career Intelligence for
-              <span className="block mt-3 text-cyan-400 font-mono tracking-normal min-h-[1.3em]">
-                <span>{displayText}</span>
-                <span className="inline-block w-[2.5px] h-[0.85em] ml-1 bg-cyan-400 align-middle animate-pulse" />
+              <span className="block mt-4">
+                <span className="inline-block bg-[#FFE600] border-[3px] border-black px-4 py-2 shadow-[5px_5px_0px_0px_#000] text-black font-mono font-black text-2xl sm:text-4xl lg:text-5xl min-h-[1.4em]">
+                  <span>{displayText}</span>
+                  <span className="inline-block w-2.5 h-[0.8em] ml-2 bg-black align-middle animate-pulse" />
+                </span>
               </span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto leading-relaxed">
-              Seven autonomous AI agents coordinate over a Neo4j knowledge graph to verify code claims,
-              benchmark skill-market demand, and compute your Career Intelligence Index in real time.
+            <p className="text-sm sm:text-base font-semibold text-slate-800 max-w-xl mx-auto leading-relaxed pt-1">
+              Seven autonomous AI agents coordinate over a Neo4j knowledge graph to audit repository
+              evidence, benchmark market demand, and compute your readiness index in real time.
             </p>
 
-            {/* Job-Driven Actions */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3.5 max-w-sm mx-auto w-full">
+            {/* Tactile Push-Down Actions */}
+            <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-xs sm:max-w-md mx-auto w-full">
               <button
                 type="button"
                 onClick={() => setAuthModal({ isOpen: true, mode: 'login' })}
-                className="w-full sm:w-auto px-7 py-3 rounded-lg bg-white text-slate-950 hover:bg-slate-100 font-semibold text-sm shadow-md transition-colors duration-150 flex items-center justify-center group active:scale-[0.98]"
+                className="w-full sm:w-auto px-7 py-3 border-[3px] border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono font-black text-xs uppercase tracking-wider shadow-[5px_5px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[7px_7px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center"
               >
                 <span>Student Login</span>
-                <ArrowRight className="w-4 h-4 ml-1.5 transition-transform duration-150 group-hover:translate-x-0.5" />
+                <ArrowRight className="w-4 h-4 ml-2 stroke-[2.5]" />
               </button>
 
               <button
                 type="button"
                 onClick={() => setAuthModal({ isOpen: true, mode: 'register' })}
-                className="w-full sm:w-auto px-6 py-3 rounded-lg border border-slate-750 bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white font-medium text-sm transition-colors duration-150 active:scale-[0.98]"
+                className="w-full sm:w-auto px-6 py-3 border-[3px] border-black bg-white hover:bg-[#F4F0EA] text-black font-mono font-black text-xs uppercase tracking-wider shadow-[5px_5px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[7px_7px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75"
               >
                 <span>Create Profile</span>
               </button>
             </div>
 
-            {/* Technical Specification Badges */}
-            <div className="pt-6 flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-[11px] font-mono text-slate-500">
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+            {/* Chunky Spec Chips (Neo-Brutalist Architecture Bar) */}
+            <div className="pt-8 flex flex-wrap items-center justify-center gap-3 max-w-2xl mx-auto">
+              <div className="border-2 border-black bg-[#C4A1FF] text-black px-3 py-1 font-mono font-bold text-xs shadow-[2px_2px_0px_0px_#000]">
                 LangGraph State DAG
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+              </div>
+              <div className="border-2 border-black bg-[#38B6FF] text-black px-3 py-1 font-mono font-bold text-xs shadow-[2px_2px_0px_0px_#000]">
                 Neo4j Property Graph
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+              </div>
+              <div className="border-2 border-black bg-[#FFDE59] text-black px-3 py-1 font-mono font-bold text-xs shadow-[2px_2px_0px_0px_#000]">
                 12-Round Bcrypt Auth
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+              </div>
+              <div className="border-2 border-black bg-[#FF70A6] text-black px-3 py-1 font-mono font-bold text-xs shadow-[2px_2px_0px_0px_#000]">
                 Token Rotation
-              </span>
+              </div>
             </div>
           </div>
         </main>
 
         {/* Minimal Engineering Footer */}
-        <footer className="relative z-10 border-t border-slate-850 py-6 text-center text-xs font-mono text-slate-500">
-          <p>CAREERPILOT • MULTI-AGENT AI PLATFORM • B.TECH FINAL YEAR PROJECT</p>
-          <p className="mt-1 text-[11px] text-slate-600">
-            Engineered by Md Hussain Ansari (Member 1), Anindya, Arik & Sargam
-          </p>
+        <footer className="relative z-10 border-t-2 border-black py-4 bg-white text-center text-xs font-mono font-bold text-black">
+          <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <span>CAREERPILOT // FINAL YEAR ENGINEERING PROJECT</span>
+            <span className="text-slate-700">
+              Built by Hussain Ansari (M1), Anindya (M2), Arik (M3) & Sargam (M4)
+            </span>
+          </div>
         </footer>
       </div>
 
-      {/* Pop-up Authentication & Registration Modal with Deep Blurred Backdrop */}
+      {/* Neo-Brutalist Modal */}
       <AuthModal
         isOpen={authModal.isOpen}
         initialMode={authModal.mode}

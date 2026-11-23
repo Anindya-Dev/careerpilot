@@ -1,7 +1,7 @@
 /**
  * @file RegisterPage.jsx
- * @description Hallmark-crafted student account registration view capturing name, email,
- * password, and engineering major with architectural dark styling and high-contrast tokens.
+ * @description Neo-Brutalist student account registration view.
+ * High-contrast borders, solid shadows, vibrant buttons.
  * @author Md Hussain Ansari (Member 1)
  */
 
@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Alert from '../components/Alert';
-import { Compass, UserPlus, ShieldCheck, Terminal } from 'lucide-react';
+import { Compass, UserPlus, Shield, Terminal } from 'lucide-react';
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -38,17 +38,17 @@ export default function RegisterPage() {
 
   const validate = () => {
     const errs = {};
-    if (!formData.name.trim()) errs.name = 'Full name is required';
+    if (!formData.name.trim()) errs.name = 'Full name required';
     if (!formData.email.trim()) {
-      errs.email = 'Email address is required';
+      errs.email = 'Email required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
-      errs.email = 'Please provide a valid university or personal email';
+      errs.email = 'Invalid email address';
     }
 
     if (!formData.password) {
-      errs.password = 'Password is required';
+      errs.password = 'Password required';
     } else if (formData.password.length < 8) {
-      errs.password = 'Password must be at least 8 characters long';
+      errs.password = 'Min. 8 characters';
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -82,30 +82,29 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
-      <div className="absolute inset-0 tech-grid pointer-events-none opacity-60" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-slate-800/20 blur-[130px] rounded-full pointer-events-none" />
+    <div className="min-h-screen bg-[#F4F0EA] text-black flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative selection:bg-[#FFE600] selection:text-black">
+      <div className="absolute inset-0 neo-grid pointer-events-none opacity-25" />
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center relative z-10">
-        <Link to="/" className="inline-flex items-center justify-center space-x-2.5 mb-5 group">
-          <div className="w-10 h-10 rounded-lg bg-white text-slate-950 flex items-center justify-center font-bold shadow-sm transition-transform duration-150 group-hover:scale-105">
-            <Compass className="w-5 h-5 text-slate-950 stroke-[2.2]" />
+        <Link to="/" className="inline-flex items-center justify-center space-x-2 mb-4 group">
+          <div className="w-10 h-10 bg-[#FFE600] border-2 border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-center font-bold transition-transform duration-75 group-hover:-translate-y-0.5">
+            <Compass className="w-6 h-6 text-black stroke-[2.5]" />
           </div>
         </Link>
-        <div className="inline-flex items-center space-x-2 px-2.5 py-1 rounded-md border border-slate-800 bg-slate-900/90 text-[11px] font-mono text-cyan-400 mb-2">
-          <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-          <span>ONBOARDING :: NEW_STUDENT_PROFILE</span>
+        <div className="inline-flex items-center space-x-2 px-3 py-1 border-2 border-black bg-white text-xs font-mono font-bold shadow-[2px_2px_0px_0px_#000] mb-3">
+          <Terminal className="w-3.5 h-3.5 stroke-[2.5]" />
+          <span>PROFILE_INITIALIZATION :: NODE_02</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-          Create Student Account
+        <h2 className="text-3xl font-black text-black tracking-tight font-sans">
+          Initialize Student Profile
         </h2>
-        <p className="mt-1 text-xs text-slate-400 font-mono">
-          Initialize your multi-agent career intelligence profile
+        <p className="mt-1 text-xs text-slate-700 font-mono font-bold">
+          Multi-Agent Career Intelligence Architecture
         </p>
       </div>
 
-      <div className="mt-7 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <div className="bg-[#0d111a] py-7 px-6 sm:px-8 rounded-xl border border-slate-800 shadow-2xl text-slate-100">
+      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+        <div className="bg-white py-7 px-6 sm:px-8 border-[3px] border-black shadow-[6px_6px_0px_0px_#000] text-black">
           {serverError && (
             <Alert
               type="error"
@@ -117,47 +116,47 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">
                 Full Name
               </label>
               <input
                 type="text"
-                placeholder="e.g. Md Hussain Ansari"
+                placeholder="Md Hussain Ansari"
                 value={formData.name}
                 onChange={handleChange}
                 name="name"
-                className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                className="w-full px-3 py-2 text-xs font-mono bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-white"
                 required
               />
-              {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name}</p>}
+              {errors.name && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.name}</p>}
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">
                 Student Email Address
               </label>
               <input
                 type="email"
-                placeholder="e.g. hussain@engineering.edu"
+                placeholder="student@university.edu"
                 value={formData.email}
                 onChange={handleChange}
                 name="email"
-                className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                className="w-full px-3 py-2 text-xs font-mono bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-white"
                 required
               />
-              {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
+              {errors.email && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.email}</p>}
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1">
-                Engineering Discipline / Major
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">
+                Academic Major
               </label>
               <select
                 id="major"
                 name="major"
                 value={formData.major}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition-colors"
+                className="w-full px-3 py-2 text-xs font-mono bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] text-black focus:outline-none focus:bg-white"
               >
                 <option value="Computer Science & Engineering">Computer Science & Engineering</option>
                 <option value="Information Technology">Information Technology</option>
@@ -168,8 +167,8 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1">
-                Create Password (Min. 8 characters)
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">
+                Create Password (Min 8 Chars)
               </label>
               <input
                 type="password"
@@ -177,14 +176,14 @@ export default function RegisterPage() {
                 value={formData.password}
                 onChange={handleChange}
                 name="password"
-                className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                className="w-full px-3 py-2 text-xs font-mono bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-white"
                 required
               />
-              {errors.password && <p className="mt-1 text-xs text-red-400">{errors.password}</p>}
+              {errors.password && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.password}</p>}
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">
                 Confirm Password
               </label>
               <input
@@ -193,26 +192,26 @@ export default function RegisterPage() {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 name="confirmPassword"
-                className="w-full px-3.5 py-2 text-sm bg-slate-950/80 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                className="w-full px-3 py-2 text-xs font-mono bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-white"
                 required
               />
-              {errors.confirmPassword && <p className="mt-1 text-xs text-red-400">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.confirmPassword}</p>}
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-2.5 mt-2 rounded-lg bg-white text-slate-950 hover:bg-slate-100 font-semibold text-sm transition-colors duration-150 flex items-center justify-center active:scale-[0.99] disabled:opacity-50"
+              className="w-full py-2.5 mt-2 border-2 border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono font-black text-xs uppercase tracking-wider shadow-[4px_4px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center disabled:opacity-50"
             >
-              <UserPlus className="w-4 h-4 mr-1.5 text-slate-800" />
-              {isSubmitting ? 'Registering...' : 'Complete Registration'}
+              <UserPlus className="w-4 h-4 mr-1.5 stroke-[2.5]" />
+              {isSubmitting ? 'Registering...' : 'Initialize Student Profile'}
             </button>
           </form>
 
-          <div className="mt-6 text-center text-xs font-mono text-slate-500 border-t border-slate-800/80 pt-4">
-            Already registered?{' '}
-            <Link to="/login" className="text-cyan-400 hover:text-cyan-300 transition-colors">
-              Sign in to dashboard &rarr;
+          <div className="mt-6 text-center text-xs font-mono font-bold text-slate-700 border-t-2 border-black pt-4">
+            Already have a profile?{' '}
+            <Link to="/login" className="text-black underline font-black hover:bg-[#FFE600] px-1">
+              Sign in to workspace &rarr;
             </Link>
           </div>
         </div>

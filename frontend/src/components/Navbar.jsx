@@ -1,7 +1,7 @@
 /**
  * @file Navbar.jsx
- * @description Hallmark-crafted top navigation bar with architectural dark styling,
- * brand telemetry, user profile summary, and logout controls.
+ * @description Neo-Brutalist top navigation bar.
+ * Bold high-contrast aesthetic with thick borders and tactile actions.
  * @author Md Hussain Ansari (Member 1)
  */
 
@@ -20,43 +20,37 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#07090e]/90 backdrop-blur-md border-b border-slate-800/80">
+    <header className="sticky top-0 z-40 bg-white border-b-2 border-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Brand Identity */}
           <Link to="/dashboard" className="flex items-center space-x-3 group">
-            <div className="w-9 h-9 rounded-lg bg-white text-slate-950 flex items-center justify-center font-bold shadow-sm transition-transform duration-150 group-hover:scale-105">
-              <Compass className="w-5 h-5 text-slate-950 stroke-[2.2]" />
+            <div className="w-9 h-9 bg-[#FFE600] border-2 border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-center font-bold transition-transform duration-75 group-hover:-translate-y-0.5">
+              <Compass className="w-5 h-5 text-black stroke-[2.5]" />
             </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="text-base font-semibold tracking-tight text-white">CareerPilot</span>
-                <span className="font-mono text-[10px] tracking-widest text-slate-400 font-normal px-1.5 py-0.2 rounded border border-slate-800 bg-slate-900">
-                  v1.0
-                </span>
-              </div>
-              <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider hidden sm:block">
-                Multi-Agent Intelligence
+            <div className="flex items-baseline space-x-2">
+              <span className="text-base font-black tracking-tight text-black uppercase font-mono">
+                CareerPilot
+              </span>
+              <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 border-2 border-black bg-[#C4A1FF] text-black uppercase shadow-[1px_1px_0px_0px_#000]">
+                V1.0
               </span>
             </div>
           </Link>
 
-          {/* User profile & controls */}
+          {/* User Profile & Logout */}
           {user && (
-            <div className="flex items-center space-x-3 sm:space-x-4">
+            <div className="flex items-center space-x-3">
               <Link
                 to="/profile"
-                className="flex items-center space-x-2.5 px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-slate-800/80 transition-colors"
+                className="flex items-center space-x-2.5 px-3 py-1.5 border-2 border-black bg-white shadow-[2px_2px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75"
               >
-                <div className="w-7 h-7 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-cyan-400 font-mono text-xs font-semibold">
-                  {user.name ? user.name.charAt(0).toUpperCase() : <UserIcon className="w-3.5 h-3.5" />}
+                <div className="w-6 h-6 border-2 border-black bg-[#70E000] flex items-center justify-center text-black font-mono text-xs font-black">
+                  {user.name ? user.name.charAt(0).toUpperCase() : <UserIcon className="w-3 h-3 stroke-[2.5]" />}
                 </div>
-                <div className="hidden md:block text-left">
-                  <div className="text-xs font-semibold text-slate-200 leading-tight">
+                <div className="hidden sm:block text-left">
+                  <div className="text-xs font-mono font-bold text-black leading-none">
                     {user.name}
-                  </div>
-                  <div className="text-[10px] font-mono text-slate-400 truncate max-w-[130px]">
-                    {user.major || 'Engineering Student'}
                   </div>
                 </div>
               </Link>
@@ -64,10 +58,10 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="inline-flex items-center px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-red-950/40 hover:border-red-800/60 text-slate-400 hover:text-red-400 text-xs font-mono transition-colors active:scale-[0.98]"
-                title="Sign out of platform"
+                className="inline-flex items-center px-3 py-1.5 border-2 border-black bg-[#FF5757] hover:bg-[#FF7070] text-white text-xs font-mono font-bold shadow-[2px_2px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75"
+                title="Disconnect session"
               >
-                <LogOut className="w-3.5 h-3.5 sm:mr-1.5" />
+                <LogOut className="w-3.5 h-3.5 sm:mr-1.5 stroke-[2.5]" />
                 <span className="hidden sm:inline">DISCONNECT</span>
               </button>
             </div>

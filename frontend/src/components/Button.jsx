@@ -1,7 +1,7 @@
 /**
  * @file Button.jsx
- * @description Hallmark atomic button component supporting tactile primary, secondary,
- * outline, and danger variants.
+ * @description Neo-Brutalist atomic button component with bold borders,
+ * hard drop-shadows, and tactile mechanical push interactions.
  * @author Md Hussain Ansari (Member 1)
  */
 
@@ -19,19 +19,20 @@ export default function Button({
   ...props
 }) {
   const baseClasses =
-    'inline-flex items-center justify-center font-semibold transition-colors duration-150 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]';
+    'inline-flex items-center justify-center font-mono font-bold border-2 border-black tracking-wide transition-all duration-75 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed';
 
   const sizeClasses = {
-    sm: 'px-3 py-1.5 text-xs',
-    md: 'px-4 py-2 text-xs sm:text-sm',
-    lg: 'px-5 py-2.5 text-sm sm:text-base'
+    sm: 'px-2.5 py-1 text-xs shadow-[2px_2px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none',
+    md: 'px-4 py-2 text-xs uppercase shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none',
+    lg: 'px-6 py-2.5 text-sm uppercase shadow-[4px_4px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none'
   };
 
   const variantClasses = {
-    primary: 'bg-white text-slate-950 hover:bg-slate-100 shadow-sm',
-    secondary: 'border border-slate-700 bg-slate-900/80 text-slate-200 hover:bg-slate-800 hover:text-white',
-    outline: 'border border-slate-800 bg-transparent text-slate-300 hover:bg-slate-900 hover:text-white',
-    danger: 'bg-red-600 text-white hover:bg-red-500 shadow-sm'
+    primary: 'bg-[#FFE600] text-black hover:bg-[#FFF066]',
+    secondary: 'bg-white text-black hover:bg-[#F4F0EA]',
+    outline: 'bg-[#C4A1FF] text-black hover:bg-[#D4B8FF]',
+    accent: 'bg-[#70E000] text-black hover:bg-[#85FF0A]',
+    danger: 'bg-[#FF5757] text-white hover:bg-[#FF7070]'
   };
 
   return (
@@ -39,7 +40,7 @@ export default function Button({
       type={type}
       disabled={disabled || isLoading}
       onClick={onClick}
-      className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
+      className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant] || variantClasses.primary} ${className}`}
       {...props}
     >
       {isLoading && (

@@ -1,7 +1,7 @@
 /**
  * @file Input.jsx
- * @description Hallmark architectural text input component with built-in label,
- * validation error, and helper text. High contrast dark styling with cyan focus states.
+ * @description Neo-Brutalist text input component.
+ * High-contrast black borders, hard drop-shadows, and bold monospace labels.
  * @author Md Hussain Ansari (Member 1)
  */
 
@@ -27,8 +27,8 @@ export default function Input({
   return (
     <div className={`w-full ${className}`}>
       {label && (
-        <label htmlFor={inputId} className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1.5">
-          {label} {required && <span className="text-red-400">*</span>}
+        <label htmlFor={inputId} className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1.5">
+          {label} {required && <span className="text-[#FF5757]">*</span>}
         </label>
       )}
       <input
@@ -40,15 +40,15 @@ export default function Input({
         placeholder={placeholder}
         disabled={disabled}
         required={required}
-        className={`w-full px-3.5 py-2 text-sm bg-slate-950/80 border rounded-lg transition-colors duration-150 focus:outline-none disabled:bg-slate-900 disabled:text-slate-500 ${
+        className={`w-full px-3 py-2 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] focus:outline-none focus:bg-[#FFFDF0] transition-colors duration-75 disabled:bg-slate-100 disabled:text-slate-500 ${
           error
-            ? 'border-red-500/80 text-red-200 focus:border-red-400 placeholder-red-400/50'
-            : 'border-slate-800 text-white placeholder-slate-500 focus:border-cyan-500'
+            ? 'border-[#FF5757] text-[#FF5757] placeholder-[#FF5757]/60'
+            : 'text-black placeholder-slate-400'
         }`}
         {...props}
       />
-      {error && <p className="mt-1 text-xs text-red-400 font-mono">{error}</p>}
-      {helperText && !error && <p className="mt-1 text-[11px] font-mono text-slate-400">{helperText}</p>}
+      {error && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{error}</p>}
+      {helperText && !error && <p className="mt-1 text-[10px] font-mono text-slate-600">{helperText}</p>}
     </div>
   );
 }
