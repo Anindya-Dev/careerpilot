@@ -419,7 +419,7 @@ export default function LandingPage() {
             <h2 className="whitespace-nowrap text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight text-black leading-none pt-1">
               Verify your technical readiness today
             </h2>
-            <p className="text-base sm:text-lg md:text-xl font-bold text-slate-900 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl font-normal text-black max-w-2xl mx-auto leading-relaxed">
               Connect your GitHub repository links to generate your Career Intelligence Index in seconds.
             </p>
 
