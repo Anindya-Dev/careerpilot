@@ -170,11 +170,11 @@ export default function LandingPage() {
                 onClick={() => setAuthModal({ isOpen: true, mode: 'register' })}
                 className="w-full sm:w-auto px-7 py-3.5 border-[3px] border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono font-black text-base sm:text-lg uppercase tracking-wider shadow-[6px_6px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center leading-snug"
               >
-                <div className="flex items-center text-left">
+                <div className="flex items-center text-center">
                   <span>
                     START PROFILE<br />EVALUATION
                   </span>
-                  <ArrowRight className="w-7 h-7 sm:w-8 sm:h-8 ml-3 stroke-[3] shrink-0" />
+                  <ArrowRight className="w-7 h-7 sm:w-8 sm:h-8 ml-5 sm:ml-6 stroke-[3] shrink-0" />
                 </div>
               </button>
 
@@ -429,11 +429,11 @@ export default function LandingPage() {
                 onClick={() => setAuthModal({ isOpen: true, mode: 'register' })}
                 className="w-full sm:w-auto px-7 py-3.5 border-[3px] border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono font-black text-base sm:text-lg uppercase tracking-wider shadow-[6px_6px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center leading-snug"
               >
-                <div className="flex items-center text-left">
+                <div className="flex items-center text-center">
                   <span>
                     START PROFILE<br />EVALUATION
                   </span>
-                  <ArrowRight className="w-7 h-7 sm:w-8 sm:h-8 ml-3 stroke-[3] shrink-0" />
+                  <ArrowRight className="w-7 h-7 sm:w-8 sm:h-8 ml-5 sm:ml-6 stroke-[3] shrink-0" />
                 </div>
               </button>
             </div>
