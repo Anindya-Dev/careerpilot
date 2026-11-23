@@ -112,7 +112,7 @@ export default function LandingPage() {
         
         {/* Navigation: Full-width container */}
         <header className="sticky top-0 z-30 bg-white/95 border-b-2 border-black backdrop-none">
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
+          <div className="w-full max-w-[1500px] mx-auto px-6 sm:px-10 lg:px-14 h-16 flex items-center justify-between">
             {/* Identity */}
             <Link to="/" className="flex items-center space-x-3 group">
               <div className="w-10 h-10 bg-[#FFE600] border-2 border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-center font-bold transition-transform duration-75 group-hover:-translate-y-0.5">
@@ -136,11 +136,11 @@ export default function LandingPage() {
         </header>
 
         {/* SECTION 1: HERO - Staggered entry animation */}
-        <section className="relative z-10 flex flex-col justify-center items-center px-4 sm:px-8 lg:px-12 pt-10 sm:pt-14 pb-16 max-w-7xl mx-auto w-full text-center">
+        <section className="relative z-10 flex flex-col justify-center items-center px-4 sm:px-8 lg:px-12 pt-10 sm:pt-14 pb-16 max-w-[1500px] mx-auto w-full text-center">
           <div className="space-y-6 w-full flex flex-col items-center">
             
             {/* Prominent Large Headline with Key Highlight Badges */}
-            <Reveal delay={0} className="max-w-5xl mx-auto">
+            <Reveal delay={0} className="max-w-6xl mx-auto">
               <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.15] text-black">
                 Autonomous{' '}
                 <span className="inline-block whitespace-nowrap">
@@ -184,7 +184,7 @@ export default function LandingPage() {
             </Reveal>
 
             {/* Hero Visual: Wide Interactive Workbench Terminal Preview */}
-            <Reveal delay={350} className="w-full max-w-5xl mt-6">
+            <Reveal delay={350} className="w-full max-w-6xl mt-6">
               <div className="w-full text-left border-[3px] border-black bg-white shadow-[10px_10px_0px_0px_#000] hover:shadow-[12px_12px_0px_0px_#000] transition-all duration-150">
                 <div className="bg-[#FAF5E6] border-b-2 border-black px-5 py-3 flex items-center justify-between">
                   <div className="flex items-center space-x-2">

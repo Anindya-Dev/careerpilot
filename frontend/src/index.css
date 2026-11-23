@@ -3,6 +3,20 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    font-size: 16px;
+  }
+  @media (min-width: 640px) {
+    html {
+      font-size: 18px; /* 112.5% scale */
+    }
+  }
+  @media (min-width: 1024px) {
+    html {
+      font-size: 20px; /* 125% scale so 100% zoom renders at 125% zoom size */
+    }
+  }
+
   body {
     @apply antialiased text-black bg-[#F4F0EA] selection:bg-[#FFE600] selection:text-black font-sans font-normal;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
