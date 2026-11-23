@@ -73,6 +73,37 @@ export default function LandingPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [authModal, setAuthModal] = useState({ isOpen: false, mode: 'login' });
 
+  // Typewriter effect for bottom banner headline
+  const bannerPhrase = 'Verify your technical readiness today';
+  const [bannerDisplayText, setBannerDisplayText] = useState('');
+  const [isBannerDeleting, setIsBannerDeleting] = useState(false);
+
+  useEffect(() => {
+    let timer;
+
+    if (!isBannerDeleting) {
+      if (bannerDisplayText.length < bannerPhrase.length) {
+        timer = setTimeout(() => {
+          setBannerDisplayText(bannerPhrase.slice(0, bannerDisplayText.length + 1));
+        }, 50);
+      } else {
+        timer = setTimeout(() => {
+          setIsBannerDeleting(true);
+        }, 3000);
+      }
+    } else {
+      if (bannerDisplayText.length > 0) {
+        timer = setTimeout(() => {
+          setBannerDisplayText(bannerPhrase.slice(0, bannerDisplayText.length - 1));
+        }, 25);
+      } else {
+        setIsBannerDeleting(false);
+      }
+    }
+
+    return () => clearTimeout(timer);
+  }, [bannerDisplayText, isBannerDeleting, bannerPhrase]);
+
   // Typewriter cadence for target roles
   useEffect(() => {
     const currentFullText = roles[roleIndex];
@@ -416,9 +447,12 @@ export default function LandingPage() {
         {/* SECTION 5: FINAL ACTION BANNER - Scale Reveal */}
         <section className="pt-2 sm:pt-3 pb-12 sm:pb-16 px-4 sm:px-8 lg:px-12 bg-[#FFE600] text-center border-t-2 border-black">
           <Reveal delay={0} className="w-full max-w-[1500px] mx-auto space-y-4">
-            <h2 className="whitespace-nowrap text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight text-black leading-none pt-1">
-              Verify your technical readiness today
-            </h2>
+            <div className="min-h-[1.3em] flex items-center justify-center">
+              <h2 className="whitespace-nowrap text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight text-black leading-none pt-1 inline-flex items-center justify-center">
+                <span>{bannerDisplayText}</span>
+                <span className="inline-block w-2.5 sm:w-3.5 md:w-4 h-[0.85em] ml-1.5 sm:ml-2.5 bg-black align-middle animate-pulse" />
+              </h2>
+            </div>
             <p className="text-base sm:text-lg md:text-xl font-normal text-black max-w-2xl mx-auto leading-relaxed">
               Connect your GitHub repository links to generate your Career Intelligence Index in seconds.
             </p>
