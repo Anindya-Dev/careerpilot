@@ -188,10 +188,11 @@ export default function ProfilePage() {
       <div className="absolute inset-0 neo-grid pointer-events-none opacity-20 -z-0" />
       <Navbar />
 
-      <div className="flex-1 flex max-w-7xl w-full mx-auto relative z-10">
+      {/* Full-width responsive workspace container */}
+      <div className="flex-1 flex w-full relative z-10">
         <Sidebar />
 
-        <main className="flex-1 p-5 sm:p-7 space-y-6">
+        <main className="flex-1 min-w-0 p-6 sm:p-8 lg:p-10 space-y-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
               <div className="inline-flex items-center space-x-2 px-2.5 py-0.5 border-2 border-black bg-[#FFE600] text-[10px] font-mono font-bold text-black mb-1 shadow-[2px_2px_0px_0px_#000]">

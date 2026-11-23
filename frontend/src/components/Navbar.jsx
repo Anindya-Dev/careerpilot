@@ -1,6 +1,6 @@
 /**
  * @file Navbar.jsx
- * @description Neo-Brutalist top navigation bar.
+ * @description Neo-Brutalist top navigation bar with full-viewport spanning width.
  * Bold high-contrast aesthetic with thick borders and tactile actions.
  * @author Md Hussain Ansari (Member 1)
  */
@@ -20,8 +20,8 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b-2 border-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 bg-white border-b-2 border-black w-full">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Brand Identity */}
           <Link to="/dashboard" className="flex items-center space-x-3 group">

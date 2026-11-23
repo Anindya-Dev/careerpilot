@@ -1,41 +1,101 @@
 /**
  * @file Sidebar.jsx
- * @description Neo-Brutalist sidebar navigation with real-time status.
+ * @description Neo-Brutalist sidebar navigation with real-time status and single active selection.
+ * Supports hash-based and path-based navigation with zero duplicate active states.
  * @author Md Hussain Ansari (Member 1)
  */
 
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, UserCheck, Target, Activity, Cpu, Terminal } from 'lucide-react';
 
 export default function Sidebar() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [currentHash, setCurrentHash] = useState(window.location.hash || '');
+
+  // Synchronize hash on hashchange or path changes
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentHash(window.location.hash || '');
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    setCurrentHash(location.hash || '');
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [location]);
+
   const navItems = [
-    { name: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
-    { name: 'Career Profile', to: '/profile', icon: UserCheck },
-    { name: 'Skills & Evidence', to: '/profile#skills', icon: Target },
-    { name: 'Career Health', to: '/dashboard#health', icon: Activity, badge: 'M4' },
-    { name: 'Agent Pipeline', to: '/dashboard#pipeline', icon: Cpu }
+    { name: 'Dashboard', path: '/dashboard', hash: '', icon: LayoutDashboard },
+    { name: 'Career Profile', path: '/profile', hash: '', icon: UserCheck },
+    { name: 'Skills & Evidence', path: '/dashboard', hash: '#skills', icon: Target },
+    { name: 'Career Health', path: '/dashboard', hash: '#health', icon: Activity, badge: 'M4' },
+    { name: 'Agent Pipeline', path: '/dashboard', hash: '#pipeline', icon: Cpu }
   ];
 
+  const handleNavClick = (e, item) => {
+    e.preventDefault();
+
+    // If navigating between different paths
+    if (location.pathname !== item.path) {
+      navigate(`${item.path}${item.hash}`);
+      setCurrentHash(item.hash);
+      return;
+    }
+
+    // Same path: smoothly scroll to targeted anchor or top
+    if (item.hash) {
+      window.history.pushState(null, '', `${item.path}${item.hash}`);
+      setCurrentHash(item.hash);
+      const targetEl = document.querySelector(item.hash);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else {
+      window.history.pushState(null, '', item.path);
+      setCurrentHash('');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  /**
+   * Deterministic Single Selection Check:
+   * Exactly ONE nav item is active at any time.
+   */
+  const isItemActive = (item) => {
+    if (location.pathname === '/profile') {
+      return item.path === '/profile';
+    }
+
+    if (location.pathname === '/dashboard') {
+      if (!currentHash || currentHash === '#' || currentHash === '#overview') {
+        return item.path === '/dashboard' && !item.hash;
+      }
+      return item.path === '/dashboard' && item.hash === currentHash;
+    }
+
+    return false;
+  };
+
   return (
-    <aside className="w-64 bg-white border-r-2 border-black hidden md:flex flex-col justify-between min-h-[calc(100vh-4rem)] p-4">
+    <aside className="w-64 shrink-0 bg-white border-r-2 border-black hidden md:flex flex-col justify-between min-h-[calc(100vh-4rem)] p-4">
       <div className="space-y-1.5">
         <div className="px-2 py-1 text-[11px] font-mono font-black uppercase tracking-widest text-black">
           WORKSPACE_NAV
         </div>
         {navItems.map((item) => {
           const Icon = item.icon;
+          const active = isItemActive(item);
+
           return (
-            <NavLink
+            <button
               key={item.name}
-              to={item.to}
-              className={({ isActive }) =>
-                `flex items-center justify-between px-3 py-2 border-2 border-black text-xs font-mono font-bold transition-all duration-75 ${
-                  isActive
-                    ? 'bg-[#FFE600] text-black shadow-[3px_3px_0px_0px_#000]'
-                    : 'bg-white text-black shadow-none hover:bg-[#FAF5E6] hover:shadow-[2px_2px_0px_0px_#000]'
-                }`
-              }
+              type="button"
+              onClick={(e) => handleNavClick(e, item)}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 border-2 border-black text-xs font-mono font-bold transition-all duration-75 text-left cursor-pointer ${
+                active
+                  ? 'bg-[#FFE600] text-black shadow-[3px_3px_0px_0px_#000] translate-x-0.5'
+                  : 'bg-white text-black shadow-none hover:bg-[#FAF5E6] hover:shadow-[2px_2px_0px_0px_#000]'
+              }`}
             >
               <div className="flex items-center space-x-2.5">
                 <Icon className="w-4 h-4 text-black stroke-[2.2]" />
@@ -46,7 +106,7 @@ export default function Sidebar() {
                   {item.badge}
                 </span>
               )}
-            </NavLink>
+            </button>
           );
         })}
       </div>
