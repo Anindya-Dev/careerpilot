@@ -4,8 +4,16 @@
 
 @layer base {
   body {
-    @apply antialiased text-black bg-[#F4F0EA] selection:bg-[#FFE600] selection:text-black;
+    @apply antialiased text-black bg-[#F4F0EA] selection:bg-[#FFE600] selection:text-black font-sans font-normal;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 }
 
@@ -13,6 +21,12 @@
 .neo-grid {
   background-image: radial-gradient(#000000 1.2px, transparent 1.2px);
   background-size: 24px 24px;
+}
+
+/* Motion: Base curve per B7 */
+.motion-base {
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  transition-duration: 500ms;
 }
 
 /* Neo-brutalism reusable utilities */
@@ -28,9 +42,5 @@
   @apply border-2 border-black font-mono font-bold tracking-wide transition-all duration-75 
          shadow-[3px_3px_0px_0px_#000000] 
          hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000000] 
-         active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_#000000];
-}
-
-.neo-pill {
-  @apply border-2 border-black font-mono font-bold text-xs uppercase px-2 py-0.5 shadow-[2px_2px_0px_0px_#000000];
+         active:translate-x-0.5 active:translate-y-0.5 active:shadow-none;
 }

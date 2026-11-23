@@ -7,22 +7,22 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        sans: ['Geist', 'sans-serif'],
+        mono: ['"Geist Mono"', 'monospace'],
       },
       colors: {
         neo: {
-          bg: '#FDFBF7',
+          bg: '#F4F0EA',
           black: '#000000',
           white: '#FFFFFF',
-          yellow: '#FFDE59',
+          yellow: '#FFE600',
           green: '#70E000',
           mint: '#52B788',
           cyan: '#38B6FF',
           pink: '#FF70A6',
           orange: '#FF9900',
-          purple: '#B388FF',
-          cream: '#FFF9E6',
+          purple: '#C4A1FF',
+          cream: '#FAF5E6',
           border: '#000000',
         }
       },
