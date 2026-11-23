@@ -163,23 +163,29 @@ export default function LandingPage() {
               </div>
             </Reveal>
 
-            {/* Action Buttons: Larger typography & arrow, no empty box wrapping */}
-            <Reveal delay={250} className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-5 max-w-3xl mx-auto w-full">
+            {/* Action Buttons: Restored compact 2-line box with large bold typography and prominent arrow */}
+            <Reveal delay={250} className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto w-full">
               <button
                 type="button"
                 onClick={() => setAuthModal({ isOpen: true, mode: 'register' })}
-                className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 border-[3px] border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono font-black text-base sm:text-lg md:text-xl uppercase tracking-wider shadow-[6px_6px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center whitespace-nowrap"
+                className="w-full sm:w-auto px-7 py-3.5 border-[3px] border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono font-black text-base sm:text-lg uppercase tracking-wider shadow-[6px_6px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center leading-snug"
               >
-                <span>Start Profile Evaluation</span>
-                <ArrowRight className="w-6 h-6 sm:w-7 sm:h-7 ml-3 stroke-[3]" />
+                <div className="flex items-center text-left">
+                  <span>
+                    START PROFILE<br />EVALUATION
+                  </span>
+                  <ArrowRight className="w-7 h-7 sm:w-8 sm:h-8 ml-3 stroke-[3] shrink-0" />
+                </div>
               </button>
 
               <button
                 type="button"
                 onClick={() => setAuthModal({ isOpen: true, mode: 'login' })}
-                className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 border-[3px] border-black bg-white hover:bg-[#F4F0EA] text-black font-mono font-black text-base sm:text-lg md:text-xl uppercase tracking-wider shadow-[6px_6px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center whitespace-nowrap"
+                className="w-full sm:w-auto px-7 py-3.5 border-[3px] border-black bg-white hover:bg-[#F4F0EA] text-black font-mono font-black text-base sm:text-lg uppercase tracking-wider shadow-[6px_6px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center leading-snug text-center"
               >
-                <span>Student Login</span>
+                <span>
+                  STUDENT<br />LOGIN
+                </span>
               </button>
             </Reveal>
 
@@ -417,14 +423,18 @@ export default function LandingPage() {
               Connect your GitHub repository links to generate your Career Intelligence Index in seconds.
             </p>
 
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-xl mx-auto w-full">
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto w-full">
               <button
                 type="button"
                 onClick={() => setAuthModal({ isOpen: true, mode: 'register' })}
-                className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 border-[3px] border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono font-black text-base sm:text-lg md:text-xl uppercase tracking-wider shadow-[6px_6px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center whitespace-nowrap"
+                className="w-full sm:w-auto px-7 py-3.5 border-[3px] border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono font-black text-base sm:text-lg uppercase tracking-wider shadow-[6px_6px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center leading-snug"
               >
-                <span>Start Profile Evaluation</span>
-                <ArrowRight className="w-6 h-6 sm:w-7 sm:h-7 ml-3 stroke-[3]" />
+                <div className="flex items-center text-left">
+                  <span>
+                    START PROFILE<br />EVALUATION
+                  </span>
+                  <ArrowRight className="w-7 h-7 sm:w-8 sm:h-8 ml-3 stroke-[3] shrink-0" />
+                </div>
               </button>
             </div>
           </Reveal>
