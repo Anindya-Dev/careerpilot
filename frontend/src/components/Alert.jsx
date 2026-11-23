@@ -1,6 +1,6 @@
 /**
  * @file Alert.jsx
- * @description Contextual alert banner for displaying errors, warnings, and success messages.
+ * @description Neo-Brutalist alert banner. Heavy black border, hard offset shadow, bold colors.
  * @author Md Hussain Ansari (Member 1)
  */
 
@@ -12,36 +12,36 @@ export default function Alert({ type = 'error', message, title, className = '', 
 
   const typeConfig = {
     error: {
-      bg: 'bg-red-50 border-red-200 text-red-800',
-      icon: <XCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+      bg: 'bg-[#FF70A6] text-black',
+      icon: <XCircle className="w-4 h-4 text-black mt-0.5 flex-shrink-0 stroke-[2.5]" />
     },
     warning: {
-      bg: 'bg-amber-50 border-amber-200 text-amber-800',
-      icon: <AlertCircle className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" />
+      bg: 'bg-[#FFDE59] text-black',
+      icon: <AlertCircle className="w-4 h-4 text-black mt-0.5 flex-shrink-0 stroke-[2.5]" />
     },
     success: {
-      bg: 'bg-emerald-50 border-emerald-200 text-emerald-800',
-      icon: <CheckCircle className="w-5 h-5 text-emerald-500 mt-0.5 flex-shrink-0" />
+      bg: 'bg-[#70E000] text-black',
+      icon: <CheckCircle className="w-4 h-4 text-black mt-0.5 flex-shrink-0 stroke-[2.5]" />
     },
     info: {
-      bg: 'bg-blue-50 border-blue-200 text-blue-800',
-      icon: <Info className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+      bg: 'bg-[#38B6FF] text-black',
+      icon: <Info className="w-4 h-4 text-black mt-0.5 flex-shrink-0 stroke-[2.5]" />
     }
   };
 
   const { bg, icon } = typeConfig[type] || typeConfig.error;
 
   return (
-    <div className={`border rounded-lg p-4 flex items-start space-x-3 text-sm ${bg} ${className}`}>
+    <div className={`border-2 border-black shadow-[4px_4px_0px_0px_#000] p-3 flex items-start space-x-2.5 text-xs font-mono font-bold ${bg} ${className}`}>
       {icon}
       <div className="flex-1">
-        {title && <h4 className="font-semibold">{title}</h4>}
-        <div className="text-sm">{message}</div>
+        {title && <h4 className="font-black uppercase tracking-wider mb-0.5">{title}</h4>}
+        <div>{message}</div>
       </div>
       {onClose && (
         <button
           onClick={onClose}
-          className="text-slate-400 hover:text-slate-600 transition-colors"
+          className="text-black hover:scale-110 font-bold px-1 transition-transform"
         >
           &times;
         </button>

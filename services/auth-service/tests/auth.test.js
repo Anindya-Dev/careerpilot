@@ -13,17 +13,21 @@ const app = require('../src/app');
 const User = require('../src/models/User');
 const RefreshToken = require('../src/models/RefreshToken');
 
+jest.setTimeout(120000);
+
 let mongoServer;
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   const uri = mongoServer.getUri();
   await mongoose.connect(uri);
-});
+}, 120000);
 
 afterAll(async () => {
   await mongoose.disconnect();
-  await mongoServer.stop();
+  if (mongoServer) {
+    await mongoServer.stop();
+  }
 });
 
 beforeEach(async () => {

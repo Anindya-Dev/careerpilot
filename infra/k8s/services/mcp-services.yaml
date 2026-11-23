@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: careerpilot-github-mcp
+  namespace: careerpilot
+spec:
+  type: ClusterIP
+  selector:
+    app: github-mcp
+  ports:
+    - name: http
+      port: 5005
+      targetPort: 5005
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: careerpilot-job-board-mcp
+  namespace: careerpilot
+spec:
+  type: ClusterIP
+  selector:
+    app: job-board-mcp
+  ports:
+    - name: http
+      port: 5006
+      targetPort: 5006

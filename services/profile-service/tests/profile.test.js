@@ -12,6 +12,8 @@ const app = require('../src/app');
 const Profile = require('../src/models/Profile');
 const { JWT_ACCESS_SECRET, INTERNAL_SERVICE_KEY } = require('../src/config/env');
 
+jest.setTimeout(120000);
+
 let mongoServer;
 let validToken;
 const testUserId = '6630f9a21e4a1a3a12345678';
@@ -28,11 +30,13 @@ beforeAll(async () => {
   await mongoose.connect(uri);
 
   validToken = jwt.sign(testUser, JWT_ACCESS_SECRET, { expiresIn: '1h' });
-});
+}, 120000);
 
 afterAll(async () => {
   await mongoose.disconnect();
-  await mongoServer.stop();
+  if (mongoServer) {
+    await mongoServer.stop();
+  }
 });
 
 beforeEach(async () => {
