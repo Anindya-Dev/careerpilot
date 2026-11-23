@@ -1,6 +1,7 @@
 /**
  * @file Navbar.jsx
- * @description Top navigation bar displaying brand identity, user profile summary, and logout trigger.
+ * @description Neo-Brutalist top navigation bar with full-viewport spanning width.
+ * Bold high-contrast aesthetic with thick borders and tactile actions.
  * @author Md Hussain Ansari (Member 1)
  */
 
@@ -8,7 +9,6 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Compass, LogOut, User as UserIcon } from 'lucide-react';
-import Button from './Button';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -16,55 +16,54 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate('/');
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 bg-white border-b-2 border-black w-full">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          {/* Logo / Brand */}
-          <Link to="/dashboard" className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center text-white shadow-md shadow-indigo-100">
-              <Compass className="w-6 h-6" />
+          {/* Brand Identity */}
+          <Link to="/dashboard" className="flex items-center space-x-3 group">
+            <div className="w-9 h-9 bg-[#FFE600] border-2 border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-center font-bold transition-transform duration-75 group-hover:-translate-y-0.5">
+              <Compass className="w-5 h-5 text-black stroke-[2.5]" />
             </div>
-            <div>
-              <span className="text-xl font-bold tracking-tight text-slate-900">CareerPilot</span>
-              <span className="hidden sm:inline-block ml-2 px-2 py-0.5 text-xs font-semibold bg-indigo-50 text-indigo-700 rounded-full">
-                AI Platform
+            <div className="flex items-baseline space-x-2">
+              <span className="text-base font-black tracking-tight text-black uppercase font-mono">
+                CareerPilot
+              </span>
+              <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 border-2 border-black bg-[#C4A1FF] text-black uppercase shadow-[1px_1px_0px_0px_#000]">
+                V1.0
               </span>
             </div>
           </Link>
 
-          {/* User profile controls */}
+          {/* User Profile & Logout */}
           {user && (
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               <Link
                 to="/profile"
-                className="flex items-center space-x-3 p-1.5 rounded-lg hover:bg-slate-50 transition-colors"
+                className="flex items-center space-x-2.5 px-3 py-1.5 border-2 border-black bg-white shadow-[2px_2px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75"
               >
-                <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 font-semibold text-sm">
-                  {user.name ? user.name.charAt(0).toUpperCase() : <UserIcon className="w-4 h-4" />}
+                <div className="w-6 h-6 border-2 border-black bg-[#70E000] flex items-center justify-center text-black font-mono text-xs font-black">
+                  {user.name ? user.name.charAt(0).toUpperCase() : <UserIcon className="w-3 h-3 stroke-[2.5]" />}
                 </div>
-                <div className="hidden md:block text-left">
-                  <div className="text-sm font-semibold text-slate-800 leading-tight">
+                <div className="hidden sm:block text-left">
+                  <div className="text-xs font-mono font-bold text-black leading-none">
                     {user.name}
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    {user.major || 'Engineering Student'}
                   </div>
                 </div>
               </Link>
 
-              <Button
-                variant="outline"
-                size="sm"
+              <button
+                type="button"
                 onClick={handleLogout}
-                className="text-slate-600 hover:text-red-600 hover:border-red-200"
+                className="inline-flex items-center px-3 py-1.5 border-2 border-black bg-[#FF5757] hover:bg-[#FF7070] text-white text-xs font-mono font-bold shadow-[2px_2px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75"
+                title="Disconnect session"
               >
-                <LogOut className="w-4 h-4 mr-1.5" />
-                <span className="hidden sm:inline">Logout</span>
-              </Button>
+                <LogOut className="w-3.5 h-3.5 sm:mr-1.5 stroke-[2.5]" />
+                <span className="hidden sm:inline">DISCONNECT</span>
+              </button>
             </div>
           )}
         </div>

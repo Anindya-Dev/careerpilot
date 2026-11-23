@@ -1,17 +1,15 @@
 /**
  * @file LoginPage.jsx
- * @description Authentication login view featuring client-side validation, error handling banner,
- * and seamless redirect to dashboard upon successful session establishment.
+ * @description Neo-Brutalist authentication login view.
+ * High-contrast borders, solid shadows, vibrant buttons.
  * @author Md Hussain Ansari (Member 1)
  */
 
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import Input from '../components/Input';
-import Button from '../components/Button';
 import Alert from '../components/Alert';
-import { Compass, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Compass, ArrowRight, Shield, Terminal } from 'lucide-react';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -27,15 +25,15 @@ export default function LoginPage() {
   const validate = () => {
     const errs = {};
     if (!email.trim()) {
-      errs.email = 'Email is required';
+      errs.email = 'Email required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      errs.email = 'Please enter a valid email address';
+      errs.email = 'Invalid email address';
     }
 
     if (!password) {
-      errs.password = 'Password is required';
+      errs.password = 'Password required';
     } else if (password.length < 8) {
-      errs.password = 'Password must be at least 8 characters';
+      errs.password = 'Min. 8 characters';
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -59,84 +57,99 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="inline-flex w-14 h-14 rounded-2xl bg-indigo-600 items-center justify-center text-white shadow-lg shadow-indigo-100 mb-4">
-          <Compass className="w-8 h-8" />
+    <div className="min-h-screen bg-[#F4F0EA] text-black flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative selection:bg-[#FFE600] selection:text-black">
+      <div className="absolute inset-0 neo-grid pointer-events-none opacity-25" />
+
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center relative z-10">
+        <Link to="/" className="inline-flex items-center justify-center space-x-2 mb-4 group">
+          <div className="w-10 h-10 bg-[#FFE600] border-2 border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-center font-bold transition-transform duration-75 group-hover:-translate-y-0.5">
+            <Compass className="w-6 h-6 text-black stroke-[2.5]" />
+          </div>
+        </Link>
+        <div className="inline-flex items-center space-x-2 px-3 py-1 border-2 border-black bg-white text-xs font-mono font-bold shadow-[2px_2px_0px_0px_#000] mb-3">
+          <Terminal className="w-3.5 h-3.5 stroke-[2.5]" />
+          <span>AUTH_GATEWAY :: NODE_01</span>
         </div>
-        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-          Welcome back to CareerPilot
+        <h2 className="text-3xl font-black text-black tracking-tight font-sans">
+          Sign In to Workspace
         </h2>
-        <p className="mt-2 text-sm text-slate-600">
-          Multi-Agent AI Career Intelligence & Roadmap Architecture
+        <p className="mt-1 text-xs text-slate-700 font-mono font-bold">
+          Multi-Agent Career Intelligence Platform
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-xl shadow-slate-200/50 rounded-2xl border border-slate-200/60 sm:px-10">
+      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+        <div className="bg-white py-7 px-6 sm:px-8 border-[3px] border-black shadow-[6px_6px_0px_0px_#000] text-black">
           {serverError && (
             <Alert
               type="error"
               message={serverError}
-              className="mb-6"
+              className="mb-5"
               onClose={() => setServerError('')}
             />
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <Input
-              label="Student Email Address"
-              name="email"
-              type="email"
-              autoComplete="email"
-              placeholder="e.g. hussain@engineering.edu"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (errors.email) setErrors({ ...errors, email: '' });
-              }}
-              error={errors.email}
-              required
-            />
-
-            <Input
-              label="Password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              placeholder="Min. 8 characters"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (errors.password) setErrors({ ...errors, password: '' });
-              }}
-              error={errors.password}
-              required
-            />
-
-            <div className="flex items-center justify-between text-xs">
-              <span className="flex items-center text-slate-500">
-                <ShieldCheck className="w-4 h-4 text-emerald-500 mr-1" />
-                12-round bcrypt encrypted
-              </span>
-              <span className="text-slate-400">Phase 1 Secure Auth</span>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1.5">
+                Student Email Address
+              </label>
+              <input
+                type="email"
+                autoComplete="email"
+                placeholder="student@university.edu"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (errors.email) setErrors({ ...errors, email: '' });
+                }}
+                className="w-full px-3 py-2 text-xs font-mono bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-white"
+                required
+              />
+              {errors.email && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.email}</p>}
             </div>
 
-            <Button
+            <div>
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1.5">
+                Password
+              </label>
+              <input
+                type="password"
+                autoComplete="current-password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (errors.password) setErrors({ ...errors, password: '' });
+                }}
+                className="w-full px-3 py-2 text-xs font-mono bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-white"
+                required
+              />
+              {errors.password && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.password}</p>}
+            </div>
+
+            <div className="flex items-center justify-between text-[11px] font-mono font-bold pt-1">
+              <span className="flex items-center">
+                <Shield className="w-3.5 h-3.5 mr-1 stroke-[2.5]" />
+                12-ROUND BCRYPT
+              </span>
+              <span className="bg-[#FFE600] border border-black px-1 text-[10px]">ROTATING TOKENS</span>
+            </div>
+
+            <button
               type="submit"
-              variant="primary"
-              className="w-full py-2.5 text-base"
-              isLoading={isSubmitting}
+              disabled={isSubmitting}
+              className="w-full py-2.5 mt-2 border-2 border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono font-black text-xs uppercase tracking-wider shadow-[4px_4px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center disabled:opacity-50"
             >
-              Sign In to Dashboard
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+              {isSubmitting ? 'Authenticating...' : 'Sign In to Dashboard'}
+              <ArrowRight className="w-4 h-4 ml-1.5 stroke-[2.5]" />
+            </button>
           </form>
 
-          <div className="mt-6 text-center text-xs text-slate-500 border-t border-slate-100 pt-5">
-            Don't have a profile yet?{' '}
-            <Link to="/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
-              Create an account
+          <div className="mt-6 text-center text-xs font-mono font-bold text-slate-700 border-t-2 border-black pt-4">
+            Need an account?{' '}
+            <Link to="/register" className="text-black underline font-black hover:bg-[#FFE600] px-1">
+              Create student profile &rarr;
             </Link>
           </div>
         </div>

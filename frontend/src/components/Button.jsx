@@ -1,6 +1,7 @@
 /**
  * @file Button.jsx
- * @description Atomic button component supporting primary, secondary, outline, and danger variants.
+ * @description Neo-Brutalist atomic button component with bold borders,
+ * hard drop-shadows, and tactile mechanical push interactions.
  * @author Md Hussain Ansari (Member 1)
  */
 
@@ -18,19 +19,20 @@ export default function Button({
   ...props
 }) {
   const baseClasses =
-    'inline-flex items-center justify-center font-medium transition-colors duration-150 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+    'inline-flex items-center justify-center font-mono font-bold border-2 border-black tracking-wide transition-all duration-75 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed';
 
   const sizeClasses = {
-    sm: 'px-3 py-1.5 text-xs',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-5 py-2.5 text-base'
+    sm: 'px-2.5 py-1 text-xs shadow-[2px_2px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none',
+    md: 'px-4 py-2 text-xs uppercase shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none',
+    lg: 'px-6 py-2.5 text-sm uppercase shadow-[4px_4px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none'
   };
 
   const variantClasses = {
-    primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500 shadow-sm',
-    secondary: 'bg-slate-100 text-slate-800 hover:bg-slate-200 focus:ring-slate-400',
-    outline: 'border border-slate-300 bg-transparent text-slate-700 hover:bg-slate-50 focus:ring-indigo-500',
-    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-sm'
+    primary: 'bg-[#FFE600] text-black hover:bg-[#FFF066]',
+    secondary: 'bg-white text-black hover:bg-[#F4F0EA]',
+    outline: 'bg-[#C4A1FF] text-black hover:bg-[#D4B8FF]',
+    accent: 'bg-[#70E000] text-black hover:bg-[#85FF0A]',
+    danger: 'bg-[#FF5757] text-white hover:bg-[#FF7070]'
   };
 
   return (
@@ -38,12 +40,12 @@ export default function Button({
       type={type}
       disabled={disabled || isLoading}
       onClick={onClick}
-      className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
+      className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant] || variantClasses.primary} ${className}`}
       {...props}
     >
       {isLoading && (
         <svg
-          className="animate-spin -ml-1 mr-2 h-4 w-4 text-current"
+          className="animate-spin -ml-1 mr-2 h-3.5 w-3.5 text-current"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"

@@ -1,8 +1,7 @@
 /**
  * @file ProfilePage.jsx
- * @description Student Career Intelligence Profile CRUD management interface.
- * Implements full schema editing for target roles, skills, goals, projects, certifications,
- * and external portfolio accounts aligned with the Neo4j Knowledge Graph.
+ * @description Neo-Brutalist student Career Intelligence Profile CRUD management interface.
+ * Implements full schema editing with bold borders, hard shadows, and high-contrast forms.
  * @author Md Hussain Ansari (Member 1)
  */
 
@@ -20,12 +19,9 @@ import {
   Plus,
   Trash2,
   CheckCircle,
-  FolderGit2,
-  Award,
-  Target,
   Github,
   Linkedin,
-  RefreshCw
+  Terminal
 } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -100,9 +96,14 @@ export default function ProfilePage() {
     if (!newSkill.name.trim()) return;
     setFormData((prev) => ({
       ...prev,
-      skills: [...prev.skills, { ...newSkill, name: newSkill.name.trim() }]
+      skills: [...prev.skills, { ...newSkill }]
     }));
-    setNewSkill({ name: '', level: 'intermediate', category: 'Languages', verified: false });
+    setNewSkill({
+      name: '',
+      level: 'intermediate',
+      category: 'Languages',
+      verified: false
+    });
   };
 
   const removeSkill = (index) => {
@@ -132,24 +133,27 @@ export default function ProfilePage() {
   // Project management
   const addProject = () => {
     if (!newProject.title.trim()) return;
-    const techArray = newProject.technologies
-      .split(',')
-      .map((t) => t.trim())
-      .filter(Boolean);
+    const techs = newProject.technologies
+      ? newProject.technologies.split(',').map((t) => t.trim()).filter(Boolean)
+      : [];
 
     setFormData((prev) => ({
       ...prev,
       projects: [
         ...prev.projects,
         {
-          title: newProject.title.trim(),
-          description: newProject.description.trim(),
-          repo_url: newProject.repo_url.trim(),
-          technologies: techArray
+          ...newProject,
+          technologies: techs
         }
       ]
     }));
-    setNewProject({ title: '', description: '', repo_url: '', technologies: '' });
+
+    setNewProject({
+      title: '',
+      description: '',
+      repo_url: '',
+      technologies: ''
+    });
   };
 
   const removeProject = (index) => {
@@ -167,7 +171,7 @@ export default function ProfilePage() {
       await updateProfile(formData);
       setNotification({
         type: 'success',
-        message: 'Profile synchronized successfully with Neo4j Knowledge Graph schema!'
+        message: 'Profile synchronized successfully with Neo4j Knowledge Graph schema.'
       });
     } catch (err) {
       setNotification({
@@ -180,30 +184,36 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-[#F4F0EA] text-black flex flex-col font-sans relative selection:bg-[#FFE600] selection:text-black">
+      <div className="absolute inset-0 neo-grid pointer-events-none opacity-20 -z-0" />
       <Navbar />
 
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
+      {/* Full-width responsive workspace container */}
+      <div className="flex-1 flex w-full relative z-10">
         <Sidebar />
 
-        <main className="flex-1 p-6 sm:p-8 space-y-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <main className="flex-1 min-w-0 p-6 sm:p-8 lg:p-10 space-y-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Career Intelligence Profile</h1>
-              <p className="text-sm text-slate-500">
-                Manage your credentials, validated competencies, and target aspirations
+              <div className="inline-flex items-center space-x-2 px-2.5 py-0.5 border-2 border-black bg-[#FFE600] text-[10px] font-mono font-bold text-black mb-1 shadow-[2px_2px_0px_0px_#000]">
+                <Terminal className="w-3 h-3 stroke-[2.5]" />
+                <span>PROFILE_SVC :: PORT_5002</span>
+              </div>
+              <h1 className="text-2xl font-black text-black tracking-tight font-sans">Career Intelligence Profile</h1>
+              <p className="text-xs font-mono font-bold text-slate-700">
+                Manage credentials, validated competencies, and target aspirations
               </p>
             </div>
 
-            <Button
-              variant="primary"
+            <button
+              type="button"
               onClick={handleSave}
-              isLoading={isSaving}
-              className="shadow-md shadow-indigo-100"
+              disabled={isSaving}
+              className="inline-flex items-center px-5 py-2.5 border-2 border-black bg-[#70E000] hover:bg-[#85FF0A] text-black text-xs font-mono font-black uppercase tracking-wider shadow-[4px_4px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 disabled:opacity-50"
             >
-              <Save className="w-4 h-4 mr-2" />
-              Save Profile Changes
-            </Button>
+              <Save className="w-4 h-4 mr-2 stroke-[2.5]" />
+              {isSaving ? 'Synchronizing...' : 'Save Profile Changes'}
+            </button>
           </div>
 
           {notification.message && (
@@ -214,11 +224,15 @@ export default function ProfilePage() {
             />
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Primary Details */}
-            <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Primary Details (7 cols) */}
+            <div className="lg:col-span-7 space-y-6">
               {/* Core Information */}
-              <Card title="Foundational Information">
+              <Card
+                title="Foundational Information"
+                subtitle="Academic enrollment and target aspiration vectors"
+                headerBg="bg-[#38B6FF]"
+              >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
                     label="Full Name"
@@ -228,7 +242,7 @@ export default function ProfilePage() {
                     required
                   />
                   <Input
-                    label="Engineering Major / Program"
+                    label="Academic Program / Major"
                     name="major"
                     value={formData.major}
                     onChange={handleBasicChange}
@@ -238,10 +252,10 @@ export default function ProfilePage() {
                     <Input
                       label="Target Professional Role"
                       name="target_role"
-                      placeholder="e.g. AI Research Engineer / Full-Stack Architect"
+                      placeholder="e.g. AI & Machine Learning Engineer"
                       value={formData.target_role}
                       onChange={handleBasicChange}
-                      helperText="Used by Skill Intelligence Agent to benchmark skill-market fit"
+                      helperText="Calibrated by Skill Intelligence Agent against market job demand graphs"
                       required
                     />
                   </div>
@@ -251,10 +265,11 @@ export default function ProfilePage() {
               {/* Skills Section */}
               <Card
                 title="Skills & Competencies"
-                subtitle="Mapped to Neo4j Knowledge Graph nodes"
+                subtitle="Mapped directly into Neo4j Knowledge Graph nodes"
+                headerBg="bg-[#FFE600]"
               >
                 <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row items-end gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                  <div className="flex flex-col sm:flex-row items-end gap-3 p-3.5 bg-[#FAF5E6] border-2 border-black shadow-[3px_3px_0px_0px_#000]">
                     <Input
                       label="Skill Name"
                       placeholder="e.g. PyTorch, React, Docker"
@@ -262,14 +277,14 @@ export default function ProfilePage() {
                       onChange={(e) => setNewSkill({ ...newSkill, name: e.target.value })}
                       className="sm:w-1/3"
                     />
-                    <div className="sm:w-1/4">
-                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <div className="sm:w-1/4 w-full">
+                      <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1.5">
                         Proficiency
                       </label>
                       <select
                         value={newSkill.level}
                         onChange={(e) => setNewSkill({ ...newSkill, level: e.target.value })}
-                        className="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg shadow-sm"
+                        className="w-full px-3 py-2 text-xs font-mono bg-white border-2 border-black shadow-[2px_2px_0px_0px_#000] text-black focus:outline-none focus:bg-[#FFFDF0]"
                       >
                         <option value="beginner">Beginner</option>
                         <option value="intermediate">Intermediate</option>
@@ -277,14 +292,14 @@ export default function ProfilePage() {
                         <option value="expert">Expert</option>
                       </select>
                     </div>
-                    <div className="sm:w-1/4">
-                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <div className="sm:w-1/4 w-full">
+                      <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1.5">
                         Category
                       </label>
                       <select
                         value={newSkill.category}
                         onChange={(e) => setNewSkill({ ...newSkill, category: e.target.value })}
-                        className="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg shadow-sm"
+                        className="w-full px-3 py-2 text-xs font-mono bg-white border-2 border-black shadow-[2px_2px_0px_0px_#000] text-black focus:outline-none focus:bg-[#FFFDF0]"
                       >
                         <option value="Languages">Languages</option>
                         <option value="Frameworks">Frameworks</option>
@@ -293,32 +308,36 @@ export default function ProfilePage() {
                         <option value="Architecture">Architecture</option>
                       </select>
                     </div>
-                    <Button variant="secondary" onClick={addSkill} className="w-full sm:w-auto">
-                      <Plus className="w-4 h-4 mr-1" /> Add
-                    </Button>
+                    <button
+                      type="button"
+                      onClick={addSkill}
+                      className="w-full sm:w-auto px-4 py-2 border-2 border-black bg-[#70E000] hover:bg-[#85FF0A] text-black text-xs font-mono font-black shadow-[2px_2px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75 flex items-center justify-center"
+                    >
+                      <Plus className="w-3.5 h-3.5 mr-1 stroke-[2.5]" /> ADD
+                    </button>
                   </div>
 
-                  <div className="divide-y divide-slate-100">
+                  <div className="divide-y-2 divide-black">
                     {formData.skills.map((skill, index) => (
                       <div key={index} className="py-2.5 flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <span className="text-sm font-medium text-slate-800">{skill.name}</span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-semibold uppercase">
+                        <div className="flex items-center space-x-2.5">
+                          <span className="text-xs font-mono font-bold text-black">{skill.name}</span>
+                          <span className="text-[10px] font-mono font-black px-1.5 py-0.2 border border-black bg-[#C4A1FF] text-black uppercase">
                             {skill.level}
                           </span>
-                          <span className="text-xs text-slate-400">({skill.category})</span>
+                          <span className="text-[11px] font-mono text-slate-700">({skill.category})</span>
                           {skill.verified && (
-                            <span className="inline-flex items-center text-xs text-emerald-600">
-                              <CheckCircle className="w-3.5 h-3.5 mr-1" /> Verified
+                            <span className="inline-flex items-center text-[10px] font-mono font-bold border border-black bg-[#70E000] text-black px-1.5 py-0.2">
+                              <CheckCircle className="w-3 h-3 mr-1 stroke-[2.5]" /> AUDITED
                             </span>
                           )}
                         </div>
                         <button
                           type="button"
                           onClick={() => removeSkill(index)}
-                          className="text-slate-400 hover:text-red-500 transition-colors"
+                          className="p-1 border border-black bg-[#FF5757] text-white hover:bg-[#FF7070] shadow-[1px_1px_0px_0px_#000] transition-colors"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5 stroke-[2.5]" />
                         </button>
                       </div>
                     ))}
@@ -329,10 +348,11 @@ export default function ProfilePage() {
               {/* Projects Section */}
               <Card
                 title="Engineering Projects"
-                subtitle="Used by Career Evidence Agent for commit & code verification"
+                subtitle="Repository evidence evaluated by Career Evidence Agent"
+                headerBg="bg-[#C4A1FF]"
               >
                 <div className="space-y-4">
-                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                  <div className="p-3.5 bg-[#FAF5E6] border-2 border-black shadow-[3px_3px_0px_0px_#000] space-y-3">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <Input
                         label="Project Title"
@@ -360,42 +380,46 @@ export default function ProfilePage() {
                       }
                     />
                     <Input
-                      label="Short Description"
-                      placeholder="Brief overview of architectural contribution..."
+                      label="Brief Overview"
+                      placeholder="Summary of architectural contributions..."
                       value={newProject.description}
                       onChange={(e) =>
                         setNewProject({ ...newProject, description: e.target.value })
                       }
                     />
-                    <Button variant="secondary" size="sm" onClick={addProject}>
-                      <Plus className="w-4 h-4 mr-1" /> Add Project
-                    </Button>
+                    <button
+                      type="button"
+                      onClick={addProject}
+                      className="px-4 py-2 border-2 border-black bg-[#FFE600] hover:bg-[#FFF066] text-black text-xs font-mono font-black shadow-[2px_2px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75 flex items-center justify-center"
+                    >
+                      <Plus className="w-3.5 h-3.5 mr-1 stroke-[2.5]" /> Add Project
+                    </button>
                   </div>
 
                   <div className="space-y-3">
                     {formData.projects.map((proj, idx) => (
                       <div
                         key={idx}
-                        className="p-3.5 border border-slate-200 rounded-lg flex items-start justify-between bg-white"
+                        className="p-3.5 border-2 border-black bg-white shadow-[3px_3px_0px_0px_#000] flex items-start justify-between"
                       >
                         <div>
-                          <h4 className="text-sm font-semibold text-slate-800">{proj.title}</h4>
-                          <p className="text-xs text-slate-600 mt-0.5">{proj.description}</p>
+                          <h4 className="text-xs font-black text-black font-mono">{proj.title}</h4>
+                          <p className="text-[11px] text-slate-700 mt-0.5">{proj.description}</p>
                           {proj.repo_url && (
                             <a
                               href={proj.repo_url}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-xs text-indigo-600 hover:underline mt-1 inline-block"
+                              className="text-[11px] font-mono font-bold text-black underline hover:bg-[#FFE600] mt-1 inline-block"
                             >
                               {proj.repo_url}
                             </a>
                           )}
-                          <div className="flex flex-wrap gap-1 mt-2">
+                          <div className="flex flex-wrap gap-1.5 mt-2">
                             {proj.technologies?.map((tech, ti) => (
                               <span
                                 key={ti}
-                                className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded"
+                                className="text-[10px] font-mono font-bold border border-black bg-[#FAF5E6] text-black px-1.5 py-0.5"
                               >
                                 {tech}
                               </span>
@@ -405,9 +429,9 @@ export default function ProfilePage() {
                         <button
                           type="button"
                           onClick={() => removeProject(idx)}
-                          className="text-slate-400 hover:text-red-500 transition-colors"
+                          className="p-1 border border-black bg-[#FF5757] text-white hover:bg-[#FF7070] shadow-[1px_1px_0px_0px_#000] transition-colors"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5 stroke-[2.5]" />
                         </button>
                       </div>
                     ))}
@@ -416,29 +440,30 @@ export default function ProfilePage() {
               </Card>
             </div>
 
-            {/* Sidebar Column: Goals, Linked Accounts, Completeness */}
-            <div className="space-y-6">
+            {/* Sidebar Column: Evidence Links, Goals (5 cols) */}
+            <div className="lg:col-span-5 space-y-6">
               {/* Linked Accounts with OAuth Stubs */}
               <Card
                 title="External Evidence Links"
-                subtitle="OAuth 2.0 integrations for Career Evidence Agent"
+                subtitle="OAuth 2.0 connectors for Evidence Agent ingestion"
+                headerBg="bg-[#FF70A6]"
               >
-                <div className="space-y-4">
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+                <div className="space-y-3.5">
+                  <div className="p-3 bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <Github className="w-5 h-5 text-slate-800" />
-                        <span className="text-sm font-medium text-slate-800">GitHub</span>
+                        <Github className="w-4 h-4 text-black stroke-[2.5]" />
+                        <span className="text-xs font-mono font-bold text-black">GitHub OAuth</span>
                       </div>
                       {formData.linked_accounts.github ? (
-                        <span className="text-xs px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold flex items-center">
-                          <CheckCircle className="w-3 h-3 mr-1" /> Connected
+                        <span className="text-[10px] font-mono font-black border border-black bg-[#70E000] text-black px-1.5 py-0.5 flex items-center">
+                          <CheckCircle className="w-3 h-3 mr-1 stroke-[2.5]" /> LINKED
                         </span>
                       ) : (
                         <button
                           type="button"
                           onClick={() => {
-                            const handle = window.prompt('Simulating GitHub OAuth 2.0 flow. Enter your GitHub username:', 'hussain-ansari');
+                            const handle = window.prompt('Simulating GitHub OAuth flow. Enter GitHub username:', 'hussain-ansari');
                             if (handle) {
                               setFormData((prev) => ({
                                 ...prev,
@@ -446,9 +471,9 @@ export default function ProfilePage() {
                               }));
                             }
                           }}
-                          className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
+                          className="text-xs font-mono font-bold text-black underline hover:bg-[#FFE600] px-1"
                         >
-                          + Connect OAuth
+                          + Connect
                         </button>
                       )}
                     </div>
@@ -460,21 +485,21 @@ export default function ProfilePage() {
                     />
                   </div>
 
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+                  <div className="p-3 bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <Linkedin className="w-5 h-5 text-blue-600" />
-                        <span className="text-sm font-medium text-slate-800">LinkedIn</span>
+                        <Linkedin className="w-4 h-4 text-black stroke-[2.5]" />
+                        <span className="text-xs font-mono font-bold text-black">LinkedIn OAuth</span>
                       </div>
                       {formData.linked_accounts.linkedin ? (
-                        <span className="text-xs px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold flex items-center">
-                          <CheckCircle className="w-3 h-3 mr-1" /> Connected
+                        <span className="text-[10px] font-mono font-black border border-black bg-[#70E000] text-black px-1.5 py-0.5 flex items-center">
+                          <CheckCircle className="w-3 h-3 mr-1 stroke-[2.5]" /> LINKED
                         </span>
                       ) : (
                         <button
                           type="button"
                           onClick={() => {
-                            const handle = window.prompt('Simulating LinkedIn OAuth flow. Enter your LinkedIn handle:', 'hussainansari');
+                            const handle = window.prompt('Simulating LinkedIn OAuth flow. Enter LinkedIn handle:', 'hussainansari');
                             if (handle) {
                               setFormData((prev) => ({
                                 ...prev,
@@ -482,9 +507,9 @@ export default function ProfilePage() {
                               }));
                             }
                           }}
-                          className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
+                          className="text-xs font-mono font-bold text-black underline hover:bg-[#FFE600] px-1"
                         >
-                          + Connect OAuth
+                          + Connect
                         </button>
                       )}
                     </div>
@@ -499,32 +524,40 @@ export default function ProfilePage() {
               </Card>
 
               {/* Career Goals */}
-              <Card title="Career Aspirations & Goals">
+              <Card
+                title="Aspirational Milestones"
+                subtitle="Target milestones for Roadmap Agent"
+                headerBg="bg-[#FFDE59]"
+              >
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2">
                     <Input
-                      placeholder="e.g. Land FAANG ML Internship"
+                      placeholder="e.g. Benchmark 90%+ for Cloud Architect"
                       value={newGoal}
                       onChange={(e) => setNewGoal(e.target.value)}
                     />
-                    <Button variant="secondary" size="sm" onClick={addGoal}>
-                      <Plus className="w-4 h-4" />
-                    </Button>
+                    <button
+                      type="button"
+                      onClick={addGoal}
+                      className="px-3 py-2 border-2 border-black bg-[#70E000] hover:bg-[#85FF0A] text-black text-xs font-mono font-bold shadow-[2px_2px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75"
+                    >
+                      <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                    </button>
                   </div>
 
                   <ul className="space-y-2">
                     {formData.goals.map((goal, idx) => (
                       <li
                         key={idx}
-                        className="flex items-center justify-between text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-200"
+                        className="flex items-center justify-between text-xs font-mono font-bold bg-[#FAF5E6] p-2.5 border-2 border-black shadow-[2px_2px_0px_0px_#000] text-black"
                       >
-                        <span className="text-slate-700">{typeof goal === 'string' ? goal : goal.title}</span>
+                        <span>{typeof goal === 'string' ? goal : goal.title}</span>
                         <button
                           type="button"
                           onClick={() => removeGoal(idx)}
-                          className="text-slate-400 hover:text-red-500"
+                          className="p-1 border border-black bg-[#FF5757] text-white hover:bg-[#FF7070] transition-colors"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-3.5 h-3.5 stroke-[2.5]" />
                         </button>
                       </li>
                     ))}
