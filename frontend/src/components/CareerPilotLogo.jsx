@@ -8,11 +8,11 @@
 
 import React from 'react';
 
-export default function CareerPilotLogo({ className = 'h-11 sm:h-13 w-auto', showTagline = true }) {
+export default function CareerPilotLogo({ className = 'h-11 sm:h-13 w-auto' }) {
   return (
     <div className="flex items-center select-none group cursor-pointer py-1">
       <svg
-        viewBox="0 0 465 82"
+        viewBox="0 0 442 72"
         className={`${className} transition-transform duration-200 group-hover:scale-[1.03] overflow-visible`}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -91,9 +91,9 @@ export default function CareerPilotLogo({ className = 'h-11 sm:h-13 w-auto', sho
           />
 
           {/* ======================================================== */}
-          {/* WORD 2: PILOT — Shifted +20px for generous air/spacing   */}
+          {/* WORD 2: PILOT — Balanced spacing next to lightning       */}
           {/* ======================================================== */}
-          <g transform="translate(20, 0) skewX(-13)">
+          <g transform="translate(8, 0) skewX(-13)">
             {/* P */}
             <path
               d="M266 18 H289 C299 18 305 24 305 33 C305 42 299 48 289 48 H278 V62 H266 Z M278 27 V39 H287 C292 39 294 37 294 33 C294 29 292 27 287 27 Z"
@@ -137,9 +137,9 @@ export default function CareerPilotLogo({ className = 'h-11 sm:h-13 w-auto', sho
           </g>
 
           {/* ======================================================== */}
-          {/* 4-POINT STAR SPARKLE ACCENT (Shifted with PILOT)         */}
+          {/* 4-POINT STAR SPARKLE ACCENT (Positioned above T)         */}
           {/* ======================================================== */}
-          <g transform="translate(442, 12)">
+          <g transform="translate(430, 12)">
             <path
               d="M0 -9 Q0 0 9 0 Q0 0 0 9 Q0 0 -9 0 Q0 0 0 -9 Z"
               fill="#FFE600"
@@ -148,21 +148,6 @@ export default function CareerPilotLogo({ className = 'h-11 sm:h-13 w-auto', sho
             />
           </g>
         </g>
-
-        {/* Micro-tagline under CAREER */}
-        {showTagline && (
-          <text
-            x="12"
-            y="76"
-            fill="#000000"
-            fontSize="7.5"
-            fontFamily="'Geist Mono', monospace"
-            fontWeight="900"
-            letterSpacing="2.6"
-          >
-            AUTONOMOUS • EVIDENCE • INTELLIGENCE
-          </text>
-        )}
       </svg>
     </div>
   );
