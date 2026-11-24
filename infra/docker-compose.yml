@@ -229,6 +229,8 @@ services:
       - HF_API_KEY=${HF_API_KEY:-}
       - GITHUB_MCP_URL=http://github-mcp:5005
       - JOB_BOARD_MCP_URL=http://job-board-mcp:5006
+      - PROFILE_SERVICE_URL=http://profile-service:5002
+      - INTERNAL_SERVICE_KEY=careerpilot_internal_agent_secret_key_2026
       - PYTHONPATH=/usr/src/app:/usr/src/app/agents
     volumes:
       - ../agents:/usr/src/app/agents:ro
@@ -240,9 +242,9 @@ services:
       chromadb:
         condition: service_healthy
       github-mcp:
-        condition: service_healthy
+        condition: service_started
       job-board-mcp:
-        condition: service_healthy
+        condition: service_started
     networks:
       - careerpilot-network
     healthcheck:
@@ -259,7 +261,7 @@ services:
     container_name: cp-frontend
     restart: unless-stopped
     ports:
-      - "3000:80"
+      - "3000:3000"
     environment:
       - VITE_AUTH_API_URL=http://localhost:5001/api/v1/auth
       - VITE_PROFILE_API_URL=http://localhost:5002/api/v1/profile
@@ -271,7 +273,7 @@ services:
     networks:
       - careerpilot-network
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:80 || exit 1"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 3
