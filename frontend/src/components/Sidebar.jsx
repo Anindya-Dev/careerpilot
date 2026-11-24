@@ -1,8 +1,8 @@
 /**
  * @file Sidebar.jsx
- * @description Neo-Brutalist sidebar navigation bar providing single-selection
- * active states, smooth hash anchor scrolling, and a smooth sliding motion animation
- * driven exclusively by the sidebar hamburger toggle.
+ * @description Neo-Brutalist sidebar navigation bar.
+ * At the starting, all navigation menus are completely hidden with only the hamburger button visible.
+ * Clicking the hamburger button triggers a weighted, smooth motion sliding animation to reveal the menus.
  * @author Md Hussain Ansari (Member 1) & Sargam Banerjee (Member 4)
  */
 
@@ -170,11 +170,13 @@ export default function Sidebar() {
       </aside>
 
       {/* ======================================================== */}
-      {/* DESKTOP SIDEBAR WITH SMOOTH SLIDING MOTION               */}
+      {/* DESKTOP SIDEBAR WITH SLIDING MOTION ANIMATION             */}
+      {/* Starting State: Menus hidden, only hamburger visible      */}
+      {/* Click Hamburger: Menus slide in with smooth motion       */}
       {/* ======================================================== */}
       <aside
         className={`shrink-0 bg-white border-r-2 border-black hidden md:flex flex-col justify-between min-h-[calc(100vh-4rem)] select-none overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          isCollapsed ? 'w-16 p-2.5' : 'w-64 p-4'
+          isCollapsed ? 'w-14 p-2' : 'w-64 p-4'
         }`}
       >
         <div className="space-y-3">
@@ -188,8 +190,8 @@ export default function Sidebar() {
               type="button"
               onClick={toggleCollapsed}
               className="p-2 border-2 border-black bg-white hover:bg-[#FFE600] shadow-[2px_2px_0px_0px_#000] hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75 flex items-center justify-center cursor-pointer shrink-0"
-              title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              aria-label="Toggle sidebar menu"
+              title={isCollapsed ? 'Show navigation menus' : 'Hide navigation menus'}
+              aria-label="Toggle navigation menu"
             >
               <Menu className="w-4 h-4 stroke-[2.5] text-black" />
             </button>
@@ -201,8 +203,14 @@ export default function Sidebar() {
             )}
           </div>
 
-          {/* Navigation Items (Desktop) */}
-          <div className="space-y-1.5">
+          {/* Navigation Items: Hidden at starting, slide open when clicked */}
+          <div
+            className={`space-y-1.5 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              isCollapsed
+                ? 'opacity-0 max-h-0 pointer-events-none -translate-x-6 overflow-hidden'
+                : 'opacity-100 max-h-[600px] translate-x-0'
+            }`}
+          >
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = isItemActive(item);
@@ -212,10 +220,7 @@ export default function Sidebar() {
                   key={item.name}
                   href={`${item.path}${item.hash}`}
                   onClick={(e) => handleNavClick(e, item)}
-                  title={isCollapsed ? item.name : undefined}
-                  className={`group relative flex items-center ${
-                    isCollapsed ? 'justify-center px-0 py-3' : 'justify-between px-3 py-2.5'
-                  } border-2 transition-all duration-200 font-mono text-xs font-bold ${
+                  className={`group relative flex items-center justify-between px-3 py-2.5 border-2 transition-all duration-200 font-mono text-xs font-bold ${
                     active
                       ? 'border-black bg-[#FFE600] text-black shadow-[3px_3px_0px_0px_#000] -translate-y-0.5'
                       : 'border-transparent text-slate-700 hover:border-black hover:bg-[#FAF5E6] hover:text-black hover:shadow-[2px_2px_0px_0px_#000]'
@@ -223,28 +228,15 @@ export default function Sidebar() {
                 >
                   <div className="flex items-center space-x-3 min-w-0">
                     <Icon className="w-4 h-4 shrink-0 stroke-[2.5]" />
-                    <span
-                      className={`uppercase tracking-tight truncate whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                        isCollapsed
-                          ? 'opacity-0 max-w-0 -translate-x-3 pointer-events-none'
-                          : 'opacity-100 max-w-[160px] translate-x-0'
-                      }`}
-                    >
+                    <span className="uppercase tracking-tight truncate whitespace-nowrap">
                       {item.name}
                     </span>
                   </div>
 
-                  {!isCollapsed && item.badge && (
-                    <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 border border-black bg-white text-black shadow-[1px_1px_0px_0px_#000] shrink-0 transition-opacity duration-200">
+                  {item.badge && (
+                    <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 border border-black bg-white text-black shadow-[1px_1px_0px_0px_#000] shrink-0">
                       {item.badge}
                     </span>
-                  )}
-
-                  {isCollapsed && item.badge && (
-                    <span
-                      className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#70E000] border border-black"
-                      title={item.badge}
-                    />
                   )}
                 </a>
               );
@@ -252,29 +244,24 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* System Telemetry Metadata (Desktop) */}
-        {isCollapsed ? (
-          <div className="pt-4 border-t-2 border-black flex justify-center font-mono transition-all duration-300">
-            <div
-              className="w-10 h-10 border-2 border-black bg-[#FAF5E6] shadow-[2px_2px_0px_0px_#000] flex items-center justify-center cursor-pointer hover:bg-[#FFE600] transition-colors"
-              title="SYS_ENV: PHASE_1 :: Microservices online on ports 5001 & 5002. LangGraph agent orchestrator on 8000."
-            >
-              <Terminal className="w-4 h-4 stroke-[2.5] text-black" />
+        {/* System Telemetry Metadata: Hidden when collapsed */}
+        <div
+          className={`transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            isCollapsed
+              ? 'opacity-0 max-h-0 pointer-events-none -translate-x-6 overflow-hidden'
+              : 'opacity-100 max-h-[300px] translate-x-0 pt-4 border-t-2 border-black font-mono'
+          }`}
+        >
+          <div className="border-2 border-black bg-[#FAF5E6] p-3 shadow-[3px_3px_0px_0px_#000] space-y-1.5">
+            <div className="flex items-center space-x-1.5 text-black font-black text-[11px]">
+              <Terminal className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>SYS_ENV: PHASE_1</span>
             </div>
+            <p className="text-[10px] text-slate-700 leading-tight">
+              Microservices online on ports 5001 & 5002. LangGraph agent orchestrator on 8000.
+            </p>
           </div>
-        ) : (
-          <div className="pt-4 border-t-2 border-black font-mono transition-opacity duration-300">
-            <div className="border-2 border-black bg-[#FAF5E6] p-3 shadow-[3px_3px_0px_0px_#000] space-y-1.5">
-              <div className="flex items-center space-x-1.5 text-black font-black text-[11px]">
-                <Terminal className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>SYS_ENV: PHASE_1</span>
-              </div>
-              <p className="text-[10px] text-slate-700 leading-tight">
-                Microservices online on ports 5001 & 5002. LangGraph agent orchestrator on 8000.
-              </p>
-            </div>
-          </div>
-        )}
+        </div>
       </aside>
     </>
   );

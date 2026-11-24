@@ -10,12 +10,16 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const SidebarContext = createContext(null);
 
 export function SidebarProvider({ children }) {
-  // Desktop collapse state: false = full w-64, true = compact w-20
+  // Desktop collapse state: true = hidden at starting (only hamburger visible), false = expanded menus
   const [isCollapsed, setIsCollapsed] = useState(() => {
     try {
-      return localStorage.getItem('careerpilot_sidebar_collapsed') === 'true';
+      const stored = localStorage.getItem('careerpilot_sidebar_collapsed');
+      if (stored !== null) {
+        return stored === 'true';
+      }
+      return true; // Hidden by default at starting
     } catch {
-      return false;
+      return true;
     }
   });
 
