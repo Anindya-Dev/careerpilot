@@ -13,12 +13,20 @@ import SocialAuthButtons from './SocialAuthButtons';
 import { Compass, X, ArrowRight, UserPlus, Shield } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
-  const { login, register, verifyEmailCode, enterDemoMode } = useAuth();
+  const { user, login, register, verifyEmailCode, enterDemoMode } = useAuth();
   const navigate = useNavigate();
 
   const [mode, setMode] = useState(initialMode); // 'login' | 'register'
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
+
+  // If already authenticated, redirect immediately to dashboard
+  useEffect(() => {
+    if (isOpen && user) {
+      onClose();
+      navigate('/dashboard');
+    }
+  }, [isOpen, user, onClose, navigate]);
 
   useEffect(() => {
     if (isOpen) {

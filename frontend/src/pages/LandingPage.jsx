@@ -8,7 +8,8 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
   Compass,
   ArrowRight,
@@ -61,6 +62,7 @@ function Reveal({ children, className = '', delay = 0 }) {
 }
 
 export default function LandingPage() {
+  const { user } = useAuth();
   const roles = [
     'AI & Machine Learning Engineers',
     'Full-Stack Cloud Architects',
@@ -151,14 +153,24 @@ export default function LandingPage() {
             </Link>
 
             {/* Student Login Action */}
-            <button
-              type="button"
-              onClick={() => setAuthModal({ isOpen: true, mode: 'login' })}
-              className="inline-flex items-center px-4 sm:px-5 py-2 sm:py-2.5 border-2 border-black bg-[#FFE600] text-black text-xs font-mono font-bold uppercase tracking-wider shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75 cursor-pointer"
-            >
-              <LogIn className="w-4 h-4 mr-1.5 stroke-[2.5]" />
-              Student Login
-            </button>
+            {user ? (
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center px-4 sm:px-5 py-2 sm:py-2.5 border-2 border-black bg-[#70E000] text-black text-xs font-mono font-bold uppercase tracking-wider shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75"
+              >
+                <span>ENTER WORKSPACE</span>
+                <ArrowRight className="w-4 h-4 ml-1.5 stroke-[2.5]" />
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setAuthModal({ isOpen: true, mode: 'login' })}
+                className="inline-flex items-center px-4 sm:px-5 py-2 sm:py-2.5 border-2 border-black bg-[#FFE600] text-black text-xs font-mono font-bold uppercase tracking-wider shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75 cursor-pointer"
+              >
+                <LogIn className="w-4 h-4 mr-1.5 stroke-[2.5]" />
+                Student Login
+              </button>
+            )}
           </div>
         </header>
 
@@ -190,31 +202,45 @@ export default function LandingPage() {
               </div>
             </Reveal>
 
-            {/* Action Buttons: Restored compact 2-line box with large bold typography and prominent arrow */}
-            <Reveal delay={250} className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto w-full">
-              <button
-                type="button"
-                onClick={() => setAuthModal({ isOpen: true, mode: 'register' })}
-                className="w-full sm:w-auto px-7 py-3.5 border-[3px] border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono font-black text-base sm:text-lg uppercase tracking-wider shadow-[6px_6px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center leading-snug"
-              >
-                <div className="flex items-center text-center">
-                  <span>
-                    START PROFILE<br />EVALUATION
-                  </span>
-                  <ArrowRight className="w-7 h-7 sm:w-8 sm:h-8 ml-5 sm:ml-6 stroke-[3] shrink-0" />
-                </div>
-              </button>
+            {/* Action Buttons: Dynamically adapts if already authenticated */}
+            {user ? (
+              <Reveal delay={250} className="pt-3 flex items-center justify-center max-w-lg mx-auto w-full">
+                <Link
+                  to="/dashboard"
+                  className="w-full sm:w-auto px-8 py-4 border-[3px] border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono font-black text-lg uppercase tracking-wider shadow-[6px_6px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center leading-snug"
+                >
+                  <div className="flex items-center text-center">
+                    <span>LAUNCH AUTONOMOUS WORKSPACE</span>
+                    <ArrowRight className="w-7 h-7 ml-4 stroke-[3] shrink-0" />
+                  </div>
+                </Link>
+              </Reveal>
+            ) : (
+              <Reveal delay={250} className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto w-full">
+                <button
+                  type="button"
+                  onClick={() => setAuthModal({ isOpen: true, mode: 'register' })}
+                  className="w-full sm:w-auto px-7 py-3.5 border-[3px] border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono font-black text-base sm:text-lg uppercase tracking-wider shadow-[6px_6px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center leading-snug"
+                >
+                  <div className="flex items-center text-center">
+                    <span>
+                      START PROFILE<br />EVALUATION
+                    </span>
+                    <ArrowRight className="w-7 h-7 sm:w-8 sm:h-8 ml-5 sm:ml-6 stroke-[3] shrink-0" />
+                  </div>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setAuthModal({ isOpen: true, mode: 'login' })}
-                className="w-full sm:w-auto px-7 py-3.5 border-[3px] border-black bg-white hover:bg-[#F4F0EA] text-black font-mono font-black text-base sm:text-lg uppercase tracking-wider shadow-[6px_6px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center leading-snug text-center"
-              >
-                <span>
-                  STUDENT<br />LOGIN
-                </span>
-              </button>
-            </Reveal>
+                <button
+                  type="button"
+                  onClick={() => setAuthModal({ isOpen: true, mode: 'login' })}
+                  className="w-full sm:w-auto px-7 py-3.5 border-[3px] border-black bg-white hover:bg-[#F4F0EA] text-black font-mono font-black text-base sm:text-lg uppercase tracking-wider shadow-[6px_6px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-75 flex items-center justify-center leading-snug text-center"
+                >
+                  <span>
+                    STUDENT<br />LOGIN
+                  </span>
+                </button>
+              </Reveal>
+            )}
 
             {/* Hero Visual: Wide Interactive Workbench Terminal Preview */}
             <Reveal delay={350} className="w-full max-w-6xl mt-6">
