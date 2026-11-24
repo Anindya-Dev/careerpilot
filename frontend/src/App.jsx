@@ -9,6 +9,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ProfileProvider } from './context/ProfileContext';
+import { SidebarProvider } from './context/SidebarContext';
 import ProtectedRoute from './routes/ProtectedRoute';
 
 import LoginPage from './pages/LoginPage';
@@ -23,35 +24,37 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <ProfileProvider>
-          <Routes>
-            {/* Public dynamic landing page */}
-            <Route path="/" element={<LandingPage />} />
+          <SidebarProvider>
+            <Routes>
+              {/* Public dynamic landing page */}
+              <Route path="/" element={<LandingPage />} />
 
-            {/* Public authentication flows */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+              {/* Public authentication flows */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
 
-            {/* Guarded student dashboard & profile flows */}
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <DashboardPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            />
+              {/* Guarded student dashboard & profile flows */}
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <DashboardPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Fallback 404 */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+              {/* Fallback 404 */}
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </SidebarProvider>
         </ProfileProvider>
       </AuthProvider>
     </BrowserRouter>

@@ -8,11 +8,13 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import { useSidebar } from '../context/SidebarContext';
+import { LogOut, User as UserIcon, Menu } from 'lucide-react';
 import CareerPilotLogo from './CareerPilotLogo';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { isCollapsed, toggleCollapsed, toggleMobileOpen } = useSidebar();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -20,14 +22,34 @@ export default function Navbar() {
     navigate('/');
   };
 
+  const handleToggleSidebar = () => {
+    if (window.innerWidth < 768) {
+      toggleMobileOpen();
+    } else {
+      toggleCollapsed();
+    }
+  };
+
   return (
     <header className="sticky top-0 z-40 bg-[#F4F0EA]/95 border-b-2 border-black w-full backdrop-blur-sm">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          {/* Brand Identity: Dynamic Anime / Supersonic Style Logo */}
-          <Link to="/dashboard" className="flex items-center">
-            <CareerPilotLogo className="h-9 sm:h-10 w-auto" />
-          </Link>
+          {/* Left: Hamburger Toggle + Brand Identity Logo */}
+          <div className="flex items-center space-x-3">
+            <button
+              type="button"
+              onClick={handleToggleSidebar}
+              className="p-2 border-2 border-black bg-white hover:bg-[#FFE600] shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75 flex items-center justify-center cursor-pointer"
+              title="Toggle sidebar navigation"
+              aria-label="Toggle navigation"
+            >
+              <Menu className="w-4 h-4 stroke-[2.5] text-black" />
+            </button>
+
+            <Link to="/dashboard" className="flex items-center">
+              <CareerPilotLogo className="h-9 sm:h-10 w-auto" />
+            </Link>
+          </div>
 
           {/* User Profile & Logout */}
           {user && (
