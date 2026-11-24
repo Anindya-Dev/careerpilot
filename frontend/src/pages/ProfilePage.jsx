@@ -469,7 +469,7 @@ export default function ProfilePage() {
                         <button
                           type="button"
                           onClick={() => {
-                            const handle = window.prompt('Simulating GitHub OAuth flow. Enter GitHub username:', 'hussain-ansari');
+                            const handle = window.prompt('Simulating GitHub OAuth flow. Enter GitHub username:', 'octocat');
                             if (handle) {
                               setFormData((prev) => ({
                                 ...prev,
@@ -484,7 +484,7 @@ export default function ProfilePage() {
                       )}
                     </div>
                     <Input
-                      placeholder="e.g. hussain-ansari"
+                      placeholder="e.g. octocat"
                       name="github"
                       value={formData.linked_accounts.github}
                       onChange={handleLinkedAccountChange}
@@ -505,7 +505,7 @@ export default function ProfilePage() {
                         <button
                           type="button"
                           onClick={() => {
-                            const handle = window.prompt('Simulating LinkedIn OAuth flow. Enter LinkedIn handle:', 'hussainansari');
+                            const handle = window.prompt('Simulating LinkedIn OAuth flow. Enter LinkedIn handle:', 'username');
                             if (handle) {
                               setFormData((prev) => ({
                                 ...prev,
@@ -520,7 +520,7 @@ export default function ProfilePage() {
                       )}
                     </div>
                     <Input
-                      placeholder="e.g. linkedin.com/in/hussainansari"
+                      placeholder="e.g. linkedin.com/in/username"
                       name="linkedin"
                       value={formData.linked_accounts.linkedin}
                       onChange={handleLinkedAccountChange}

@@ -15,14 +15,14 @@ async function seed() {
     await connectDB();
 
     console.log('[Seed] Clearing existing demo accounts...');
-    await User.deleteMany({ email: { $in: ['student@careerpilot.io', 'demo@careerpilot.io', 'hussain@engineering.edu'] } });
+    await User.deleteMany({ email: { $in: ['student@careerpilot.io', 'demo@careerpilot.io'] } });
 
     console.log('[Seed] Seeding sample student accounts...');
     const students = [
       {
         email: 'student@careerpilot.io',
         passwordHash: 'Password123!',
-        name: 'Md Hussain Ansari',
+        name: 'Alex Rivera',
         major: 'Computer Science & Engineering',
         enrollmentYear: 2023,
         isActive: true,

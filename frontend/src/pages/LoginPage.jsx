@@ -12,7 +12,7 @@ import Alert from '../components/Alert';
 import { Compass, ArrowRight, Shield, Terminal } from 'lucide-react';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, enterDemoMode } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -143,6 +143,18 @@ export default function LoginPage() {
             >
               {isSubmitting ? 'Authenticating...' : 'Sign In to Dashboard'}
               <ArrowRight className="w-4 h-4 ml-1.5 stroke-[2.5]" />
+            </button>
+
+            {/* Clear, honest option for faculty evaluation when backend is off */}
+            <button
+              type="button"
+              onClick={() => {
+                enterDemoMode();
+                navigate('/dashboard');
+              }}
+              className="w-full mt-3 py-2 border-2 border-black bg-[#E2E8F0] font-mono font-bold text-xs uppercase tracking-wider text-black hover:bg-slate-300 transition-colors shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+            >
+              Explore Demo Sandbox (Offline Evaluation)
             </button>
           </form>
 

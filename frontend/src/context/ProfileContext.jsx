@@ -27,8 +27,8 @@ export function ProfileProvider({ children }) {
       // Graceful offline demo profile fallback
       console.warn('[CareerPilot Preview] Profile service offline. Using preview profile.');
       const localProfile = JSON.parse(localStorage.getItem('demo_profile') || 'null') || {
-        userId: user.userId || '6630f9a21e4a1a3a12345678',
-        name: user.name || 'Md Hussain Ansari',
+        userId: user.userId || 'demo-student-id-001',
+        name: user.name || 'Student',
         email: user.email || 'student@careerpilot.io',
         major: user.major || 'Computer Science & Engineering',
         target_role: 'AI / Machine Learning Engineer',
@@ -52,10 +52,10 @@ export function ProfileProvider({ children }) {
             technologies: ['Node.js', 'Express', 'React', 'MongoDB', 'Python', 'Neo4j']
           },
           {
-            title: 'Expense Tracker Pro',
-            description: 'Full-stack MERN application featuring JWT authentication and expense analytics.',
-            repo_url: 'https://github.com/ansari/expense-tracker',
-            technologies: ['MongoDB', 'Express', 'React', 'Node.js']
+            title: 'Distributed Systems Key-Value Store',
+            description: 'Raft consensus key-value store built in Go with automated cluster failover.',
+            repo_url: 'https://github.com/example/raft-kv',
+            technologies: ['Go', 'Raft', 'gRPC', 'Docker']
           }
         ],
         certifications: [
@@ -64,8 +64,8 @@ export function ProfileProvider({ children }) {
         career_health_score: 84.5,
         profile_completeness: 85,
         linked_accounts: {
-          github: 'hussain-ansari',
-          linkedin: 'linkedin.com/in/hussainansari'
+          github: user.email ? `${user.email.split('@')[0]}-dev` : 'student-dev',
+          linkedin: user.email ? `linkedin.com/in/${user.email.split('@')[0]}` : 'linkedin.com/in/student'
         }
       };
       setProfile(localProfile);

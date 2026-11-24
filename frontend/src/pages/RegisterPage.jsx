@@ -12,7 +12,7 @@ import Alert from '../components/Alert';
 import { Compass, UserPlus, Shield, Terminal } from 'lucide-react';
 
 export default function RegisterPage() {
-  const { register } = useAuth();
+  const { register, enterDemoMode } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -121,7 +121,7 @@ export default function RegisterPage() {
               </label>
               <input
                 type="text"
-                placeholder="Md Hussain Ansari"
+                placeholder="e.g. Alex Rivera"
                 value={formData.name}
                 onChange={handleChange}
                 name="name"
@@ -205,6 +205,18 @@ export default function RegisterPage() {
             >
               <UserPlus className="w-4 h-4 mr-1.5 stroke-[2.5]" />
               {isSubmitting ? 'Registering...' : 'Initialize Student Profile'}
+            </button>
+
+            {/* Clear, honest option for faculty evaluation when backend is off */}
+            <button
+              type="button"
+              onClick={() => {
+                enterDemoMode();
+                navigate('/dashboard');
+              }}
+              className="w-full mt-3 py-2 border-2 border-black bg-[#E2E8F0] font-mono font-bold text-xs uppercase tracking-wider text-black hover:bg-slate-300 transition-colors shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+            >
+              Explore Demo Sandbox (Offline Evaluation)
             </button>
           </form>
 

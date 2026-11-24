@@ -65,11 +65,12 @@ export function AuthProvider({ children }) {
 
       if (storedToken === 'demo-jwt-preview-token') {
         const saved = JSON.parse(localStorage.getItem('demo_user') || 'null') || {
-          userId: '6630f9a21e4a1a3a12345678',
-          name: 'Md Hussain Ansari',
-          email: 'student@careerpilot.io',
+          userId: 'demo-student-id-001',
+          name: 'Sample Student (Demo Sandbox)',
+          email: 'demo@careerpilot.io',
           major: 'Computer Science & Engineering',
-          enrollmentYear: 2023
+          enrollmentYear: 2024,
+          isDemoSession: true
         };
         return dispatch({
           type: 'AUTH_SUCCESS',
@@ -92,6 +93,10 @@ export function AuthProvider({ children }) {
     initAuth();
   }, []);
 
+  /**
+   * Fail-Closed Login Implementation
+   * Requires authentic backend microservice response; refuses silent fallback.
+   */
   const login = async (email, password) => {
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
@@ -103,31 +108,21 @@ export function AuthProvider({ children }) {
       });
       return { success: true, user: data.user };
     } catch (err) {
-      // Graceful offline preview fallback if backend microservice is not running
+      let errorMsg = 'Login failed. Please check your credentials.';
       if (!err.response) {
-        console.warn('[CareerPilot Preview] Backend offline. Activating preview session.');
-        const demoUser = {
-          userId: '6630f9a21e4a1a3a12345678',
-          name: 'Md Hussain Ansari',
-          email: email || 'student@careerpilot.io',
-          major: 'Computer Science & Engineering',
-          enrollmentYear: 2023
-        };
-        const demoToken = 'demo-jwt-preview-token';
-        localStorage.setItem('token', demoToken);
-        localStorage.setItem('demo_user', JSON.stringify(demoUser));
-        dispatch({
-          type: 'AUTH_SUCCESS',
-          payload: { user: demoUser, token: demoToken }
-        });
-        return { success: true, user: demoUser };
+        errorMsg = 'Cannot connect to Auth Service (http://localhost:5001). Ensure the backend server and MongoDB are running.';
+      } else if (err.response.data?.error?.message) {
+        errorMsg = err.response.data.error.message;
       }
-      const msg = err.response?.data?.error?.message || err.message || 'Login failed';
-      dispatch({ type: 'SET_ERROR', payload: msg });
-      throw new Error(msg);
+      dispatch({ type: 'SET_ERROR', payload: errorMsg });
+      throw new Error(errorMsg);
     }
   };
 
+  /**
+   * Fail-Closed Registration Implementation
+   * Enforces genuine validation & persistence by the Auth Service.
+   */
   const register = async (userData) => {
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
@@ -139,28 +134,38 @@ export function AuthProvider({ children }) {
       });
       return { success: true, user: data.user };
     } catch (err) {
+      let errorMsg = 'Registration failed. Please check your details.';
       if (!err.response) {
-        console.warn('[CareerPilot Preview] Backend offline. Activating preview registration.');
-        const demoUser = {
-          userId: '6630f9a21e4a1a3a12345678',
-          name: userData.name || 'Student',
-          email: userData.email,
-          major: userData.major || 'Computer Science & Engineering',
-          enrollmentYear: userData.enrollmentYear || 2023
-        };
-        const demoToken = 'demo-jwt-preview-token';
-        localStorage.setItem('token', demoToken);
-        localStorage.setItem('demo_user', JSON.stringify(demoUser));
-        dispatch({
-          type: 'AUTH_SUCCESS',
-          payload: { user: demoUser, token: demoToken }
-        });
-        return { success: true, user: demoUser };
+        errorMsg = 'Cannot connect to Auth Service (http://localhost:5001). Ensure the backend server and MongoDB are running.';
+      } else if (err.response.data?.error?.message) {
+        errorMsg = err.response.data.error.message;
       }
-      const msg = err.response?.data?.error?.message || err.message || 'Registration failed';
-      dispatch({ type: 'SET_ERROR', payload: msg });
-      throw new Error(msg);
+      dispatch({ type: 'SET_ERROR', payload: errorMsg });
+      throw new Error(errorMsg);
     }
+  };
+
+  /**
+   * Explicit Demo Sandbox / Evaluation Mode
+   * Transparently boots a simulated offline sandbox session without faking authentication.
+   */
+  const enterDemoMode = () => {
+    const demoUser = {
+      userId: 'demo-student-id-001',
+      name: 'Sample Student (Demo Sandbox)',
+      email: 'demo@careerpilot.io',
+      major: 'Computer Science & Engineering',
+      enrollmentYear: 2024,
+      isDemoSession: true
+    };
+    const demoToken = 'demo-jwt-preview-token';
+    localStorage.setItem('token', demoToken);
+    localStorage.setItem('demo_user', JSON.stringify(demoUser));
+    dispatch({
+      type: 'AUTH_SUCCESS',
+      payload: { user: demoUser, token: demoToken }
+    });
+    return demoUser;
   };
 
   const logout = async () => {
@@ -171,12 +176,13 @@ export function AuthProvider({ children }) {
     } finally {
       localStorage.removeItem('token');
       localStorage.removeItem('demo_user');
+      localStorage.removeItem('demo_profile');
       dispatch({ type: 'AUTH_LOGOUT' });
     }
   };
 
   return (
-    <AuthContext.Provider value={{ ...state, login, register, logout }}>
+    <AuthContext.Provider value={{ ...state, login, register, logout, enterDemoMode }}>
       {children}
     </AuthContext.Provider>
   );
