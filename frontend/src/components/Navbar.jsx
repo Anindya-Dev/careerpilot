@@ -25,11 +25,8 @@ export default function Navbar() {
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Brand Identity: Dynamic Anime / Supersonic Style Logo */}
-          <Link to="/dashboard" className="flex items-center space-x-2">
-            <CareerPilotLogo className="h-9 sm:h-10 w-auto" showTagline={false} />
-            <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 border-2 border-black bg-[#C4A1FF] text-black uppercase shadow-[1px_1px_0px_0px_#000] -translate-y-1">
-              V1.0
-            </span>
+          <Link to="/dashboard" className="flex items-center">
+            <CareerPilotLogo className="h-9 sm:h-10 w-auto" />
           </Link>
 
           {/* User Profile & Logout */}
