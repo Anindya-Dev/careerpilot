@@ -8,7 +8,8 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Compass, LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut, User as UserIcon } from 'lucide-react';
+import CareerPilotLogo from './CareerPilotLogo';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -23,19 +24,12 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 bg-white border-b-2 border-black w-full">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          {/* Brand Identity: Stylish & Big Neo-Brutalist Logo */}
-          <Link to="/dashboard" className="flex items-center space-x-3.5 group">
-            <div className="w-11 h-11 bg-[#FFE600] border-[2.5px] border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-center font-bold transition-all duration-150 group-hover:-translate-y-0.5 group-hover:shadow-[5px_5px_0px_0px_#000] group-hover:rotate-[-2deg]">
-              <Compass className="w-6 h-6 text-black stroke-[2.5] transition-transform duration-300 group-hover:rotate-45" />
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xl sm:text-2xl font-black tracking-tight font-display text-black uppercase">
-                Career<span className="inline-block bg-[#FFE600] text-black px-1.5 py-0.5 border-2 border-black shadow-[2px_2px_0px_0px_#000] ml-1 rotate-[-1deg] group-hover:rotate-0 transition-transform duration-150">Pilot</span>
-              </span>
-              <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 border-2 border-black bg-[#C4A1FF] text-black uppercase shadow-[1px_1px_0px_0px_#000]">
-                V1.0
-              </span>
-            </div>
+          {/* Brand Identity: Dynamic Anime / Supersonic Style Logo */}
+          <Link to="/dashboard" className="flex items-center space-x-2">
+            <CareerPilotLogo className="h-9 sm:h-10 w-auto" showTagline={false} />
+            <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 border-2 border-black bg-[#C4A1FF] text-black uppercase shadow-[1px_1px_0px_0px_#000] -translate-y-1">
+              V1.0
+            </span>
           </Link>
 
           {/* User Profile & Logout */}

@@ -21,6 +21,7 @@ import {
   Activity
 } from 'lucide-react';
 import AuthModal from '../components/AuthModal';
+import CareerPilotLogo from '../components/CareerPilotLogo';
 
 /**
  * Reusable IntersectionObserver Scroll Reveal Wrapper
@@ -144,16 +145,9 @@ export default function LandingPage() {
         {/* Navigation: Full-width container */}
         <header className="sticky top-0 z-30 bg-white/95 border-b-2 border-black backdrop-none">
           <div className="w-full max-w-[1500px] mx-auto px-6 sm:px-10 lg:px-14 h-16 flex items-center justify-between">
-            {/* Stylish, Big Neo-Brutalist Identity Logo */}
-            <Link to="/" className="flex items-center space-x-3.5 group">
-              <div className="w-12 h-12 bg-[#FFE600] border-[2.5px] border-black shadow-[4px_4px_0px_0px_#000] flex items-center justify-center font-bold transition-all duration-150 group-hover:-translate-y-1 group-hover:shadow-[6px_6px_0px_0px_#000] group-hover:rotate-[-2deg]">
-                <Compass className="w-7 h-7 text-black stroke-[2.5] transition-transform duration-300 group-hover:rotate-45" />
-              </div>
-              <div className="flex items-center">
-                <span className="text-2xl sm:text-3xl font-black tracking-tight font-display text-black uppercase">
-                  Career<span className="inline-block bg-[#FFE600] text-black px-2 py-0.5 border-2 border-black shadow-[2.5px_2.5px_0px_0px_#000] ml-1.5 rotate-[-1deg] group-hover:rotate-0 transition-transform duration-150">Pilot</span>
-                </span>
-              </div>
+            {/* Dynamic Anime / Supersonic Style Logo */}
+            <Link to="/" className="flex items-center">
+              <CareerPilotLogo className="h-10 sm:h-12 w-auto" />
             </Link>
 
             {/* Student Login Action */}
