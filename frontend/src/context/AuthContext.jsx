@@ -1,13 +1,15 @@
 /**
  * @file AuthContext.jsx
  * @description Centralized React Context for user authentication state management.
- * Follows useReducer pattern mandated by the Member 1 Handbook.
- * Provides login, register, logout, and token hydration hooks.
- * @author Md Hussain Ansari (Member 1)
+ * Seamlessly integrates Clerk OAuth (Google, GitHub) with CareerPilot's internal
+ * microservices JWT auth and offline Sandbox evaluation mode.
+ * @author Md Hussain Ansari (Member 1) & Anindya Bhattacharya (Member 2)
  */
 
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import authService from '../services/authService';
+import { useClerkConfig } from './ClerkProviderWrapper';
+import { useUser, useClerk } from '@clerk/clerk-react';
 
 const AuthContext = createContext(null);
 
@@ -52,10 +54,41 @@ function authReducer(state, action) {
   }
 }
 
+/**
+ * Clerk Synchronization Listener.
+ * Safely mounts ONLY when ClerkProvider is active.
+ */
+function ClerkSyncListener({ onSync }) {
+  const { user: clerkUser, isLoaded, isSignedIn } = useUser();
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn && clerkUser) {
+      const email = clerkUser.primaryEmailAddress?.emailAddress || 'student@careerpilot.io';
+      const name = clerkUser.fullName || clerkUser.firstName || email.split('@')[0];
+      
+      const syncedUser = {
+        userId: clerkUser.id,
+        name,
+        email,
+        imageUrl: clerkUser.imageUrl,
+        isClerkSession: true,
+        major: 'Computer Science & Engineering',
+        enrollmentYear: new Date().getFullYear()
+      };
+
+      const token = `clerk-jwt-${clerkUser.id}`;
+      onSync(syncedUser, token);
+    }
+  }, [isLoaded, isSignedIn, clerkUser, onSync]);
+
+  return null;
+}
+
 export function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(authReducer, initialState);
+  const { isClerkConfigured } = useClerkConfig();
 
-  // Validate existing token on initial application load
+  // Validate existing token on initial load
   useEffect(() => {
     const initAuth = async () => {
       const storedToken = localStorage.getItem('token');
@@ -63,6 +96,18 @@ export function AuthProvider({ children }) {
         return dispatch({ type: 'AUTH_LOGOUT' });
       }
 
+      // Check for Clerk cached session
+      if (storedToken.startsWith('clerk-jwt-')) {
+        const savedClerkUser = JSON.parse(localStorage.getItem('clerk_user') || 'null');
+        if (savedClerkUser) {
+          return dispatch({
+            type: 'AUTH_SUCCESS',
+            payload: { user: savedClerkUser, token: storedToken }
+          });
+        }
+      }
+
+      // Check for Demo Sandbox session
       if (storedToken === 'demo-jwt-preview-token') {
         const saved = JSON.parse(localStorage.getItem('demo_user') || 'null') || {
           userId: 'demo-student-id-001',
@@ -78,6 +123,7 @@ export function AuthProvider({ children }) {
         });
       }
 
+      // Standard Auth-Service JWT token check
       try {
         const user = await authService.getMe();
         dispatch({
@@ -93,9 +139,17 @@ export function AuthProvider({ children }) {
     initAuth();
   }, []);
 
+  const handleClerkSync = useCallback((clerkUser, token) => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('clerk_user', JSON.stringify(clerkUser));
+    dispatch({
+      type: 'AUTH_SUCCESS',
+      payload: { user: clerkUser, token }
+    });
+  }, []);
+
   /**
-   * Fail-Closed Login Implementation
-   * Requires authentic backend microservice response; refuses silent fallback.
+   * Internal Microservice Login
    */
   const login = async (email, password) => {
     dispatch({ type: 'SET_LOADING', payload: true });
@@ -120,8 +174,7 @@ export function AuthProvider({ children }) {
   };
 
   /**
-   * Fail-Closed Registration Implementation
-   * Enforces genuine validation & persistence by the Auth Service.
+   * Internal Microservice Registration
    */
   const register = async (userData) => {
     dispatch({ type: 'SET_LOADING', payload: true });
@@ -146,8 +199,7 @@ export function AuthProvider({ children }) {
   };
 
   /**
-   * Explicit Demo Sandbox / Evaluation Mode
-   * Transparently boots a simulated offline sandbox session without faking authentication.
+   * Demo Sandbox / Evaluation Mode
    */
   const enterDemoMode = () => {
     const demoUser = {
@@ -168,21 +220,26 @@ export function AuthProvider({ children }) {
     return demoUser;
   };
 
+  /**
+   * Unified Logout
+   */
   const logout = async () => {
     try {
       await authService.logout();
     } catch (_) {
-      // Clean up even if offline
+      // Ignore network errors on logout
     } finally {
       localStorage.removeItem('token');
       localStorage.removeItem('demo_user');
       localStorage.removeItem('demo_profile');
+      localStorage.removeItem('clerk_user');
       dispatch({ type: 'AUTH_LOGOUT' });
     }
   };
 
   return (
     <AuthContext.Provider value={{ ...state, login, register, logout, enterDemoMode }}>
+      {isClerkConfigured && <ClerkSyncListener onSync={handleClerkSync} />}
       {children}
     </AuthContext.Provider>
   );

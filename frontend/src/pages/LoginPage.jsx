@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Alert from '../components/Alert';
+import SocialAuthButtons from '../components/SocialAuthButtons';
 import { Compass, ArrowRight, Shield, Terminal } from 'lucide-react';
 
 export default function LoginPage() {
@@ -88,6 +89,9 @@ export default function LoginPage() {
               onClose={() => setServerError('')}
             />
           )}
+
+          {/* Social OAuth Providers (Clerk Headless) */}
+          <SocialAuthButtons mode="login" onError={setServerError} />
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

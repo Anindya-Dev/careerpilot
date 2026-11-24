@@ -9,6 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Alert from './Alert';
+import SocialAuthButtons from './SocialAuthButtons';
 import { Compass, X, ArrowRight, UserPlus, Shield } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
@@ -199,6 +200,9 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                 onClose={() => setServerError('')}
               />
             )}
+
+            {/* Social OAuth Providers (Clerk Headless) */}
+            <SocialAuthButtons mode={mode} onError={setServerError} />
 
             {/* LOGIN FORM */}
             {mode === 'login' && (

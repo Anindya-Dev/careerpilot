@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Alert from '../components/Alert';
+import SocialAuthButtons from '../components/SocialAuthButtons';
 import { Compass, UserPlus, Shield, Terminal } from 'lucide-react';
 
 export default function RegisterPage() {
@@ -113,6 +114,9 @@ export default function RegisterPage() {
               onClose={() => setServerError('')}
             />
           )}
+
+          {/* Social OAuth Providers (Clerk Headless) */}
+          <SocialAuthButtons mode="register" onError={setServerError} />
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

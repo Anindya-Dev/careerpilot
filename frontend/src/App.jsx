@@ -1,16 +1,18 @@
 /**
  * @file App.jsx
  * @description Root client application routing tree configuring BrowserRouter,
- * guarded routes, public auth entry points, and dedicated workspace handlers.
- * @author Md Hussain Ansari (Member 1)
+ * guarded routes, public auth entry points, Clerk SSO callback, and dedicated workspace handlers.
+ * @author Md Hussain Ansari (Member 1) & Anindya Bhattacharya (Member 2)
  */
 
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import ClerkProviderWrapper from './context/ClerkProviderWrapper';
 import { AuthProvider } from './context/AuthContext';
 import { ProfileProvider } from './context/ProfileContext';
 import { SidebarProvider } from './context/SidebarContext';
 import ProtectedRoute from './routes/ProtectedRoute';
+import { AuthenticateWithRedirectCallback } from '@clerk/clerk-react';
 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -25,65 +27,78 @@ import LandingPage from './pages/LandingPage';
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <ProfileProvider>
-          <SidebarProvider>
-            <Routes>
-              {/* Public dynamic landing page */}
-              <Route path="/" element={<LandingPage />} />
+      <ClerkProviderWrapper>
+        <AuthProvider>
+          <ProfileProvider>
+            <SidebarProvider>
+              <Routes>
+                {/* Public dynamic landing page */}
+                <Route path="/" element={<LandingPage />} />
 
-              {/* Public authentication flows */}
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
+                {/* Public authentication flows */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
 
-              {/* Guarded dedicated workspaces */}
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <DashboardPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <ProfilePage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/skills"
-                element={
-                  <ProtectedRoute>
-                    <SkillsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/health"
-                element={
-                  <ProtectedRoute>
-                    <CareerHealthPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/pipeline"
-                element={
-                  <ProtectedRoute>
-                    <AgentPipelinePage />
-                  </ProtectedRoute>
-                }
-              />
+                {/* Clerk SSO Redirect Handler */}
+                <Route
+                  path="/sso-callback"
+                  element={
+                    <AuthenticateWithRedirectCallback
+                      signInForceRedirectUrl="/dashboard"
+                      signUpForceRedirectUrl="/dashboard"
+                    />
+                  }
+                />
 
-              {/* Fallback 404 */}
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </SidebarProvider>
-        </ProfileProvider>
-      </AuthProvider>
+                {/* Guarded dedicated workspaces */}
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <ProfilePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/skills"
+                  element={
+                    <ProtectedRoute>
+                      <SkillsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/health"
+                  element={
+                    <ProtectedRoute>
+                      <CareerHealthPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/pipeline"
+                  element={
+                    <ProtectedRoute>
+                      <AgentPipelinePage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Fallback 404 */}
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </SidebarProvider>
+          </ProfileProvider>
+        </AuthProvider>
+      </ClerkProviderWrapper>
     </BrowserRouter>
   );
 }

@@ -14,11 +14,14 @@ import sys
 from pathlib import Path
 from typing import Any, Callable, Coroutine, Dict, Optional
 
+import httpx
+
 # Ensure repository root is on sys.path for direct agent package imports
 REPO_ROOT = str(Path(__file__).resolve().parents[4])
 if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
+from app.config import get_settings
 from app.db.neo4j_client import get_neo4j_client
 from app.models.requests import AgentName
 from app.models.responses import JobStatus
@@ -51,6 +54,27 @@ WORKER_DISPATCH_TABLE: Dict[
 }
 
 
+async def fetch_student_profile(user_id: str) -> Optional[Dict[str, Any]]:
+    """Query live student profile from Member 1's Profile Microservice.
+    
+    Uses secure inter-service internal header authentication to bridge
+    the Agent Orchestrator to the Student Profile datastore.
+    """
+    settings = get_settings()
+    url = f"{settings.profile_service_url.rstrip('/')}/api/v1/profile/{user_id}"
+    headers = {"x-internal-key": settings.internal_service_key}
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            resp = await client.get(url, headers=headers)
+            if resp.status_code == 200:
+                data = resp.json()
+                logger.info("[Worker] Ingested live profile for user %s from Profile Service", user_id)
+                return data.get("profile")
+    except Exception as exc:
+        logger.debug("[Worker] Profile fetch skipped for user %s: %s (using offline fallback)", user_id, exc)
+    return None
+
+
 async def execute_agent_job(
     job_id: str,
     agent_name: AgentName,
@@ -76,12 +100,26 @@ async def execute_agent_job(
     # 1. Transition state from QUEUED -> RUNNING
     await job_mgr.update_job_status(job_id=job_id, status=JobStatus.RUNNING)
 
+    # 2. Enrich parameters with live student profile if not already provided
+    resolved_params = dict(params or {})
+    if "profile" not in resolved_params and "skills" not in resolved_params:
+        live_profile = await fetch_student_profile(user_id)
+        if live_profile:
+            resolved_params["profile"] = live_profile
+            if "target_role" not in resolved_params and live_profile.get("target_role"):
+                resolved_params["target_role"] = live_profile["target_role"]
+            if "skills" not in resolved_params and live_profile.get("skills"):
+                resolved_params["skills"] = [
+                    s.get("name") if isinstance(s, dict) else str(s)
+                    for s in live_profile["skills"]
+                ]
+
     try:
         worker_func = WORKER_DISPATCH_TABLE.get(agent_name)
 
         if worker_func is not None:
-            # Execute dedicated agent worker
-            result = await worker_func(user_id, params, neo4j_client, llm_service)
+            # Execute dedicated agent worker with resolved profile parameters
+            result = await worker_func(user_id, resolved_params, neo4j_client, llm_service)
         else:
             # Fallback stub for remaining Phase 3 agents
             logger.info("Executing standard pipeline stub for agent '%s'", agent_name.value)
