@@ -110,9 +110,30 @@ async def run_opportunity_discovery(
         ),
     }
 
+    # Query Job Board MCP Tool Server if available
+    mcp_jobs_summary = ""
+    try:
+        import httpx
+        from app.config import get_settings
+        settings = get_settings()
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            resp = await client.post(
+                f"{settings.job_board_mcp_url}/invoke",
+                json={"tool": "search_job_postings", "params": {"query": target_role, "limit": 5}},
+            )
+            if resp.status_code == 200:
+                mcp_data = resp.json().get("data", {})
+                jobs = mcp_data.get("jobs", [])
+                if jobs:
+                    job_titles = [f"{j.get('title')} ({j.get('company')})" for j in jobs[:3]]
+                    mcp_jobs_summary = f"Scanned Live Listings: {', '.join(job_titles)}"
+                    logger.info("Integrated live job postings via MCP: %s", mcp_jobs_summary)
+    except Exception as mcp_err:
+        logger.debug("Job Board MCP query skipped or offline: %s", mcp_err)
+
     if llm_service is not None:
         try:
-            user_prompt = f"Target Role: {target_role}\nStudent: {user_id}"
+            user_prompt = f"Target Role: {target_role}\nStudent: {user_id}\nMarket Postings: {mcp_jobs_summary}"
             result = await llm_service.generate_json(
                 system_prompt=OPP_DISCOVERY_SYSTEM_PROMPT,
                 user_prompt=user_prompt,

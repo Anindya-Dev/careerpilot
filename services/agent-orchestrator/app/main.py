@@ -23,7 +23,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
-from app.routers import health, orchestrator
+from app.routers import health, orchestrator, telemetry
 from app.services.job_manager import get_job_manager
 
 logging.basicConfig(
@@ -77,3 +77,4 @@ app.add_middleware(
 # Mount API routers
 app.include_router(health.router)
 app.include_router(orchestrator.router)
+app.include_router(telemetry.router)

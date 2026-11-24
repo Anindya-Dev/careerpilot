@@ -120,9 +120,30 @@ async def run_career_evidence(
         ),
     }
 
+    # Query GitHub MCP Tool Server if available
+    mcp_evidence_context = ""
+    try:
+        import httpx
+        from app.config import get_settings
+        settings = get_settings()
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            resp = await client.post(
+                f"{settings.github_mcp_url}/invoke",
+                json={"tool": "get_user_repos", "params": {"username": github_user}},
+            )
+            if resp.status_code == 200:
+                mcp_data = resp.json().get("data", {})
+                repos = mcp_data.get("repositories", [])
+                if repos:
+                    repo_names = [r.get("name", "") for r in repos[:5]]
+                    mcp_evidence_context = f"Verified Repositories ({len(repos)} total): {', '.join(repo_names)}"
+                    logger.info("Integrated live GitHub evidence via MCP: %s", mcp_evidence_context)
+    except Exception as mcp_err:
+        logger.debug("GitHub MCP query skipped or offline: %s", mcp_err)
+
     if llm_service is not None:
         try:
-            user_prompt = f"Student ID: {user_id}\nGitHub: {github_user}"
+            user_prompt = f"Student ID: {user_id}\nGitHub: {github_user}\nMCP Evidence: {mcp_evidence_context}"
             result = await llm_service.generate_json(
                 system_prompt=CAREER_EVIDENCE_SYSTEM_PROMPT,
                 user_prompt=user_prompt,
