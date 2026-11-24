@@ -1,6 +1,0 @@
-version: '3.8'
-
-# Root convenience redirect to infra/docker-compose.yml
-# To run from root: docker compose -f infra/docker-compose.yml up -d
-include:
-  - infra/docker-compose.yml
