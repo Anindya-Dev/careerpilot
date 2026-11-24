@@ -12,7 +12,7 @@ import Alert from './Alert';
 import { Compass, X, ArrowRight, UserPlus, Shield } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
-  const { login, register } = useAuth();
+  const { login, register, enterDemoMode } = useAuth();
   const navigate = useNavigate();
 
   const [mode, setMode] = useState(initialMode); // 'login' | 'register'
@@ -258,6 +258,19 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                   {isSubmitting ? 'Authenticating...' : 'Sign In to Workspace'}
                   <ArrowRight className="w-4 h-4 ml-1.5 stroke-[2.5]" />
                 </button>
+
+                {/* Clear, honest option for faculty evaluation when backend is off */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    enterDemoMode();
+                    onClose();
+                    navigate('/dashboard');
+                  }}
+                  className="w-full mt-3 py-2 border-2 border-black bg-[#E2E8F0] font-mono font-bold text-xs uppercase tracking-wider text-black hover:bg-slate-300 transition-colors shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+                >
+                  Explore Demo Sandbox (Offline Evaluation)
+                </button>
               </form>
             )}
 
@@ -270,7 +283,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                   </label>
                   <input
                     type="text"
-                    placeholder="Md Hussain Ansari"
+                    placeholder="e.g. Alex Rivera"
                     value={regData.name}
                     onChange={(e) => setRegData({ ...regData, name: e.target.value })}
                     className="w-full px-3 py-2 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-[#FFFDF0]"
@@ -285,7 +298,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                   </label>
                   <input
                     type="email"
-                    placeholder="hussain@university.edu"
+                    placeholder="e.g. student@university.edu"
                     value={regData.email}
                     onChange={(e) => setRegData({ ...regData, email: e.target.value })}
                     className="w-full px-3 py-2 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-[#FFFDF0]"
@@ -348,6 +361,19 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                 >
                   <UserPlus className="w-4 h-4 mr-1.5 stroke-[2.5]" />
                   {isSubmitting ? 'Registering...' : 'Initialize Student Account'}
+                </button>
+
+                {/* Clear, honest option for faculty evaluation when backend is off */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    enterDemoMode();
+                    onClose();
+                    navigate('/dashboard');
+                  }}
+                  className="w-full mt-3 py-2 border-2 border-black bg-[#E2E8F0] font-mono font-bold text-xs uppercase tracking-wider text-black hover:bg-slate-300 transition-colors shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+                >
+                  Explore Demo Sandbox (Offline Evaluation)
                 </button>
               </form>
             )}

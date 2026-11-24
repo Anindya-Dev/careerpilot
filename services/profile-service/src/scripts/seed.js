@@ -18,7 +18,7 @@ async function seed() {
 
     const demoProfile = {
       userId: '6630f9a21e4a1a3a12345678',
-      name: 'Md Hussain Ansari',
+      name: 'Alex Rivera',
       email: 'student@careerpilot.io',
       major: 'Computer Science & Engineering',
       target_role: 'AI / Machine Learning Engineer',
@@ -42,10 +42,10 @@ async function seed() {
           technologies: ['Node.js', 'Express', 'React', 'MongoDB', 'Python', 'Neo4j']
         },
         {
-          title: 'Expense Tracker Pro',
-          description: 'Full-stack MERN application featuring JWT authentication and expense analytics.',
-          repo_url: 'https://github.com/ansari/expense-tracker',
-          technologies: ['MongoDB', 'Express', 'React', 'Node.js']
+          title: 'Distributed Systems Key-Value Store',
+          description: 'Raft consensus key-value store built in Go with automated cluster failover.',
+          repo_url: 'https://github.com/example/raft-kv',
+          technologies: ['Go', 'Raft', 'gRPC', 'Docker']
         }
       ],
       certifications: [
@@ -57,8 +57,8 @@ async function seed() {
       ],
       career_health_score: 84.5,
       linked_accounts: {
-        github: 'hussain-ansari',
-        linkedin: 'linkedin.com/in/hussainansari'
+        github: 'alex-rivera-dev',
+        linkedin: 'linkedin.com/in/alexrivera'
       }
     };
 
