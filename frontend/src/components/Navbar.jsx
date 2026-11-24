@@ -8,7 +8,8 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Compass, LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut, User as UserIcon } from 'lucide-react';
+import CareerPilotLogo from './CareerPilotLogo';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -20,22 +21,12 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b-2 border-black w-full">
+    <header className="sticky top-0 z-40 bg-[#F4F0EA]/95 border-b-2 border-black w-full backdrop-blur-sm">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          {/* Brand Identity */}
-          <Link to="/dashboard" className="flex items-center space-x-3 group">
-            <div className="w-9 h-9 bg-[#FFE600] border-2 border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-center font-bold transition-transform duration-75 group-hover:-translate-y-0.5">
-              <Compass className="w-5 h-5 text-black stroke-[2.5]" />
-            </div>
-            <div className="flex items-baseline space-x-2">
-              <span className="text-base font-black tracking-tight text-black uppercase font-mono">
-                CareerPilot
-              </span>
-              <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 border-2 border-black bg-[#C4A1FF] text-black uppercase shadow-[1px_1px_0px_0px_#000]">
-                V1.0
-              </span>
-            </div>
+          {/* Brand Identity: Dynamic Anime / Supersonic Style Logo */}
+          <Link to="/dashboard" className="flex items-center">
+            <CareerPilotLogo className="h-9 sm:h-10 w-auto" />
           </Link>
 
           {/* User Profile & Logout */}

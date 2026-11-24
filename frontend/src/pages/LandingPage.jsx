@@ -21,6 +21,7 @@ import {
   Activity
 } from 'lucide-react';
 import AuthModal from '../components/AuthModal';
+import CareerPilotLogo from '../components/CareerPilotLogo';
 
 /**
  * Reusable IntersectionObserver Scroll Reveal Wrapper
@@ -141,24 +142,19 @@ export default function LandingPage() {
       {/* Main Content Layout */}
       <div className={`relative z-10 flex flex-col ${authModal.isOpen ? 'pointer-events-none select-none' : ''}`}>
         
-        {/* Navigation: Full-width container */}
-        <header className="sticky top-0 z-30 bg-white/95 border-b-2 border-black backdrop-none">
-          <div className="w-full max-w-[1500px] mx-auto px-6 sm:px-10 lg:px-14 h-16 flex items-center justify-between">
-            {/* Identity */}
-            <Link to="/" className="flex items-center space-x-3 group">
-              <div className="w-10 h-10 bg-[#FFE600] border-2 border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-center font-bold transition-transform duration-75 group-hover:-translate-y-0.5">
-                <Compass className="w-6 h-6 text-black stroke-[2.5]" />
-              </div>
-              <span className="text-lg font-black tracking-tight text-black uppercase font-mono">
-                CareerPilot
-              </span>
+        {/* Navigation: Full-width spanning to outer corners */}
+        <header className="sticky top-0 z-30 bg-transparent w-full">
+          <div className="w-full px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+            {/* Dynamic Anime / Supersonic Style Logo */}
+            <Link to="/" className="flex items-center">
+              <CareerPilotLogo className="h-10 sm:h-12 w-auto" />
             </Link>
 
             {/* Student Login Action */}
             <button
               type="button"
               onClick={() => setAuthModal({ isOpen: true, mode: 'login' })}
-              className="inline-flex items-center px-5 py-2.5 border-2 border-black bg-[#FFE600] text-black text-xs font-mono font-bold uppercase tracking-wider shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75"
+              className="inline-flex items-center px-4 sm:px-5 py-2 sm:py-2.5 border-2 border-black bg-[#FFE600] text-black text-xs font-mono font-bold uppercase tracking-wider shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75 cursor-pointer"
             >
               <LogIn className="w-4 h-4 mr-1.5 stroke-[2.5]" />
               Student Login
@@ -268,20 +264,36 @@ export default function LandingPage() {
         </section>
 
         {/* NEO-BRUTALIST INFINITE RUNNING MARQUEE BANNER */}
-        <div className="w-full overflow-hidden bg-[#FFE600] border-y-2 border-black py-3 select-none">
-          <div className="animate-marquee font-mono font-bold text-xs sm:text-sm tracking-wider uppercase text-black">
-            <span className="mx-4">✦ 7 AUTONOMOUS AGENT NODES</span>
-            <span className="mx-4">✦ NEO4J CYPHER GRAPH BENCHMARKING</span>
-            <span className="mx-4">✦ GITHUB CODEBASE AUDITING</span>
-            <span className="mx-4">✦ 12-ROUND BCRYPT AUTH</span>
-            <span className="mx-4">✦ DYNAMIC CAREER HEALTH INDEX</span>
-            <span className="mx-4">✦ LIVE SKILL GAP RESOLUTION</span>
-            <span className="mx-4">✦ 7 AUTONOMOUS AGENT NODES</span>
-            <span className="mx-4">✦ NEO4J CYPHER GRAPH BENCHMARKING</span>
-            <span className="mx-4">✦ GITHUB CODEBASE AUDITING</span>
-            <span className="mx-4">✦ 12-ROUND BCRYPT AUTH</span>
-            <span className="mx-4">✦ DYNAMIC CAREER HEALTH INDEX</span>
-            <span className="mx-4">✦ LIVE SKILL GAP RESOLUTION</span>
+        <div className="w-full overflow-hidden bg-[#FFE600] border-y-2 border-black py-2.5 select-none">
+          <div className="animate-marquee font-mono font-black text-xs sm:text-sm tracking-wider uppercase text-black whitespace-nowrap flex items-center">
+            {[1, 2].map((set) => (
+              <React.Fragment key={set}>
+                <span className="shrink-0 flex items-center">
+                  <span>7 AUTONOMOUS AGENT NODES</span>
+                  <span className="mx-7 text-black text-xs select-none">✦</span>
+                </span>
+                <span className="shrink-0 flex items-center">
+                  <span>NEO4J CYPHER GRAPH BENCHMARKING</span>
+                  <span className="mx-7 text-black text-xs select-none">✦</span>
+                </span>
+                <span className="shrink-0 flex items-center">
+                  <span>GITHUB CODEBASE AUDITING</span>
+                  <span className="mx-7 text-black text-xs select-none">✦</span>
+                </span>
+                <span className="shrink-0 flex items-center">
+                  <span>12-ROUND BCRYPT AUTH</span>
+                  <span className="mx-7 text-black text-xs select-none">✦</span>
+                </span>
+                <span className="shrink-0 flex items-center">
+                  <span>DYNAMIC CAREER HEALTH INDEX</span>
+                  <span className="mx-7 text-black text-xs select-none">✦</span>
+                </span>
+                <span className="shrink-0 flex items-center">
+                  <span>LIVE SKILL GAP RESOLUTION</span>
+                  <span className="mx-7 text-black text-xs select-none">✦</span>
+                </span>
+              </React.Fragment>
+            ))}
           </div>
         </div>
 

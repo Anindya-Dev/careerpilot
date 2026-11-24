@@ -9,6 +9,7 @@ export default {
       fontFamily: {
         sans: ['Geist', 'sans-serif'],
         mono: ['"Geist Mono"', 'monospace'],
+        display: ['"Space Grotesk"', 'sans-serif'],
       },
       colors: {
         neo: {
