@@ -265,3 +265,27 @@ def test_opportunity_discovery_agent_end_to_end(client: TestClient) -> None:
         assert "opportunities" in result
         assert len(result["opportunities"]) > 0
         assert "match_percentage" in result["opportunities"][0]
+
+
+def test_dashboard_telemetry_live_endpoint(client: TestClient) -> None:
+    """Test that dashboard telemetry endpoint returns 200 with verified dimensions and health score."""
+    response = client.get("/api/v1/agents/dashboard-telemetry")
+    assert response.status_code == 200
+    data = response.json()
+    assert "healthScore" in data
+    assert data["healthScore"] > 0
+    assert "dimensions" in data
+    assert len(data["dimensions"]) >= 4
+    assert "agentStatuses" in data
+    assert len(data["agentStatuses"]) == 7
+
+
+def test_skill_intelligence_radar_endpoint(client: TestClient) -> None:
+    """Test that skill intelligence radar benchmark endpoint returns 200 with radarData."""
+    response = client.get("/api/v1/agents/skill-intelligence")
+    assert response.status_code == 200
+    data = response.json()
+    assert "radarData" in data
+    assert len(data["radarData"]) >= 5
+    assert "gaps" in data
+    assert "narrative" in data

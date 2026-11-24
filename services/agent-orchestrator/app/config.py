@@ -51,6 +51,14 @@ class Settings(BaseSettings):
     groq_api_key: str = ""
     groq_model: str = "qwen/qwen3.8-27b"
 
+    # MCP Tool Servers
+    github_mcp_url: str = "http://localhost:5005"
+    job_board_mcp_url: str = "http://localhost:5006"
+
+    # Profile Microservice
+    profile_service_url: str = "http://localhost:5002"
+    internal_service_key: str = "careerpilot_internal_agent_secret_key_2026"
+
 
 @lru_cache
 def get_settings() -> Settings:
