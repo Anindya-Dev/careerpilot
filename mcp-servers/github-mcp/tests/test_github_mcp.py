@@ -101,3 +101,26 @@ async def test_invoke_unknown_tool():
         payload = {"tool": "invalid_tool", "params": {}}
         response = await client.post("/invoke", json=payload)
         assert response.status_code == 404
+
+
+@pytest.mark.anyio
+async def test_invoke_offline_mode_fallback():
+    """Verify offline mode triggers synthetic fallback simulator explicitly."""
+    from app.config import get_settings
+    settings = get_settings()
+    original_mode = settings.offline_mode
+    try:
+        settings.offline_mode = True
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            payload = {
+                "tool": "get_user_repos",
+                "params": {"username": "test-student", "max_repos": 3},
+            }
+            response = await client.post("/invoke", json=payload)
+            assert response.status_code == 200
+            data = response.json()["data"]
+            assert data["source"] == "synthetic_fallback_simulator"
+            assert len(data["repositories"]) == 3
+    finally:
+        settings.offline_mode = original_mode

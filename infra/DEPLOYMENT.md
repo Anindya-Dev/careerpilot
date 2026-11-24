@@ -1,56 +1,62 @@
 # CareerPilot Production Deployment Manual & Runbook
 
 **Author**: Arik (Member 3 — DevOps & Platform Integration)  
-**Target Environment**: Local Docker Compose / Managed Kubernetes (DigitalOcean / Minikube)
+**Target Environments**: 
+- Option 1: Hardened Cloud Production Stack (`infra/docker-compose.prod.yml`) with Port Shielding
+- Option 2: Local Demo Stack with Zero-Config Cloudflare Tunnel (Instant Public HTTPS)
+- Option 3: Cloud Kubernetes Cluster (`infra/k8s/`)
 
 ---
 
-## 1. Quick Start: Single-Command Docker Deployment
+## 1. Production Docker Compose Stack (`docker-compose.prod.yml`)
 
-### System Prerequisites
-- Docker Engine 24.0+ & Docker Compose v2.20+
-- Minimum 4GB RAM, 10GB free disk space
+### Architecture & Security Hardening
+In this production topology:
+- **Port Shielding**: All databases (MongoDB, Redis, Neo4j, ChromaDB) and microservices are completely unexposed to the host/internet.
+- **Single Ingress Gateway**: Only the Nginx Gateway container (`cp-gateway`) binds to port `80`/`443`.
+- **Zero CORS / Mixed Content**: All requests to `/api/v1/auth`, `/api/v1/profile`, and `/api/v1/orchestrator` flow through the same domain as the React SPA.
+- **Log Rotation**: Every container enforces Docker json-file log rotation (`max-size: 50m`, `max-file: 3`) to prevent disk exhaustion.
 
-### Execution Steps
+### Launching Production Stack
 ```bash
-# 1. Clone repository
-git clone https://github.com/Anindya-Dev/careerpilot.git
+# 1. From repository root
 cd careerpilot
 
-# 2. Configure environment
+# 2. Configure production credentials
 cp .env.example .env
 
-# 3. Boot full platform stack
-docker compose -f infra/docker-compose.yml up -d --build
+# 3. Boot production stack
+docker compose -f infra/docker-compose.prod.yml up -d --build
 
-# 4. Verify platform health
-python scripts/smoke_test.py
+# 4. Verify gateway liveness
+curl http://localhost/gateway-health
 ```
-
-### Port Map
-| Service | Host Port | Protocol | Purpose |
-| :--- | :--- | :--- | :--- |
-| `frontend` | 3000 | HTTP | Vite React SPA UI |
-| `auth-service` | 5001 | HTTP | JWT authentication & user sessions |
-| `profile-service` | 5002 | HTTP | Profile & skill portfolio management |
-| `agent-orchestrator`| 8000 | HTTP | LangGraph multi-agent coordination |
-| `github-mcp` | 5005 | HTTP | Code evidence inspection & AST audit |
-| `job-board-mcp` | 5006 | HTTP | Job postings retrieval & demand trends |
-| `neo4j` | 7474, 7687 | HTTP / Bolt | Knowledge Graph database |
-| `chromadb` | 8001 | HTTP | Vector similarity store |
-| `mongodb` | 27017 | TCP | Document store for auth & profile |
-| `redis` | 6379 | TCP | Asynchronous FIFO task queue |
 
 ---
 
-## 2. Cloud Kubernetes Deployment (`infra/k8s/`)
+## 2. Instant Zero-Cost Public HTTPS Demo (Cloudflare Tunnel)
 
-### Cluster Pre-requisites
-- A running Kubernetes cluster (v1.26+)
-- `kubectl` configured with cluster admin context
-- Nginx Ingress Controller installed
+For college viva presentations or remote evaluations where you need an instant public URL without buying a domain or configuring SSL certificates:
 
-### Deployment Commands
+### Step 1: Install Cloudflared
+- **Windows**: `winget install --id Cloudflare.cloudflared` or download from [cloudflare.com](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/)
+- **Linux / macOS**: `brew install cloudflare/cloudflare/cloudflared` or `apt-get install cloudflared`
+
+### Step 2: Boot Platform & Launch Tunnel
+```bash
+# Start the production stack
+docker compose -f infra/docker-compose.prod.yml up -d
+
+# Open instant encrypted tunnel to port 80
+cloudflared tunnel --url http://localhost:80
+```
+Cloudflare will immediately generate an HTTPS URL (e.g. `https://careerpilot-eval-demo.trycloudflare.com`). Anyone on any device can test the live platform.
+
+---
+
+## 3. Cloud Kubernetes Deployment (`infra/k8s/`)
+
+For multi-node cloud clusters (DigitalOcean DOKS, Google GKE, AWS EKS):
 ```bash
 # Apply in order
 kubectl apply -f infra/k8s/namespace.yaml
@@ -61,22 +67,17 @@ kubectl apply -f infra/k8s/services/
 kubectl apply -f infra/k8s/ingress.yaml
 ```
 
-### Verifying Rollout
-```bash
-kubectl get pods -n careerpilot -w
-kubectl get ingress -n careerpilot
-```
-
 ---
 
-## 3. Disaster Recovery & Troubleshooting
+## 4. Production Verification & Diagnostics
 
-### Issue 1: Neo4j Authentication Failure
-If Neo4j returns `Neo.ClientError.Security.Unauthorized`, delete existing volume and recreate:
 ```bash
-docker compose -f infra/docker-compose.yml down -v
-docker compose -f infra/docker-compose.yml up -d
-```
+# Check all container states
+docker compose -f infra/docker-compose.prod.yml ps
 
-### Issue 2: External GitHub API Rate Limiting
-The GitHub MCP server includes an automatic synthetic fallback simulator. It automatically activates when `GITHUB_TOKEN` is unset or exhausted, guaranteeing zero presentation failures during live viva evaluations.
+# Run automated smoke test
+python scripts/smoke_test.py
+
+# Check orchestrator logs
+docker compose -f infra/docker-compose.prod.yml logs -f agent-orchestrator
+```
