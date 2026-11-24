@@ -1,3 +1,0 @@
-# See full OpenAPI 3.0 specification at docs/openapi/auth.yaml
-# Referenced for team member discovery
-$ref: '../openapi/auth.yaml'
