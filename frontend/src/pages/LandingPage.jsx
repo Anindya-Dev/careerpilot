@@ -264,20 +264,59 @@ export default function LandingPage() {
         </section>
 
         {/* NEO-BRUTALIST INFINITE RUNNING MARQUEE BANNER */}
-        <div className="w-full overflow-hidden bg-[#FFE600] border-y-2 border-black py-3 select-none">
-          <div className="animate-marquee font-mono font-bold text-xs sm:text-sm tracking-wider uppercase text-black">
-            <span className="mx-4">✦ 7 AUTONOMOUS AGENT NODES</span>
-            <span className="mx-4">✦ NEO4J CYPHER GRAPH BENCHMARKING</span>
-            <span className="mx-4">✦ GITHUB CODEBASE AUDITING</span>
-            <span className="mx-4">✦ 12-ROUND BCRYPT AUTH</span>
-            <span className="mx-4">✦ DYNAMIC CAREER HEALTH INDEX</span>
-            <span className="mx-4">✦ LIVE SKILL GAP RESOLUTION</span>
-            <span className="mx-4">✦ 7 AUTONOMOUS AGENT NODES</span>
-            <span className="mx-4">✦ NEO4J CYPHER GRAPH BENCHMARKING</span>
-            <span className="mx-4">✦ GITHUB CODEBASE AUDITING</span>
-            <span className="mx-4">✦ 12-ROUND BCRYPT AUTH</span>
-            <span className="mx-4">✦ DYNAMIC CAREER HEALTH INDEX</span>
-            <span className="mx-4">✦ LIVE SKILL GAP RESOLUTION</span>
+        <div className="w-full overflow-hidden bg-[#FFE600] border-y-2 border-black py-2.5 select-none">
+          <div className="animate-marquee font-mono font-black text-xs sm:text-sm tracking-wider uppercase text-black whitespace-nowrap flex items-center">
+            {/* Set 1 */}
+            <span className="mx-6 flex items-center gap-3 shrink-0">
+              <span>7 AUTONOMOUS AGENT NODES</span>
+              <span className="text-black text-sm">✦</span>
+            </span>
+            <span className="mx-6 flex items-center gap-3 shrink-0">
+              <span>NEO4J CYPHER GRAPH BENCHMARKING</span>
+              <span className="text-black text-sm">✦</span>
+            </span>
+            <span className="mx-6 flex items-center gap-3 shrink-0">
+              <span>GITHUB CODEBASE AUDITING</span>
+              <span className="text-black text-sm">✦</span>
+            </span>
+            <span className="mx-6 flex items-center gap-3 shrink-0">
+              <span>12-ROUND BCRYPT AUTH</span>
+              <span className="text-black text-sm">✦</span>
+            </span>
+            <span className="mx-6 flex items-center gap-3 shrink-0">
+              <span>DYNAMIC CAREER HEALTH INDEX</span>
+              <span className="text-black text-sm">✦</span>
+            </span>
+            <span className="mx-6 flex items-center gap-3 shrink-0">
+              <span>LIVE SKILL GAP RESOLUTION</span>
+              <span className="text-black text-sm">✦</span>
+            </span>
+
+            {/* Set 2 (Duplicate for infinite seamless loop) */}
+            <span className="mx-6 flex items-center gap-3 shrink-0">
+              <span>7 AUTONOMOUS AGENT NODES</span>
+              <span className="text-black text-sm">✦</span>
+            </span>
+            <span className="mx-6 flex items-center gap-3 shrink-0">
+              <span>NEO4J CYPHER GRAPH BENCHMARKING</span>
+              <span className="text-black text-sm">✦</span>
+            </span>
+            <span className="mx-6 flex items-center gap-3 shrink-0">
+              <span>GITHUB CODEBASE AUDITING</span>
+              <span className="text-black text-sm">✦</span>
+            </span>
+            <span className="mx-6 flex items-center gap-3 shrink-0">
+              <span>12-ROUND BCRYPT AUTH</span>
+              <span className="text-black text-sm">✦</span>
+            </span>
+            <span className="mx-6 flex items-center gap-3 shrink-0">
+              <span>DYNAMIC CAREER HEALTH INDEX</span>
+              <span className="text-black text-sm">✦</span>
+            </span>
+            <span className="mx-6 flex items-center gap-3 shrink-0">
+              <span>LIVE SKILL GAP RESOLUTION</span>
+              <span className="text-black text-sm">✦</span>
+            </span>
           </div>
         </div>
 
