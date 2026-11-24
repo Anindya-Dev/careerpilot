@@ -1,12 +1,12 @@
 /**
  * @file Sidebar.jsx
  * @description Neo-Brutalist sidebar navigation bar.
- * At the starting, all navigation menus are completely hidden with only the hamburger button visible.
- * Clicking the hamburger button triggers a weighted, smooth motion sliding animation to reveal the menus.
+ * Routes directly to dedicated workspaces (/dashboard, /profile, /skills, /health, /pipeline).
+ * Starts hidden with only the hamburger button visible, sliding open smoothly on click.
  * @author Md Hussain Ansari (Member 1) & Sargam Banerjee (Member 4)
  */
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -23,70 +23,26 @@ import CareerPilotLogo from './CareerPilotLogo';
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [currentHash, setCurrentHash] = useState(window.location.hash || '');
   const { isCollapsed, toggleCollapsed, isMobileOpen, closeMobile } = useSidebar();
 
-  // Synchronize hash on hashchange or path changes
-  useEffect(() => {
-    const handleHashChange = () => {
-      setCurrentHash(window.location.hash || '');
-    };
-    window.addEventListener('hashchange', handleHashChange);
-    setCurrentHash(location.hash || '');
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [location]);
-
   const navItems = [
-    { name: 'Dashboard', path: '/dashboard', hash: '', icon: LayoutDashboard },
-    { name: 'Career Profile', path: '/profile', hash: '', icon: UserCheck },
-    { name: 'Skills & Evidence', path: '/dashboard', hash: '#skills', icon: Target },
-    { name: 'Career Health', path: '/dashboard', hash: '#health', icon: Activity, badge: 'Live' },
-    { name: 'Agent Pipeline', path: '/dashboard', hash: '#pipeline', icon: Cpu }
+    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'Career Profile', path: '/profile', icon: UserCheck },
+    { name: 'Skills & Evidence', path: '/skills', icon: Target },
+    { name: 'Career Health', path: '/health', icon: Activity, badge: 'Live' },
+    { name: 'Agent Pipeline', path: '/pipeline', icon: Cpu }
   ];
 
   const handleNavClick = (e, item) => {
     e.preventDefault();
     closeMobile();
-
-    // If navigating between different paths
     if (location.pathname !== item.path) {
-      navigate(`${item.path}${item.hash}`);
-      setCurrentHash(item.hash);
-      return;
-    }
-
-    // Same path: smoothly scroll to targeted anchor or top
-    if (item.hash) {
-      window.history.pushState(null, '', `${item.path}${item.hash}`);
-      setCurrentHash(item.hash);
-      const targetEl = document.querySelector(item.hash);
-      if (targetEl) {
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    } else {
-      window.history.pushState(null, '', item.path);
-      setCurrentHash('');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      navigate(item.path);
     }
   };
 
-  /**
-   * Deterministic Single Selection Check:
-   * Exactly ONE nav item is active at any time.
-   */
   const isItemActive = (item) => {
-    if (location.pathname === '/profile') {
-      return item.path === '/profile';
-    }
-
-    if (location.pathname === '/dashboard') {
-      if (!currentHash || currentHash === '#' || currentHash === '#overview') {
-        return item.path === '/dashboard' && !item.hash;
-      }
-      return item.path === '/dashboard' && item.hash === currentHash;
-    }
-
-    return false;
+    return location.pathname === item.path;
   };
 
   return (
@@ -131,7 +87,7 @@ export default function Sidebar() {
               return (
                 <a
                   key={item.name}
-                  href={`${item.path}${item.hash}`}
+                  href={item.path}
                   onClick={(e) => handleNavClick(e, item)}
                   className={`flex items-center justify-between px-3 py-2.5 border-2 transition-all font-mono text-xs font-bold ${
                     active
@@ -176,7 +132,7 @@ export default function Sidebar() {
               type="button"
               onClick={toggleCollapsed}
               className="p-2 border-2 border-black bg-white hover:bg-[#FFE600] shadow-[2px_2px_0px_0px_#000] hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75 flex items-center justify-center cursor-pointer shrink-0"
-              title={isCollapsed ? 'Show navigation menus' : 'Hide navigation menus'}
+              title={isCollapsed ? 'Show navigation workspaces' : 'Hide navigation workspaces'}
               aria-label="Toggle navigation menu"
             >
               <Menu className="w-4 h-4 stroke-[2.5] text-black" />
@@ -184,7 +140,7 @@ export default function Sidebar() {
 
             {!isCollapsed && (
               <span className="font-mono text-[10px] font-black uppercase tracking-wider text-slate-500 transition-opacity duration-300 truncate">
-                WORKSPACE
+                WORKSPACES
               </span>
             )}
           </div>
@@ -204,7 +160,7 @@ export default function Sidebar() {
               return (
                 <a
                   key={item.name}
-                  href={`${item.path}${item.hash}`}
+                  href={item.path}
                   onClick={(e) => handleNavClick(e, item)}
                   className={`group relative flex items-center justify-between px-3 py-2.5 border-2 transition-all duration-200 font-mono text-xs font-bold ${
                     active

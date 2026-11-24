@@ -1,7 +1,7 @@
 /**
  * @file App.jsx
  * @description Root client application routing tree configuring BrowserRouter,
- * guarded routes, public auth entry points, and fallback handlers.
+ * guarded routes, public auth entry points, and dedicated workspace handlers.
  * @author Md Hussain Ansari (Member 1)
  */
 
@@ -16,6 +16,9 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
+import SkillsPage from './pages/SkillsPage';
+import CareerHealthPage from './pages/CareerHealthPage';
+import AgentPipelinePage from './pages/AgentPipelinePage';
 import NotFoundPage from './pages/NotFoundPage';
 import LandingPage from './pages/LandingPage';
 
@@ -33,7 +36,7 @@ export default function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
 
-              {/* Guarded student dashboard & profile flows */}
+              {/* Guarded dedicated workspaces */}
               <Route
                 path="/dashboard"
                 element={
@@ -47,6 +50,30 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/skills"
+                element={
+                  <ProtectedRoute>
+                    <SkillsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/health"
+                element={
+                  <ProtectedRoute>
+                    <CareerHealthPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pipeline"
+                element={
+                  <ProtectedRoute>
+                    <AgentPipelinePage />
                   </ProtectedRoute>
                 }
               />
