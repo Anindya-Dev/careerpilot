@@ -14,7 +14,6 @@ import {
   Target,
   Activity,
   Cpu,
-  Terminal,
   Menu,
   X
 } from 'lucide-react';
@@ -105,7 +104,7 @@ export default function Sidebar() {
 
       {/* Mobile Slide-Over Drawer Panel */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r-2 border-black flex flex-col justify-between p-4 md:hidden transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r-2 border-black flex flex-col p-4 md:hidden transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isMobileOpen ? 'translate-x-0 shadow-[8px_0px_0px_0px_#000]' : '-translate-x-full'
         }`}
       >
@@ -154,19 +153,6 @@ export default function Sidebar() {
             })}
           </div>
         </div>
-
-        {/* Mobile Telemetry Footer */}
-        <div className="pt-4 border-t-2 border-black font-mono">
-          <div className="border-2 border-black bg-[#FAF5E6] p-3 shadow-[3px_3px_0px_0px_#000] space-y-1.5">
-            <div className="flex items-center space-x-1.5 text-black font-black text-[11px]">
-              <Terminal className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>SYS_ENV: PHASE_1</span>
-            </div>
-            <p className="text-[10px] text-slate-700 leading-tight">
-              Microservices online on ports 5001 & 5002.
-            </p>
-          </div>
-        </div>
       </aside>
 
       {/* ======================================================== */}
@@ -175,7 +161,7 @@ export default function Sidebar() {
       {/* Click Hamburger: Menus slide in with smooth motion       */}
       {/* ======================================================== */}
       <aside
-        className={`shrink-0 bg-white border-r-2 border-black hidden md:flex flex-col justify-between min-h-[calc(100vh-4rem)] select-none overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`shrink-0 bg-white border-r-2 border-black hidden md:flex flex-col min-h-[calc(100vh-4rem)] select-none overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isCollapsed ? 'w-14 p-2' : 'w-64 p-4'
         }`}
       >
@@ -241,25 +227,6 @@ export default function Sidebar() {
                 </a>
               );
             })}
-          </div>
-        </div>
-
-        {/* System Telemetry Metadata: Hidden when collapsed */}
-        <div
-          className={`transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-            isCollapsed
-              ? 'opacity-0 max-h-0 pointer-events-none -translate-x-6 overflow-hidden'
-              : 'opacity-100 max-h-[300px] translate-x-0 pt-4 border-t-2 border-black font-mono'
-          }`}
-        >
-          <div className="border-2 border-black bg-[#FAF5E6] p-3 shadow-[3px_3px_0px_0px_#000] space-y-1.5">
-            <div className="flex items-center space-x-1.5 text-black font-black text-[11px]">
-              <Terminal className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>SYS_ENV: PHASE_1</span>
-            </div>
-            <p className="text-[10px] text-slate-700 leading-tight">
-              Microservices online on ports 5001 & 5002. LangGraph agent orchestrator on 8000.
-            </p>
           </div>
         </div>
       </aside>
