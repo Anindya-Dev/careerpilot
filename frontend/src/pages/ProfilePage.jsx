@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../context/ProfileContext';
 import Navbar from '../components/Navbar';
@@ -192,7 +193,12 @@ export default function ProfilePage() {
       <div className="flex-1 flex w-full relative z-10">
         <Sidebar />
 
-        <main className="flex-1 min-w-0 p-6 sm:p-8 lg:p-10 space-y-8">
+        <motion.main
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          className="flex-1 min-w-0 p-6 sm:p-8 lg:p-10 space-y-8"
+        >
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
               <div className="inline-flex items-center space-x-2 px-2.5 py-0.5 border-2 border-black bg-[#FFE600] text-[10px] font-mono font-bold text-black mb-1 shadow-[2px_2px_0px_0px_#000]">
@@ -566,7 +572,7 @@ export default function ProfilePage() {
               </Card>
             </div>
           </div>
-        </main>
+        </motion.main>
       </div>
     </div>
   );

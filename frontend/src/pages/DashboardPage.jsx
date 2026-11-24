@@ -11,6 +11,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../context/ProfileContext';
 import { useDashboardTelemetry, useSkillIntelligence } from '../hooks';
@@ -55,7 +56,12 @@ export default function DashboardPage() {
       <div className="flex-1 flex w-full relative z-10">
         <Sidebar />
 
-        <main className="flex-1 min-w-0 p-5 sm:p-7 lg:p-8">
+        <motion.main
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          className="flex-1 min-w-0 p-5 sm:p-7 lg:p-8"
+        >
           {/* 2 Independent Column Stacks: Prevents CSS Grid Row-Height Stretching */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
             
@@ -272,7 +278,7 @@ export default function DashboardPage() {
             </div>
 
           </div>
-        </main>
+        </motion.main>
       </div>
     </div>
   );
