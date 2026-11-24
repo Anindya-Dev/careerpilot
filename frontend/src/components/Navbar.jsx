@@ -21,7 +21,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b-2 border-black w-full">
+    <header className="sticky top-0 z-40 bg-[#F4F0EA]/95 border-b-2 border-black w-full backdrop-blur-sm">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Brand Identity: Dynamic Anime / Supersonic Style Logo */}

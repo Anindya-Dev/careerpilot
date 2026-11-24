@@ -2,7 +2,7 @@
  * @file CareerPilotLogo.jsx
  * @description Dynamic, angular, anime/supersonic-inspired Neo-Brutalist logo.
  * Modeled after the high-energy Re:Anime aesthetic: sharp geometric bevels,
- * lightning flight slash, two-tone neon styling, 4-point star, and micro-tagline.
+ * lightning flight slash with generous breathing room, two-tone neon styling, 4-point star, and micro-tagline.
  * @author Md Hussain Ansari (Member 1)
  */
 
@@ -12,7 +12,7 @@ export default function CareerPilotLogo({ className = 'h-11 sm:h-13 w-auto', sho
   return (
     <div className="flex items-center select-none group cursor-pointer py-1">
       <svg
-        viewBox="0 0 445 84"
+        viewBox="0 0 465 82"
         className={`${className} transition-transform duration-200 group-hover:scale-[1.03] overflow-visible`}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -20,7 +20,7 @@ export default function CareerPilotLogo({ className = 'h-11 sm:h-13 w-auto', sho
         <defs>
           {/* Hard Neo-Brutalist Drop Shadow */}
           <filter id="neoLogoShadow" x="-10%" y="-10%" width="130%" height="135%">
-            <feDropShadow dx="3.5" dy="4" stdDeviation="0" floodColor="#000000" />
+            <feDropShadow dx="3" dy="3.5" stdDeviation="0" floodColor="#000000" />
           </filter>
         </defs>
 
@@ -80,10 +80,10 @@ export default function CareerPilotLogo({ className = 'h-11 sm:h-13 w-auto', sho
           </g>
 
           {/* ======================================================== */}
-          {/* LIGHTNING SUPERSONIC FIN SLASH — Cuts through center     */}
+          {/* LIGHTNING SUPERSONIC FIN SLASH — Cleanly centered        */}
           {/* ======================================================== */}
           <polygon
-            points="224,80 250,33 239,33 268,2 253,38 265,38"
+            points="224,68 246,33 236,33 262,4 249,37 259,37"
             fill="#70E000"
             stroke="#000000"
             strokeWidth="2.5"
@@ -91,9 +91,9 @@ export default function CareerPilotLogo({ className = 'h-11 sm:h-13 w-auto', sho
           />
 
           {/* ======================================================== */}
-          {/* WORD 2: PILOT — High-Contrast White with Sharp Bevels    */}
+          {/* WORD 2: PILOT — Shifted +20px for generous air/spacing   */}
           {/* ======================================================== */}
-          <g transform="skewX(-13)">
+          <g transform="translate(20, 0) skewX(-13)">
             {/* P */}
             <path
               d="M266 18 H289 C299 18 305 24 305 33 C305 42 299 48 289 48 H278 V62 H266 Z M278 27 V39 H287 C292 39 294 37 294 33 C294 29 292 27 287 27 Z"
@@ -137,9 +137,9 @@ export default function CareerPilotLogo({ className = 'h-11 sm:h-13 w-auto', sho
           </g>
 
           {/* ======================================================== */}
-          {/* 4-POINT STAR SPARKLE ACCENT (Matches the reference)      */}
+          {/* 4-POINT STAR SPARKLE ACCENT (Shifted with PILOT)         */}
           {/* ======================================================== */}
-          <g transform="translate(422, 12)">
+          <g transform="translate(442, 12)">
             <path
               d="M0 -9 Q0 0 9 0 Q0 0 0 9 Q0 0 -9 0 Q0 0 0 -9 Z"
               fill="#FFE600"
@@ -149,16 +149,16 @@ export default function CareerPilotLogo({ className = 'h-11 sm:h-13 w-auto', sho
           </g>
         </g>
 
-        {/* Micro-tagline under CAREER (Just like in the reference image) */}
+        {/* Micro-tagline under CAREER */}
         {showTagline && (
           <text
             x="12"
-            y="78"
+            y="76"
             fill="#000000"
-            fontSize="8"
+            fontSize="7.5"
             fontFamily="'Geist Mono', monospace"
             fontWeight="900"
-            letterSpacing="2.8"
+            letterSpacing="2.6"
           >
             AUTONOMOUS • EVIDENCE • INTELLIGENCE
           </text>

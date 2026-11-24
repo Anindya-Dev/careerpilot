@@ -142,8 +142,8 @@ export default function LandingPage() {
       {/* Main Content Layout */}
       <div className={`relative z-10 flex flex-col ${authModal.isOpen ? 'pointer-events-none select-none' : ''}`}>
         
-        {/* Navigation: Full-width container */}
-        <header className="sticky top-0 z-30 bg-white/95 border-b-2 border-black backdrop-none">
+        {/* Navigation: Full-width container with seamless theme background */}
+        <header className="sticky top-0 z-30 bg-[#F4F0EA]/95 border-b-2 border-black backdrop-blur-sm">
           <div className="w-full max-w-[1500px] mx-auto px-6 sm:px-10 lg:px-14 h-16 flex items-center justify-between">
             {/* Dynamic Anime / Supersonic Style Logo */}
             <Link to="/" className="flex items-center">
