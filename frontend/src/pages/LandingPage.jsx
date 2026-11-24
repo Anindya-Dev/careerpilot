@@ -142,9 +142,9 @@ export default function LandingPage() {
       {/* Main Content Layout */}
       <div className={`relative z-10 flex flex-col ${authModal.isOpen ? 'pointer-events-none select-none' : ''}`}>
         
-        {/* Navigation: Full-width container with seamless theme background */}
-        <header className="sticky top-0 z-30 bg-transparent">
-          <div className="w-full max-w-[1500px] mx-auto px-6 sm:px-10 lg:px-14 h-16 flex items-center justify-between">
+        {/* Navigation: Full-width spanning to outer corners */}
+        <header className="sticky top-0 z-30 bg-transparent w-full">
+          <div className="w-full px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
             {/* Dynamic Anime / Supersonic Style Logo */}
             <Link to="/" className="flex items-center">
               <CareerPilotLogo className="h-10 sm:h-12 w-auto" />
@@ -154,7 +154,7 @@ export default function LandingPage() {
             <button
               type="button"
               onClick={() => setAuthModal({ isOpen: true, mode: 'login' })}
-              className="inline-flex items-center px-5 py-2.5 border-2 border-black bg-[#FFE600] text-black text-xs font-mono font-bold uppercase tracking-wider shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75"
+              className="inline-flex items-center px-4 sm:px-5 py-2 sm:py-2.5 border-2 border-black bg-[#FFE600] text-black text-xs font-mono font-bold uppercase tracking-wider shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75 cursor-pointer"
             >
               <LogIn className="w-4 h-4 mr-1.5 stroke-[2.5]" />
               Student Login
