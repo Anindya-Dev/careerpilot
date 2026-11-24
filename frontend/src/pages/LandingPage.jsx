@@ -281,7 +281,7 @@ export default function LandingPage() {
                   <span className="mx-7 text-black text-xs select-none">✦</span>
                 </span>
                 <span className="shrink-0 flex items-center">
-                  <span>12-ROUND BCRYPT AUTH</span>
+                  <span>PROTECTED BY CLERK</span>
                   <span className="mx-7 text-black text-xs select-none">✦</span>
                 </span>
                 <span className="shrink-0 flex items-center">

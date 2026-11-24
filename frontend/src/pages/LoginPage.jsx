@@ -135,7 +135,7 @@ export default function LoginPage() {
             <div className="flex items-center justify-between text-[11px] font-mono font-bold pt-1">
               <span className="flex items-center">
                 <Shield className="w-3.5 h-3.5 mr-1 stroke-[2.5]" />
-                12-ROUND BCRYPT
+                PROTECTED BY CLERK
               </span>
               <span className="bg-[#FFE600] border border-black px-1 text-[10px]">ROTATING TOKENS</span>
             </div>

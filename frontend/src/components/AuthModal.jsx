@@ -240,7 +240,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                 <div className="flex items-center justify-between text-[11px] font-mono text-black font-bold pt-1">
                   <span className="flex items-center">
                     <Shield className="w-3.5 h-3.5 mr-1 stroke-[2.5]" />
-                    BCRYPT_12
+                    PROTECTED BY CLERK
                   </span>
                   <button
                     type="button"
