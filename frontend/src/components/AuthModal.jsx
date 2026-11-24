@@ -13,10 +13,12 @@ import SocialAuthButtons from './SocialAuthButtons';
 import { Compass, X, ArrowRight, UserPlus, Shield } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
-  const { login, register, enterDemoMode } = useAuth();
+  const { login, register, verifyEmailCode, enterDemoMode } = useAuth();
   const navigate = useNavigate();
 
   const [mode, setMode] = useState(initialMode); // 'login' | 'register'
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -108,17 +110,40 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
 
     setIsSubmitting(true);
     try {
-      await register({
+      const res = await register({
         name: regData.name,
         email: regData.email,
         password: regData.password,
         major: regData.major,
         enrollmentYear: parseInt(regData.enrollmentYear, 10)
       });
+      if (res?.needsVerification) {
+        setIsVerifying(true);
+        return;
+      }
       onClose();
       navigate('/dashboard');
     } catch (err) {
       setServerError(err.message || 'Registration failed');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleVerifySubmit = async (e) => {
+    e.preventDefault();
+    setServerError('');
+    if (!verificationCode.trim()) {
+      setServerError('Please enter the 6-digit verification code.');
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await verifyEmailCode(verificationCode.trim());
+      onClose();
+      navigate('/dashboard');
+    } catch (err) {
+      setServerError(err.message || 'Verification failed');
     } finally {
       setIsSubmitting(false);
     }
@@ -279,7 +304,37 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
             )}
 
             {/* REGISTER FORM */}
-            {mode === 'register' && (
+            {mode === 'register' && isVerifying && (
+              <form onSubmit={handleVerifySubmit} className="space-y-4">
+                <div className="bg-[#FFE600] border-2 border-black p-3 text-xs font-mono font-bold shadow-[2px_2px_0px_0px_#000]">
+                  <p>Verification code sent to: <span className="underline">{regData.email}</span></p>
+                  <p className="text-[11px] font-normal mt-1">Please enter the 6-digit confirmation code from your email.</p>
+                </div>
+                <div>
+                  <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">
+                    6-Digit Verification Code
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="123456"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                    className="w-full px-3 py-2 text-center text-lg font-mono tracking-widest bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] focus:outline-none focus:bg-[#FFFDF0]"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-2.5 border-2 border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono font-black text-xs uppercase tracking-wider shadow-[4px_4px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all"
+                >
+                  {isSubmitting ? 'Verifying...' : 'Complete Registration'}
+                </button>
+              </form>
+            )}
+
+            {/* REGISTER FORM */}
+            {mode === 'register' && !isVerifying && (
               <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
                 <div>
                   <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">

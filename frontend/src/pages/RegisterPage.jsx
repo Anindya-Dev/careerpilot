@@ -13,8 +13,11 @@ import SocialAuthButtons from '../components/SocialAuthButtons';
 import { Compass, UserPlus, Shield, Terminal } from 'lucide-react';
 
 export default function RegisterPage() {
-  const { register, enterDemoMode } = useAuth();
+  const { register, verifyEmailCode, enterDemoMode } = useAuth();
   const navigate = useNavigate();
+
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -67,16 +70,38 @@ export default function RegisterPage() {
 
     setIsSubmitting(true);
     try {
-      await register({
+      const res = await register({
         name: formData.name,
         email: formData.email,
         password: formData.password,
         major: formData.major,
         enrollmentYear: parseInt(formData.enrollmentYear, 10)
       });
+      if (res?.needsVerification) {
+        setIsVerifying(true);
+        return;
+      }
       navigate('/dashboard', { replace: true });
     } catch (err) {
       setServerError(err.message || 'Registration failed');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleVerifySubmit = async (e) => {
+    e.preventDefault();
+    setServerError('');
+    if (!verificationCode.trim()) {
+      setServerError('Please enter the 6-digit verification code.');
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await verifyEmailCode(verificationCode.trim());
+      navigate('/dashboard', { replace: true });
+    } catch (err) {
+      setServerError(err.message || 'Verification failed');
     } finally {
       setIsSubmitting(false);
     }
@@ -118,7 +143,35 @@ export default function RegisterPage() {
           {/* Social OAuth Providers (Clerk Headless) */}
           <SocialAuthButtons mode="register" onError={setServerError} />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {isVerifying ? (
+            <form onSubmit={handleVerifySubmit} className="space-y-4">
+              <div className="bg-[#FFE600] border-2 border-black p-3 text-xs font-mono font-bold shadow-[2px_2px_0px_0px_#000]">
+                <p>Verification code sent to: <span className="underline">{formData.email}</span></p>
+                <p className="text-[11px] font-normal mt-1">Please enter the 6-digit confirmation code from your email.</p>
+              </div>
+              <div>
+                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">
+                  6-Digit Verification Code
+                </label>
+                <input
+                  type="text"
+                  placeholder="123456"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value)}
+                  className="w-full px-3 py-2 text-center text-lg font-mono tracking-widest bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] focus:outline-none focus:bg-white"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-2.5 border-2 border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono font-black text-xs uppercase tracking-wider shadow-[4px_4px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all"
+              >
+                {isSubmitting ? 'Verifying...' : 'Complete Registration'}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">
                 Full Name
@@ -223,6 +276,7 @@ export default function RegisterPage() {
               Explore Demo Sandbox (Offline Evaluation)
             </button>
           </form>
+          )}
 
           <div className="mt-6 text-center text-xs font-mono font-bold text-slate-700 border-t-2 border-black pt-4">
             Already have a profile?{' '}

@@ -1,15 +1,15 @@
 /**
  * @file AuthContext.jsx
  * @description Centralized React Context for user authentication state management.
- * Seamlessly integrates Clerk OAuth (Google, GitHub) with CareerPilot's internal
- * microservices JWT auth and offline Sandbox evaluation mode.
+ * Seamlessly routes login/registration through Clerk Cloud (OAuth, Email/Password)
+ * when configured, while retaining offline Demo Sandbox and microservice fallbacks.
  * @author Md Hussain Ansari (Member 1) & Anindya Bhattacharya (Member 2)
  */
 
-import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import authService from '../services/authService';
 import { useClerkConfig } from './ClerkProviderWrapper';
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useSignIn, useSignUp, useUser, useClerk } from '@clerk/clerk-react';
 
 const AuthContext = createContext(null);
 
@@ -55,17 +55,20 @@ function authReducer(state, action) {
 }
 
 /**
- * Clerk Synchronization Listener.
- * Safely mounts ONLY when ClerkProvider is active.
+ * Clerk-Powered Provider
+ * Handles Email/Password + OAuth via Clerk Cloud without requiring local MongoDB.
  */
-function ClerkSyncListener({ onSync }) {
-  const { user: clerkUser, isLoaded, isSignedIn } = useUser();
+function ClerkActiveAuthProvider({ children, state, dispatch }) {
+  const { isLoaded: isSignInLoaded, signIn, setActive: setSignInActive } = useSignIn();
+  const { isLoaded: isSignUpLoaded, signUp, setActive: setSignUpActive } = useSignUp();
+  const { user: clerkUser, isLoaded: isUserLoaded, isSignedIn } = useUser();
+  const clerk = useClerk();
 
+  // Sync logged-in Clerk user on mount / session change
   useEffect(() => {
-    if (isLoaded && isSignedIn && clerkUser) {
+    if (isUserLoaded && isSignedIn && clerkUser) {
       const email = clerkUser.primaryEmailAddress?.emailAddress || 'student@careerpilot.io';
       const name = clerkUser.fullName || clerkUser.firstName || email.split('@')[0];
-      
       const syncedUser = {
         userId: clerkUser.id,
         name,
@@ -75,82 +78,199 @@ function ClerkSyncListener({ onSync }) {
         major: 'Computer Science & Engineering',
         enrollmentYear: new Date().getFullYear()
       };
-
       const token = `clerk-jwt-${clerkUser.id}`;
-      onSync(syncedUser, token);
+      localStorage.setItem('token', token);
+      localStorage.setItem('clerk_user', JSON.stringify(syncedUser));
+      dispatch({
+        type: 'AUTH_SUCCESS',
+        payload: { user: syncedUser, token }
+      });
     }
-  }, [isLoaded, isSignedIn, clerkUser, onSync]);
+  }, [isUserLoaded, isSignedIn, clerkUser, dispatch]);
 
-  return null;
-}
-
-export function AuthProvider({ children }) {
-  const [state, dispatch] = useReducer(authReducer, initialState);
-  const { isClerkConfigured } = useClerkConfig();
-
-  // Validate existing token on initial load
-  useEffect(() => {
-    const initAuth = async () => {
-      const storedToken = localStorage.getItem('token');
-      if (!storedToken) {
-        return dispatch({ type: 'AUTH_LOGOUT' });
+  const login = async (email, password) => {
+    dispatch({ type: 'SET_LOADING', payload: true });
+    try {
+      if (!isSignInLoaded) {
+        throw new Error('Clerk authentication service initializing. Please retry in a second.');
       }
+      const result = await signIn.create({
+        identifier: email,
+        password: password,
+      });
 
-      // Check for Clerk cached session
-      if (storedToken.startsWith('clerk-jwt-')) {
-        const savedClerkUser = JSON.parse(localStorage.getItem('clerk_user') || 'null');
-        if (savedClerkUser) {
-          return dispatch({
-            type: 'AUTH_SUCCESS',
-            payload: { user: savedClerkUser, token: storedToken }
-          });
-        }
-      }
-
-      // Check for Demo Sandbox session
-      if (storedToken === 'demo-jwt-preview-token') {
-        const saved = JSON.parse(localStorage.getItem('demo_user') || 'null') || {
-          userId: 'demo-student-id-001',
-          name: 'Sample Student (Demo Sandbox)',
-          email: 'demo@careerpilot.io',
+      if (result.status === 'complete') {
+        await setSignInActive({ session: result.createdSessionId });
+        const user = {
+          userId: result.createdUserId || result.createdSessionId,
+          name: email.split('@')[0],
+          email,
+          isClerkSession: true,
           major: 'Computer Science & Engineering',
-          enrollmentYear: 2024,
-          isDemoSession: true
+          enrollmentYear: new Date().getFullYear()
         };
-        return dispatch({
-          type: 'AUTH_SUCCESS',
-          payload: { user: saved, token: storedToken }
-        });
-      }
-
-      // Standard Auth-Service JWT token check
-      try {
-        const user = await authService.getMe();
+        const token = `clerk-jwt-${user.userId}`;
+        localStorage.setItem('token', token);
+        localStorage.setItem('clerk_user', JSON.stringify(user));
         dispatch({
           type: 'AUTH_SUCCESS',
-          payload: { user, token: storedToken }
+          payload: { user, token }
         });
-      } catch (err) {
-        localStorage.removeItem('token');
-        dispatch({ type: 'AUTH_LOGOUT' });
+        return { success: true, user };
+      } else {
+        throw new Error(`Authentication requires additional verification: ${result.status}`);
       }
+    } catch (err) {
+      const errorMsg =
+        err.errors?.[0]?.longMessage ||
+        err.errors?.[0]?.message ||
+        err.message ||
+        'Invalid email or password';
+      dispatch({ type: 'SET_ERROR', payload: errorMsg });
+      throw new Error(errorMsg);
+    }
+  };
+
+  const register = async (userData) => {
+    dispatch({ type: 'SET_LOADING', payload: true });
+    try {
+      if (!isSignUpLoaded) {
+        throw new Error('Clerk registration service initializing. Please retry in a second.');
+      }
+      const result = await signUp.create({
+        emailAddress: userData.email,
+        password: userData.password,
+        firstName: userData.name,
+      });
+
+      if (result.status === 'complete') {
+        await setSignUpActive({ session: result.createdSessionId });
+        const user = {
+          userId: result.createdUserId || result.createdSessionId,
+          name: userData.name,
+          email: userData.email,
+          major: userData.major || 'Computer Science & Engineering',
+          enrollmentYear: userData.enrollmentYear || new Date().getFullYear(),
+          isClerkSession: true
+        };
+        const token = `clerk-jwt-${user.userId}`;
+        localStorage.setItem('token', token);
+        localStorage.setItem('clerk_user', JSON.stringify(user));
+        dispatch({
+          type: 'AUTH_SUCCESS',
+          payload: { user, token }
+        });
+        return { success: true, user };
+      } else if (result.status === 'missing_requirements') {
+        // Send email verification code if enabled in Clerk dashboard
+        await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+        return {
+          needsVerification: true,
+          email: userData.email,
+          message: 'A verification code has been sent to your email.'
+        };
+      } else {
+        throw new Error(`Registration status: ${result.status}`);
+      }
+    } catch (err) {
+      const errorMsg =
+        err.errors?.[0]?.longMessage ||
+        err.errors?.[0]?.message ||
+        err.message ||
+        'Registration failed. Please check your credentials.';
+      dispatch({ type: 'SET_ERROR', payload: errorMsg });
+      throw new Error(errorMsg);
+    }
+  };
+
+  const verifyEmailCode = async (code) => {
+    dispatch({ type: 'SET_LOADING', payload: true });
+    try {
+      const result = await signUp.attemptEmailAddressVerification({ code });
+      if (result.status === 'complete') {
+        await setSignUpActive({ session: result.createdSessionId });
+        const user = {
+          userId: result.createdUserId || result.createdSessionId,
+          name: result.firstName || 'Student',
+          email: result.emailAddress,
+          isClerkSession: true,
+          major: 'Computer Science & Engineering',
+          enrollmentYear: new Date().getFullYear()
+        };
+        const token = `clerk-jwt-${user.userId}`;
+        localStorage.setItem('token', token);
+        localStorage.setItem('clerk_user', JSON.stringify(user));
+        dispatch({
+          type: 'AUTH_SUCCESS',
+          payload: { user, token }
+        });
+        return { success: true, user };
+      } else {
+        throw new Error('Verification incomplete. Please check the code.');
+      }
+    } catch (err) {
+      const errorMsg =
+        err.errors?.[0]?.longMessage ||
+        err.errors?.[0]?.message ||
+        err.message ||
+        'Invalid verification code.';
+      dispatch({ type: 'SET_ERROR', payload: errorMsg });
+      throw new Error(errorMsg);
+    }
+  };
+
+  const enterDemoMode = () => {
+    const demoUser = {
+      userId: 'demo-student-id-001',
+      name: 'Sample Student (Demo Sandbox)',
+      email: 'demo@careerpilot.io',
+      major: 'Computer Science & Engineering',
+      enrollmentYear: 2024,
+      isDemoSession: true
     };
-
-    initAuth();
-  }, []);
-
-  const handleClerkSync = useCallback((clerkUser, token) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('clerk_user', JSON.stringify(clerkUser));
+    const demoToken = 'demo-jwt-preview-token';
+    localStorage.setItem('token', demoToken);
+    localStorage.setItem('demo_user', JSON.stringify(demoUser));
     dispatch({
       type: 'AUTH_SUCCESS',
-      payload: { user: clerkUser, token }
+      payload: { user: demoUser, token: demoToken }
     });
-  }, []);
+    return demoUser;
+  };
 
-  /**
-   * Internal Microservice Login
-   */
+  const logout = async () => {
+    try {
+      if (clerk?.signOut) await clerk.signOut();
+    } catch (_) {}
+    localStorage.removeItem('token');
+    localStorage.removeItem('demo_user');
+    localStorage.removeItem('demo_profile');
+    localStorage.removeItem('clerk_user');
+    dispatch({ type: 'AUTH_LOGOUT' });
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        ...state,
+        login,
+        register,
+        verifyEmailCode,
+        logout,
+        enterDemoMode,
+        isClerkActive: true
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+/**
+ * Standard Local Backend Provider
+ * Used when Clerk is not configured or in offline fallback mode.
+ */
+function StandardAuthProvider({ children, state, dispatch }) {
   const login = async (email, password) => {
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
@@ -173,9 +293,6 @@ export function AuthProvider({ children }) {
     }
   };
 
-  /**
-   * Internal Microservice Registration
-   */
   const register = async (userData) => {
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
@@ -198,9 +315,6 @@ export function AuthProvider({ children }) {
     }
   };
 
-  /**
-   * Demo Sandbox / Evaluation Mode
-   */
   const enterDemoMode = () => {
     const demoUser = {
       userId: 'demo-student-id-001',
@@ -220,28 +334,97 @@ export function AuthProvider({ children }) {
     return demoUser;
   };
 
-  /**
-   * Unified Logout
-   */
   const logout = async () => {
     try {
       await authService.logout();
-    } catch (_) {
-      // Ignore network errors on logout
-    } finally {
-      localStorage.removeItem('token');
-      localStorage.removeItem('demo_user');
-      localStorage.removeItem('demo_profile');
-      localStorage.removeItem('clerk_user');
-      dispatch({ type: 'AUTH_LOGOUT' });
-    }
+    } catch (_) {}
+    localStorage.removeItem('token');
+    localStorage.removeItem('demo_user');
+    localStorage.removeItem('demo_profile');
+    dispatch({ type: 'AUTH_LOGOUT' });
   };
 
   return (
-    <AuthContext.Provider value={{ ...state, login, register, logout, enterDemoMode }}>
-      {isClerkConfigured && <ClerkSyncListener onSync={handleClerkSync} />}
+    <AuthContext.Provider
+      value={{
+        ...state,
+        login,
+        register,
+        verifyEmailCode: async () => ({ success: true }),
+        logout,
+        enterDemoMode,
+        isClerkActive: false
+      }}
+    >
       {children}
     </AuthContext.Provider>
+  );
+}
+
+export function AuthProvider({ children }) {
+  const [state, dispatch] = useReducer(authReducer, initialState);
+  const { isClerkConfigured } = useClerkConfig();
+
+  // Validate existing stored token on app boot
+  useEffect(() => {
+    const initAuth = async () => {
+      const storedToken = localStorage.getItem('token');
+      if (!storedToken) {
+        return dispatch({ type: 'AUTH_LOGOUT' });
+      }
+
+      if (storedToken.startsWith('clerk-jwt-')) {
+        const savedClerkUser = JSON.parse(localStorage.getItem('clerk_user') || 'null');
+        if (savedClerkUser) {
+          return dispatch({
+            type: 'AUTH_SUCCESS',
+            payload: { user: savedClerkUser, token: storedToken }
+          });
+        }
+      }
+
+      if (storedToken === 'demo-jwt-preview-token') {
+        const saved = JSON.parse(localStorage.getItem('demo_user') || 'null') || {
+          userId: 'demo-student-id-001',
+          name: 'Sample Student (Demo Sandbox)',
+          email: 'demo@careerpilot.io',
+          major: 'Computer Science & Engineering',
+          enrollmentYear: 2024,
+          isDemoSession: true
+        };
+        return dispatch({
+          type: 'AUTH_SUCCESS',
+          payload: { user: saved, token: storedToken }
+        });
+      }
+
+      try {
+        const user = await authService.getMe();
+        dispatch({
+          type: 'AUTH_SUCCESS',
+          payload: { user, token: storedToken }
+        });
+      } catch (err) {
+        localStorage.removeItem('token');
+        dispatch({ type: 'AUTH_LOGOUT' });
+      }
+    };
+
+    initAuth();
+  }, []);
+
+  if (isClerkConfigured) {
+    return (
+      <ClerkActiveAuthProvider state={state} dispatch={dispatch}>
+        {children}
+      </ClerkActiveAuthProvider>
+    );
+  }
+
+  return (
+    <StandardAuthProvider state={state} dispatch={dispatch}>
+      {children}
+    </StandardAuthProvider>
   );
 }
 

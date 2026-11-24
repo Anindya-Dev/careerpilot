@@ -137,7 +137,7 @@ export default function LoginPage() {
                 <Shield className="w-3.5 h-3.5 mr-1 stroke-[2.5]" />
                 PROTECTED BY CLERK
               </span>
-              <span className="bg-[#FFE600] border border-black px-1 text-[10px]">ROTATING TOKENS</span>
+              <span className="bg-[#FFE600] border border-black px-1 text-[10px]">ENTERPRISE SSO</span>
             </div>
 
             <button
