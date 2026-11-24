@@ -58,40 +58,6 @@ export default function DashboardPage() {
         <Sidebar />
 
         <main className="flex-1 min-w-0 p-6 sm:p-8 lg:p-10 space-y-8">
-          {/* Top Telemetry Header Banner */}
-          <div className="border-2 border-black bg-[#FFE600] shadow-[4px_4px_0px_0px_#000] px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono font-bold">
-            <div className="flex flex-wrap items-center gap-2 text-black">
-              <Terminal className="w-4 h-4 stroke-[2.5]" />
-              <span className="bg-black text-white px-2 py-0.5 text-[11px] uppercase">
-                STATUS: ACTIVE
-              </span>
-              <span className="hidden sm:inline text-black">/</span>
-              <span className="hidden sm:inline">STUDENT_ID: {user?.id?.slice(-8) || 'ONLINE'}</span>
-              <span className="hidden sm:inline text-black">/</span>
-              <span className="bg-[#70E000] text-black border border-black px-2 py-0.5 text-[10px]">
-                NEO4J_SYNCED
-              </span>
-              {latencyMs !== null && (
-                <>
-                  <span className="hidden sm:inline text-black">/</span>
-                  <span className="bg-[#38B6FF] text-black border border-black px-2 py-0.5 text-[10px]">
-                    LATENCY: {latencyMs}MS
-                  </span>
-                </>
-              )}
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Link
-                to="/profile"
-                className="inline-flex items-center px-4 py-2 border-2 border-black bg-white hover:bg-[#F4F0EA] text-black font-mono text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75"
-              >
-                <span>Edit Profile</span>
-                <ArrowRight className="w-3.5 h-3.5 ml-1.5 stroke-[2.5]" />
-              </Link>
-            </div>
-          </div>
-
           {/* Dedicated Workspace Quick-Launcher Hub (4 Cards) */}
           <div>
             <div className="flex items-center justify-between mb-3 font-mono">
