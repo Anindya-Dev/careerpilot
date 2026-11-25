@@ -15,6 +15,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../context/ProfileContext';
 import { useDashboardTelemetry, useSkillIntelligence } from '../hooks';
+import { buildLiveRadarData } from '../utils/skillBenchmark';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Card from '../components/Card';
@@ -68,7 +69,9 @@ export default function DashboardPage() {
       ]
     : (telemetry?.recommendations || []);
   const trendHistory = isFreshProfile ? [] : telemetry?.trendHistory;
-  const radarData = isFreshProfile ? [] : skillIntel?.radarData;
+  const radarData = user?.isDemoSession
+    ? skillIntel?.radarData
+    : buildLiveRadarData(profile?.skills || [], targetRole);
 
   return (
     <div className="min-h-screen bg-[#F4F0EA] text-black flex flex-col font-sans relative selection:bg-[#FFE600] selection:text-black">

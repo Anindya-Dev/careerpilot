@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../context/ProfileContext';
 import { useSkillIntelligence } from '../hooks';
+import { buildLiveRadarData } from '../utils/skillBenchmark';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Card from '../components/Card';
@@ -277,7 +278,11 @@ export default function SkillsPage() {
                 bodyClassName="p-6"
               >
                 <SkillRadarChart
-                  data={!user?.isDemoSession && skills.length === 0 ? [] : skillIntel?.radarData}
+                  data={
+                    user?.isDemoSession
+                      ? skillIntel?.radarData
+                      : buildLiveRadarData(skills, targetRole)
+                  }
                   targetRole={targetRole}
                 />
               </Card>
