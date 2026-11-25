@@ -657,7 +657,7 @@ export default function ProfilePage() {
                     </button>
                   </div>
 
-                  <div className="divide-y-2 divide-black">
+                  <div className="max-h-[250px] overflow-y-auto pr-1 divide-y-2 divide-black">
                     {formData.skills.map((skill, index) => (
                       <div key={index} className="py-2.5 flex items-center justify-between">
                         <div className="flex items-center space-x-2.5">

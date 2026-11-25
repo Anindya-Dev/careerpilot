@@ -188,9 +188,9 @@ export default function SkillsPage() {
                     </Link>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto border-2 border-black">
+                  <div className="max-h-[280px] overflow-y-auto overflow-x-auto border-2 border-black">
                     <table className="w-full text-left text-xs font-mono">
-                      <thead>
+                      <thead className="sticky top-0 z-10">
                         <tr className="border-b-2 border-black bg-[#FAF5E6] text-black text-[11px] uppercase font-black">
                           <th className="py-2.5 px-3">Skill Node</th>
                           <th className="py-2.5 px-3">Category</th>
