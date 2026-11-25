@@ -28,7 +28,19 @@ const defaultRadarData = [
   { skill: 'Git / CI/CD', student: 80, market: 78, fullMark: 100 }
 ];
 
-export default function SkillRadarChart({ data = defaultRadarData, targetRole = 'Full-Stack Developer' }) {
+export default function SkillRadarChart({ data, targetRole = 'Full-Stack Developer' }) {
+  if (Array.isArray(data) && data.length === 0) {
+    return (
+      <div className="h-[250px] w-full bg-[#FAF5E6] border-2 border-black p-6 shadow-[3px_3px_0px_0px_#000] font-mono flex flex-col items-center justify-center text-center space-y-2">
+        <Layers className="w-7 h-7 text-black stroke-[2]" />
+        <p className="text-xs font-black uppercase text-black">NO_SKILL_VECTORS_CALIBRATED</p>
+        <p className="text-[11px] font-bold text-slate-600 max-w-xs">
+          Add skills and set a target role in Career Profile to compute your live market alignment radar.
+        </p>
+      </div>
+    );
+  }
+
   const chartData = data && data.length > 0 ? data : defaultRadarData;
 
   // Identify high-priority gaps

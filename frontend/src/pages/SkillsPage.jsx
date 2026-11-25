@@ -258,7 +258,7 @@ export default function SkillsPage() {
                 bodyClassName="p-6"
               >
                 <SkillRadarChart
-                  data={skillIntel?.radarData}
+                  data={!user?.isDemoSession && skills.length === 0 ? [] : skillIntel?.radarData}
                   targetRole={targetRole}
                 />
               </Card>

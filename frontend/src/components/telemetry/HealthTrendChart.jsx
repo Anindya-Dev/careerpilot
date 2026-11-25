@@ -24,7 +24,18 @@ const defaultTrend = [
   { month: 'Nov', score: 84.5 }
 ];
 
-export default function HealthTrendChart({ history = defaultTrend }) {
+export default function HealthTrendChart({ history }) {
+  if (Array.isArray(history) && history.length === 0) {
+    return (
+      <div className="h-[210px] w-full bg-[#FAF5E6] border-2 border-black p-6 shadow-[3px_3px_0px_0px_#000] font-mono flex flex-col items-center justify-center text-center space-y-2">
+        <p className="text-xs font-black uppercase text-black">AWAITING_HISTORICAL_TELEMETRY</p>
+        <p className="text-[11px] font-bold text-slate-600 max-w-xs">
+          6-month trajectory projection activates after you initialize your profile and run the pipeline.
+        </p>
+      </div>
+    );
+  }
+
   const data = history && history.length > 0 ? history : defaultTrend;
 
   return (
