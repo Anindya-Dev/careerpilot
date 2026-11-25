@@ -45,8 +45,9 @@ export default function DashboardPage() {
   const projectsCount = profile?.projects?.length || 0;
   const targetRole = profile?.target_role || 'Target Role Unassigned';
 
-  const healthScore = telemetry?.healthScore || profile?.career_health_score || 84.5;
-  const healthGrade = telemetry?.healthGrade || 'A-';
+  const isFreshProfile = !user?.isDemoSession && skillsCount === 0 && !profile?.target_role;
+  const healthScore = isFreshProfile ? 0 : (profile?.career_health_score || telemetry?.healthScore || 0);
+  const healthGrade = isFreshProfile ? 'N/A' : (telemetry?.healthGrade || 'B+');
 
   return (
     <div className="min-h-screen bg-[#F4F0EA] text-black flex flex-col font-sans relative selection:bg-[#FFE600] selection:text-black">

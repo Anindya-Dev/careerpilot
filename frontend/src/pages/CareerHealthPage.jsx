@@ -37,8 +37,9 @@ export default function CareerHealthPage() {
   const { profile } = useProfile();
   const { data: telemetry, latencyMs } = useDashboardTelemetry();
 
-  const healthScore = telemetry?.healthScore || profile?.career_health_score || 84.5;
-  const healthGrade = telemetry?.healthGrade || 'A-';
+  const isFreshProfile = !user?.isDemoSession && (profile?.skills?.length || 0) === 0 && !profile?.target_role;
+  const healthScore = isFreshProfile ? 0 : (profile?.career_health_score || telemetry?.healthScore || 0);
+  const healthGrade = isFreshProfile ? 'N/A' : (telemetry?.healthGrade || 'B+');
   const dimensions = telemetry?.dimensions || [
     { name: 'Technical Depth', score: 88, status: 'Optimal' },
     { name: 'Git Commit Velocity', score: 82, status: 'Healthy' },

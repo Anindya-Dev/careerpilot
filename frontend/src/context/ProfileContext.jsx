@@ -1,7 +1,9 @@
 /**
  * @file ProfileContext.jsx
  * @description React Context for managing student career intelligence profile state.
- * @author Md Hussain Ansari (Member 1)
+ * Separates Demo Sandbox preview data from genuine authenticated student profiles
+ * so new users start with a clean, honest profile rather than fabricated data.
+ * @author Md Hussain Ansari (Member 1) & Anindya Bhattacharya (Member 2)
  */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -9,6 +11,16 @@ import profileService from '../services/profileService';
 import { useAuth } from './AuthContext';
 
 const ProfileContext = createContext(null);
+
+function computeCompleteness(p) {
+  let score = 15; // Base identity (name, email, major)
+  if (p.target_role && p.target_role.trim() !== '') score += 15;
+  if (Array.isArray(p.skills) && p.skills.length > 0) score += 20;
+  if (Array.isArray(p.projects) && p.projects.length > 0) score += 20;
+  if (Array.isArray(p.goals) && p.goals.length > 0) score += 15;
+  if (p.linked_accounts?.github || p.linked_accounts?.linkedin) score += 15;
+  return Math.min(score, 100);
+}
 
 export function ProfileProvider({ children }) {
   const { user } = useAuth();
@@ -19,17 +31,13 @@ export function ProfileProvider({ children }) {
   const fetchProfile = async () => {
     if (!user) return;
     setIsLoading(true);
-    try {
-      const data = await profileService.getMyProfile();
-      setProfile(data);
-      setError(null);
-    } catch (err) {
-      // Graceful offline demo profile fallback
-      console.warn('[CareerPilot Preview] Profile service offline. Using preview profile.');
-      const localProfile = JSON.parse(localStorage.getItem('demo_profile') || 'null') || {
-        userId: user.userId || 'demo-student-id-001',
-        name: user.name || 'Student',
-        email: user.email || 'student@careerpilot.io',
+
+    // 1. Explicit Demo Sandbox mode: load sample evaluation data
+    if (user.isDemoSession) {
+      const demoProfile = JSON.parse(localStorage.getItem('demo_profile') || 'null') || {
+        userId: 'demo-student-id-001',
+        name: user.name || 'Sample Student (Demo Sandbox)',
+        email: user.email || 'demo@careerpilot.io',
         major: user.major || 'Computer Science & Engineering',
         target_role: 'AI / Machine Learning Engineer',
         skills: [
@@ -64,11 +72,48 @@ export function ProfileProvider({ children }) {
         career_health_score: 84.5,
         profile_completeness: 85,
         linked_accounts: {
-          github: user.email ? `${user.email.split('@')[0]}-dev` : 'student-dev',
-          linkedin: user.email ? `linkedin.com/in/${user.email.split('@')[0]}` : 'linkedin.com/in/student'
+          github: 'demo-student-dev',
+          linkedin: 'linkedin.com/in/demo-student'
         }
       };
-      setProfile(localProfile);
+      setProfile(demoProfile);
+      setError(null);
+      setIsLoading(false);
+      return;
+    }
+
+    // 2. Genuine authenticated user: fetch from Profile Microservice or per-user local cache
+    const storageKey = `profile_${user.userId}`;
+    try {
+      const data = await profileService.getMyProfile();
+      setProfile(data);
+      localStorage.setItem(storageKey, JSON.stringify(data));
+      setError(null);
+    } catch (err) {
+      // Profile service offline: load user's own saved profile or a clean empty slate (NO fake data)
+      const savedUserProfile = JSON.parse(localStorage.getItem(storageKey) || 'null');
+      if (savedUserProfile) {
+        setProfile(savedUserProfile);
+      } else {
+        const cleanProfile = {
+          userId: user.userId,
+          name: user.name || 'Student',
+          email: user.email || '',
+          major: user.major || 'Computer Science & Engineering',
+          target_role: '',
+          skills: [],
+          goals: [],
+          projects: [],
+          certifications: [],
+          career_health_score: 0,
+          profile_completeness: 15,
+          linked_accounts: {
+            github: '',
+            linkedin: ''
+          }
+        };
+        setProfile(cleanProfile);
+      }
       setError(null);
     } finally {
       setIsLoading(false);
@@ -88,20 +133,26 @@ export function ProfileProvider({ children }) {
     try {
       const updated = await profileService.updateProfile(updates);
       setProfile(updated);
+      if (user && !user.isDemoSession) {
+        localStorage.setItem(`profile_${user.userId}`, JSON.stringify(updated));
+      }
       setError(null);
       return updated;
     } catch (err) {
-      console.warn('[CareerPilot Preview] Profile service offline. Saving updates to local state.');
       const current = profile || {};
-      const updated = {
+      const merged = {
         ...current,
-        ...updates,
-        profile_completeness: 90
+        ...updates
       };
-      setProfile(updated);
-      localStorage.setItem('demo_profile', JSON.stringify(updated));
+      merged.profile_completeness = computeCompleteness(merged);
+      if (!merged.career_health_score && merged.skills?.length > 0) {
+        merged.career_health_score = Math.min(40 + merged.skills.length * 8 + (merged.projects?.length || 0) * 10, 95);
+      }
+      setProfile(merged);
+      const storageKey = user?.isDemoSession ? 'demo_profile' : `profile_${user?.userId}`;
+      localStorage.setItem(storageKey, JSON.stringify(merged));
       setError(null);
-      return updated;
+      return merged;
     } finally {
       setIsLoading(false);
     }
