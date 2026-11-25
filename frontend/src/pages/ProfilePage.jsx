@@ -30,7 +30,8 @@ import {
   Star,
   ExternalLink,
   RefreshCw,
-  Sparkles
+  Sparkles,
+  Pencil
 } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -77,6 +78,7 @@ export default function ProfilePage() {
   const [isFetchingGithub, setIsFetchingGithub] = useState(false);
   const [isFetchingLeetcode, setIsFetchingLeetcode] = useState(false);
   const [showAddProject, setShowAddProject] = useState(false);
+  const [isEditingFoundational, setIsEditingFoundational] = useState(false);
 
   // Auto-dismiss toast notification after 4 seconds
   useEffect(() => {
@@ -569,39 +571,109 @@ export default function ProfilePage() {
                 </div>
               </Card>
 
-              {/* Core Information */}
+              {/* Core Information (Read-only by default with Edit toggle) */}
               <Card
                 title="Foundational Information"
                 subtitle="Academic enrollment and target aspiration vectors"
                 headerBg="bg-[#38B6FF]"
+                actions={
+                  isEditingFoundational ? (
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          await updateProfile(formData);
+                          setIsEditingFoundational(false);
+                          setNotification({
+                            type: 'success',
+                            message: 'Foundational profile details updated.'
+                          });
+                        }}
+                        className="inline-flex items-center px-3 py-1 border-2 border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            name: profile?.name || user?.name || '',
+                            major: profile?.major || user?.major || '',
+                            target_role: profile?.target_role || ''
+                          }));
+                          setIsEditingFoundational(false);
+                        }}
+                        className="inline-flex items-center px-2.5 py-1 border-2 border-black bg-white hover:bg-slate-100 text-black font-mono text-xs font-bold uppercase shadow-[2px_2px_0px_0px_#000] cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingFoundational(true)}
+                      className="inline-flex items-center px-3 py-1 border-2 border-black bg-[#FFE600] hover:bg-[#FFF066] text-black font-mono text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+                    >
+                      <Pencil className="w-3 h-3 mr-1 stroke-[2.5]" />
+                      Edit
+                    </button>
+                  )
+                }
               >
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Input
-                    label="Full Name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleBasicChange}
-                    required
-                  />
-                  <Input
-                    label="Academic Program / Major"
-                    name="major"
-                    value={formData.major}
-                    onChange={handleBasicChange}
-                    required
-                  />
-                  <div className="sm:col-span-2">
+                {isEditingFoundational ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Input
-                      label="Target Professional Role"
-                      name="target_role"
-                      placeholder="e.g. AI & Machine Learning Engineer"
-                      value={formData.target_role}
+                      label="Full Name"
+                      name="name"
+                      value={formData.name}
                       onChange={handleBasicChange}
-                      helperText="Calibrated by Skill Intelligence Agent against market job demand graphs"
                       required
                     />
+                    <Input
+                      label="Academic Program / Major"
+                      name="major"
+                      value={formData.major}
+                      onChange={handleBasicChange}
+                      required
+                    />
+                    <div className="sm:col-span-2">
+                      <Input
+                        label="Target Professional Role"
+                        name="target_role"
+                        placeholder="e.g. AI & Machine Learning Engineer"
+                        value={formData.target_role}
+                        onChange={handleBasicChange}
+                        helperText="Calibrated by Skill Intelligence Agent against market job demand graphs"
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono">
+                    <div className="p-3 bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000]">
+                      <div className="text-[10px] font-bold uppercase text-slate-600">Full Name</div>
+                      <div className="text-sm font-black text-black mt-1">
+                        {formData.name || 'Not set'}
+                      </div>
+                    </div>
+                    <div className="p-3 bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000]">
+                      <div className="text-[10px] font-bold uppercase text-slate-600">Academic Program / Major</div>
+                      <div className="text-sm font-black text-black mt-1">
+                        {formData.major || 'Not set'}
+                      </div>
+                    </div>
+                    <div className="sm:col-span-2 p-3 bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000]">
+                      <div className="text-[10px] font-bold uppercase text-slate-600">Target Professional Role</div>
+                      <div className="text-sm font-black text-black mt-1">
+                        {formData.target_role || 'Target Role Unassigned — click Edit to set'}
+                      </div>
+                      <div className="text-[10px] font-bold text-slate-500 mt-1">
+                        Calibrated by Skill Intelligence Agent against live market job demand
+                      </div>
+                    </div>
+                  </div>
+                )}
               </Card>
 
               {/* Skills Section */}
