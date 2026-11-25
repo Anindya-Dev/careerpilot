@@ -42,12 +42,31 @@ export default function SkillsPage() {
 
   const categories = ['ALL', 'Frontend', 'Backend', 'Database', 'Cloud & DevOps', 'AI & ML'];
 
+  const DOMAIN_MAP = {
+    frontend: ['react', 'next.js', 'nextjs', 'vue', 'angular', 'tailwind', 'html', 'css', 'typescript', 'javascript', 'redux', 'vite'],
+    backend: ['fastapi', 'node.js', 'nodejs', 'express', 'django', 'flask', 'spring', 'nestjs', 'graphql', 'grpc', 'python', 'java', 'go', 'golang', 'rust', 'c++', 'c#', 'php', 'ruby', 'rest'],
+    database: ['postgresql', 'postgres', 'mongodb', 'mysql', 'redis', 'neo4j', 'chromadb', 'sqlite', 'elasticsearch', 'firebase', 'supabase', 'dynamodb', 'sql'],
+    'cloud & devops': ['docker', 'kubernetes', 'k8s', 'aws', 'gcp', 'azure', 'terraform', 'ci/cd', 'nginx', 'linux', 'kafka', 'git', 'prometheus', 'grafana', 'devops'],
+    'ai & ml': ['pytorch', 'tensorflow', 'scikit-learn', 'sklearn', 'langchain', 'langgraph', 'hugging face', 'opencv', 'pandas', 'numpy', 'rag', 'llm', 'nlp', 'computer vision', 'machine learning', 'deep learning']
+  };
+
+  const matchesDomainCategory = (skill, category) => {
+    if (category === 'ALL') return true;
+    const catKey = category.toLowerCase();
+    const skillCat = (skill.category || '').toLowerCase();
+    const skillName = (skill.name || '').toLowerCase();
+
+    if (skillCat === catKey) return true;
+    if (catKey === 'cloud & devops' && skillCat === 'devops & cloud') return true;
+    if (catKey === 'database' && skillCat === 'databases') return true;
+
+    const keywords = DOMAIN_MAP[catKey] || [];
+    return keywords.some((kw) => skillName.includes(kw));
+  };
+
   const filteredSkills = skills.filter((skill) => {
     const matchesSearch = skill.name?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      selectedCategory === 'ALL' ||
-      (skill.category || 'Backend').toLowerCase() === selectedCategory.toLowerCase();
-    return matchesSearch && matchesCategory;
+    return matchesSearch && matchesDomainCategory(skill, selectedCategory);
   });
 
   const verifiedCount = skills.filter((s) => s.verified).length;
