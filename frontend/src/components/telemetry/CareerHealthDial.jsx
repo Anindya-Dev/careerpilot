@@ -5,11 +5,27 @@
  * @author Sargam Banerjee (Member 4)
  */
 
-import React from 'react';
-import { Activity, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Activity, TrendingUp, TrendingDown, Minus, HelpCircle } from 'lucide-react';
 
-export default function CareerHealthDial({ score = 84.5, grade = 'A-', dimensions = [] }) {
-  const numericScore = typeof score === 'number' ? score : parseFloat(score) || 84.5;
+export function computeHealthGrade(score) {
+  const s = Number(score) || 0;
+  if (s <= 0) return 'N/A';
+  if (s >= 93) return 'A+';
+  if (s >= 88) return 'A';
+  if (s >= 82) return 'A-';
+  if (s >= 75) return 'B+';
+  if (s >= 68) return 'B';
+  if (s >= 55) return 'C+';
+  return 'C';
+}
+
+export default function CareerHealthDial({ score = 0, grade, dimensions = [] }) {
+  const [showRubric, setShowRubric] = useState(false);
+  const numericScore = typeof score === 'number' ? score : parseFloat(score) || 0;
+  const resolvedGrade = grade && grade !== 'N/A' && numericScore > 0
+    ? computeHealthGrade(numericScore)
+    : computeHealthGrade(numericScore);
   const size = 160;
   const strokeWidth = 12;
   const radius = (size - strokeWidth) / 2;
@@ -71,16 +87,43 @@ export default function CareerHealthDial({ score = 84.5, grade = 'A-', dimension
             {numericScore}
           </div>
           <div className="text-[10px] font-mono font-black border border-black bg-[#FFE600] text-black px-2 py-0.5 mt-1.5 shadow-[1px_1px_0px_0px_#000]">
-            GRADE {grade}
+            GRADE {resolvedGrade}
           </div>
         </div>
       </div>
 
-      <div className="mt-2 text-center">
+      <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
         <span className="text-[11px] font-mono font-black uppercase text-black bg-[#C4A1FF] border border-black px-2.5 py-0.5 shadow-[2px_2px_0px_0px_#000]">
           AUTONOMOUS MULTI-AGENT INDEX
         </span>
+        <button
+          type="button"
+          onClick={() => setShowRubric(!showRubric)}
+          className="inline-flex items-center text-[10px] font-mono font-bold text-black bg-white hover:bg-[#FFE600] border border-black px-2 py-0.5 shadow-[2px_2px_0px_0px_#000] cursor-pointer transition-colors"
+        >
+          <HelpCircle className="w-3 h-3 mr-1 stroke-[2.5]" />
+          {showRubric ? 'Hide Scale' : 'How Grading Works'}
+        </button>
       </div>
+
+      {showRubric && (
+        <div className="w-full mt-3 p-3 bg-[#FAF5E6] border-2 border-black shadow-[3px_3px_0px_0px_#000] text-[10px] font-mono space-y-2 text-left">
+          <div className="font-black uppercase text-black border-b border-black pb-1">
+            Grading Scale & Score Formula
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 text-center font-bold">
+            <span className="bg-[#70E000] border border-black px-1 py-0.5">A+: 93+</span>
+            <span className="bg-[#70E000]/70 border border-black px-1 py-0.5">A: 88-92</span>
+            <span className="bg-[#38B6FF]/60 border border-black px-1 py-0.5">A-: 82-87</span>
+            <span className="bg-[#FFE600] border border-black px-1 py-0.5">B+: 75-81</span>
+            <span className="bg-[#FFE600]/60 border border-black px-1 py-0.5">B: 68-74</span>
+            <span className="bg-[#FF70A6]/60 border border-black px-1 py-0.5">C: &lt;68</span>
+          </div>
+          <p className="text-slate-700 font-bold leading-snug">
+            Computed from Skill-Market Fit (30%), Goal Alignment (25%), Profile Completeness (20%), GitHub Evidence (15%), and Recent Activity (10%).
+          </p>
+        </div>
+      )}
 
       {/* Sub-dimensions in Neo-Brutalist Tiles */}
       <div className="w-full mt-5 space-y-2 pt-3 border-t-2 border-black font-mono">
@@ -89,7 +132,7 @@ export default function CareerHealthDial({ score = 84.5, grade = 'A-', dimension
             key={idx}
             className="flex items-center justify-between p-2 bg-white border border-black text-xs shadow-[2px_2px_0px_0px_#000]"
           >
-            <span className="font-bold text-black truncate max-w-[150px]">{dim.dimension}</span>
+            <span className="font-bold text-black truncate max-w-[150px]">{dim.dimension || dim.name}</span>
             <div className="flex items-center space-x-2">
               <span className="font-black text-black bg-[#FAF5E6] border border-black px-1.5 py-0.2">
                 {dim.score}%

@@ -48,7 +48,23 @@ export default function DashboardPage() {
 
   const isFreshProfile = !user?.isDemoSession && skillsCount === 0 && !profile?.target_role;
   const healthScore = isFreshProfile ? 0 : (profile?.career_health_score || telemetry?.healthScore || 0);
-  const healthGrade = isFreshProfile ? 'N/A' : (telemetry?.healthGrade || 'B+');
+  const healthGrade = isFreshProfile
+    ? 'N/A'
+    : healthScore >= 93
+    ? 'A+'
+    : healthScore >= 88
+    ? 'A'
+    : healthScore >= 82
+    ? 'A-'
+    : healthScore >= 75
+    ? 'B+'
+    : healthScore >= 68
+    ? 'B'
+    : healthScore >= 55
+    ? 'C+'
+    : healthScore > 0
+    ? 'C'
+    : 'N/A';
   const dimensions = isFreshProfile
     ? [
         { name: 'Skill Alignment', score: 0, status: 'Pending' },
