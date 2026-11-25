@@ -51,7 +51,8 @@ export default function ProfilePage() {
       leetcode: ''
     },
     github_data: null,
-    leetcode_data: null
+    leetcode_data: null,
+    dismissed_skills: []
   });
 
   const [newSkill, setNewSkill] = useState({
@@ -101,7 +102,8 @@ export default function ProfilePage() {
           leetcode: profile.linked_accounts?.leetcode || ''
         },
         github_data: profile.github_data || null,
-        leetcode_data: profile.leetcode_data || null
+        leetcode_data: profile.leetcode_data || null,
+        dismissed_skills: profile.dismissed_skills || []
       });
     }
   }, [profile, user]);
@@ -119,76 +121,100 @@ export default function ProfilePage() {
     }));
   };
 
-  // Skill management
-  const addSkill = () => {
+  // Skill management (persists immediately & respects dismissed skills)
+  const addSkill = async () => {
     if (!newSkill.name.trim()) return;
-    setFormData((prev) => ({
-      ...prev,
-      skills: [...prev.skills, { ...newSkill }]
-    }));
+    const trimmedName = newSkill.name.trim();
+    const updatedSkills = [...formData.skills, { ...newSkill, name: trimmedName }];
+    const updatedDismissed = (formData.dismissed_skills || []).filter(
+      (d) => d.toLowerCase() !== trimmedName.toLowerCase()
+    );
+    const updatedForm = {
+      ...formData,
+      skills: updatedSkills,
+      dismissed_skills: updatedDismissed
+    };
+    setFormData(updatedForm);
     setNewSkill({
       name: '',
       level: 'intermediate',
       category: 'Languages',
       verified: false
     });
+    await updateProfile(updatedForm);
   };
 
-  const removeSkill = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      skills: prev.skills.filter((_, i) => i !== index)
-    }));
+  const removeSkill = async (index) => {
+    const removed = formData.skills[index];
+    const updatedSkills = formData.skills.filter((_, i) => i !== index);
+    const dismissed = new Set((formData.dismissed_skills || []).map((d) => d.toLowerCase()));
+    if (removed?.name) {
+      dismissed.add(removed.name.toLowerCase());
+    }
+    const updatedForm = {
+      ...formData,
+      skills: updatedSkills,
+      dismissed_skills: Array.from(dismissed)
+    };
+    setFormData(updatedForm);
+    await updateProfile(updatedForm);
   };
 
   // Goal management
-  const addGoal = () => {
+  const addGoal = async () => {
     if (!newGoal.trim()) return;
-    setFormData((prev) => ({
-      ...prev,
-      goals: [...prev.goals, newGoal.trim()]
-    }));
+    const updatedForm = {
+      ...formData,
+      goals: [...formData.goals, newGoal.trim()]
+    };
+    setFormData(updatedForm);
     setNewGoal('');
+    await updateProfile(updatedForm);
   };
 
-  const removeGoal = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      goals: prev.goals.filter((_, i) => i !== index)
-    }));
+  const removeGoal = async (index) => {
+    const updatedForm = {
+      ...formData,
+      goals: formData.goals.filter((_, i) => i !== index)
+    };
+    setFormData(updatedForm);
+    await updateProfile(updatedForm);
   };
 
   // Project management
-  const addProject = () => {
+  const addProject = async () => {
     if (!newProject.title.trim()) return;
     const techs = newProject.technologies
       ? newProject.technologies.split(',').map((t) => t.trim()).filter(Boolean)
       : [];
 
-    setFormData((prev) => ({
-      ...prev,
+    const updatedForm = {
+      ...formData,
       projects: [
-        ...prev.projects,
+        ...formData.projects,
         {
           ...newProject,
           technologies: techs
         }
       ]
-    }));
-
+    };
+    setFormData(updatedForm);
     setNewProject({
       title: '',
       description: '',
       repo_url: '',
       technologies: ''
     });
+    await updateProfile(updatedForm);
   };
 
-  const removeProject = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      projects: prev.projects.filter((_, i) => i !== index)
-    }));
+  const removeProject = async (index) => {
+    const updatedForm = {
+      ...formData,
+      projects: formData.projects.filter((_, i) => i !== index)
+    };
+    setFormData(updatedForm);
+    await updateProfile(updatedForm);
   };
 
   // Production Resume Upload & Skill Extraction
@@ -202,13 +228,14 @@ export default function ProfilePage() {
       const parsed = await integrationService.parseResume(file);
       const extractedSkills = parsed.skills || [];
 
+      const dismissedSet = new Set((formData.dismissed_skills || []).map((d) => d.toLowerCase()));
       const existingMap = new Map(
         (formData.skills || []).map((s) => [s.name.toLowerCase(), s])
       );
       let addedCount = 0;
       for (const sk of extractedSkills) {
         const key = sk.name.toLowerCase();
-        if (!existingMap.has(key)) {
+        if (!existingMap.has(key) && !dismissedSet.has(key)) {
           existingMap.set(key, sk);
           addedCount += 1;
         }
@@ -254,13 +281,14 @@ export default function ProfilePage() {
         (c) => c.name && !existingCertNames.has(c.name.toLowerCase())
       );
 
+      const dismissedSet = new Set((formData.dismissed_skills || []).map((d) => d.toLowerCase()));
       const existingSkillMap = new Map(
         (formData.skills || []).map((s) => [s.name.toLowerCase(), s])
       );
       let addedSkills = 0;
       for (const sk of extractedSkills) {
         const key = sk.name.toLowerCase();
-        if (!existingSkillMap.has(key)) {
+        if (!existingSkillMap.has(key) && !dismissedSet.has(key)) {
           existingSkillMap.set(key, sk);
           addedSkills += 1;
         }
@@ -307,11 +335,13 @@ export default function ProfilePage() {
 
     try {
       const data = await integrationService.fetchGithubProfile(username);
+      const dismissedSet = new Set((formData.dismissed_skills || []).map((d) => d.toLowerCase()));
       const existingMap = new Map(
         (formData.skills || []).map((s) => [s.name.toLowerCase(), s])
       );
       for (const sk of data.detected_skills || []) {
         const key = sk.name.toLowerCase();
+        if (dismissedSet.has(key)) continue;
         const prev = existingMap.get(key);
         existingMap.set(key, {
           ...(prev || sk),

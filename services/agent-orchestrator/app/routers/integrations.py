@@ -435,7 +435,8 @@ async def fetch_github_profile(username: str) -> Dict[str, Any]:
         lang = r.get("language")
         stars = r.get("stargazers_count", 0)
         total_stars += stars
-        if lang:
+        # Only verify languages from non-forked repositories and exclude non-language markers
+        if lang and not r.get("fork") and lang not in ("Jupyter Notebook", "HTML", "CSS", "Makefile"):
             language_counts[lang] = language_counts.get(lang, 0) + 1
         repositories.append(
             {
