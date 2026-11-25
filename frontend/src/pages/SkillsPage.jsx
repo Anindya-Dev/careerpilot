@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../context/ProfileContext';
 import { useSkillIntelligence } from '../hooks';
-import { buildLiveRadarData } from '../utils/skillBenchmark';
+import { useLiveSkillBenchmark } from '../hooks/useLiveSkillBenchmark';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Card from '../components/Card';
@@ -40,6 +40,11 @@ export default function SkillsPage() {
   const skills = profile?.skills || [];
   const projects = profile?.projects || [];
   const targetRole = profile?.target_role || 'Target Role Unassigned';
+  const { radarData: liveRadarData, isResearching } = useLiveSkillBenchmark(
+    skills,
+    targetRole,
+    Boolean(user?.isDemoSession)
+  );
 
   const categories = ['ALL', 'Frontend', 'Backend', 'Database', 'Cloud & DevOps', 'AI & ML'];
 
@@ -277,14 +282,19 @@ export default function SkillsPage() {
                 headerBg="bg-[#C4A1FF]"
                 bodyClassName="p-6"
               >
-                <SkillRadarChart
-                  data={
-                    user?.isDemoSession
-                      ? skillIntel?.radarData
-                      : buildLiveRadarData(skills, targetRole)
-                  }
-                  targetRole={targetRole}
-                />
+                {isResearching ? (
+                  <div className="h-[250px] w-full bg-[#FAF5E6] border-2 border-black p-6 shadow-[3px_3px_0px_0px_#000] font-mono flex flex-col items-center justify-center text-center space-y-2">
+                    <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    <p className="text-xs font-black uppercase text-black">
+                      RESEARCHING MARKET DEMAND FOR {targetRole}...
+                    </p>
+                  </div>
+                ) : (
+                  <SkillRadarChart
+                    data={user?.isDemoSession ? skillIntel?.radarData : liveRadarData}
+                    targetRole={targetRole}
+                  />
+                )}
               </Card>
 
               {/* Action Insights Card */}

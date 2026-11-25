@@ -60,6 +60,19 @@ export const integrationService = {
       timeout: 15000
     });
     return res.data;
+  },
+
+  /**
+   * Dynamically research market skill requirements for the student's target role
+   * via live Job Board MCP + Groq LLM and benchmark their actual skills.
+   */
+  async benchmarkSkills(targetRole, skills) {
+    const res = await orchestratorClient.post(
+      getEndpoint('/skills/benchmark'),
+      { target_role: targetRole || 'Software Engineer', skills: skills || [] },
+      { timeout: 25000 }
+    );
+    return res.data;
   }
 };
 

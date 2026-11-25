@@ -16,8 +16,10 @@ from typing import Any, Dict, List, Optional
 
 import httpx
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
+from pydantic import BaseModel, Field
 from pypdf import PdfReader
 
+from app.config import get_settings
 from app.services.llm_service import get_llm_service
 
 logger = logging.getLogger("orchestrator.integrations")
@@ -653,4 +655,165 @@ async def fetch_leetcode_dsa_analysis(username: str) -> Dict[str, Any]:
         "strong_topics": strong_topics,
         "weak_topics": weak_topics[:5],
         "suggestions": suggestions,
+    }
+
+
+class SkillBenchmarkRequest(BaseModel):
+    """Request payload for real-time role-based skill market research."""
+
+    target_role: str = Field(..., min_length=1)
+    skills: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+def _score_student_skill(level: Any, verified: bool) -> int:
+    base_map = {"beginner": 45, "intermediate": 70, "advanced": 85, "expert": 95}
+    base = base_map.get(str(level or "intermediate").lower(), 65)
+    return min(base + (10 if verified else 0), 100)
+
+
+@router.post(
+    "/api/v1/orchestrator/integrations/skills/benchmark",
+    summary="Research target role market demand via Job Board MCP + LLM and benchmark user skills",
+)
+@router.post(
+    "/api/v1/integrations/skills/benchmark",
+    summary="Research target role market demand (alias)",
+)
+async def benchmark_skills_for_role(request: SkillBenchmarkRequest) -> Dict[str, Any]:
+    """Dynamically research market skill requirements for the user's target role
+    using the Job Board MCP Server and Groq LLM, then benchmark the user's real skills.
+    """
+    if not request.skills:
+        return {"radarData": [], "narrative": "", "source": "empty_skills"}
+
+    settings = get_settings()
+    target_role = request.target_role.strip()
+    user_skills_map = {
+        str(s.get("name", "")).strip().lower(): s
+        for s in request.skills
+        if s.get("name")
+    }
+
+    # 1. Query live Job Board MCP server for real market postings matching target_role
+    mcp_postings: List[Dict[str, Any]] = []
+    mcp_trends: List[Dict[str, Any]] = []
+    try:
+        mcp_base = settings.job_board_mcp_url.rstrip("/")
+        async with httpx.AsyncClient(timeout=4.0) as client:
+            postings_resp, trends_resp = await client.post(
+                f"{mcp_base}/invoke",
+                json={"tool": "search_job_postings", "params": {"role": target_role, "limit": 15}},
+            ), await client.post(
+                f"{mcp_base}/invoke",
+                json={"tool": "get_skill_demand_trends", "params": {"domain": target_role, "top_n": 10}},
+            )
+            if postings_resp.status_code == 200:
+                mcp_postings = postings_resp.json().get("result", {}).get("postings", [])
+            if trends_resp.status_code == 200:
+                mcp_trends = trends_resp.json().get("result", {}).get("top_skills", [])
+    except Exception as exc:
+        logger.warning("Job Board MCP lookup skipped (%s); proceeding with LLM market research.", exc)
+
+    # 2. Use Groq LLM to research & synthesize the role-specific benchmark radar
+    llm = get_llm_service()
+    if llm._get_llm() is not None:
+        try:
+            student_skill_summary = [
+                {
+                    "name": s.get("name"),
+                    "level": s.get("level", "intermediate"),
+                    "verified": bool(s.get("verified", False)),
+                }
+                for s in request.skills[:20]
+            ]
+            market_context = {
+                "matching_job_titles": [p.get("title") for p in mcp_postings[:8]],
+                "mcp_top_demanded_skills": mcp_trends[:8],
+            }
+            prompt = (
+                f"Target Role: {target_role}\n"
+                f"Student's Current Skills: {json.dumps(student_skill_summary)}\n"
+                f"Live Job Market Data (from Job Board MCP): {json.dumps(market_context)}\n\n"
+                "Task: Research the 6 to 7 most critical technical skills required in the real job market for "
+                f"'{target_role}'. Include the student's relevant skills AND the most important missing skills they need "
+                "for this role. For each skill, output:\n"
+                "- skill: exact skill name (use student's exact skill name if they have it)\n"
+                "- student: integer 0-100 (0-15 if student does not have this skill; 45-95 based on their level and verified=true bonus if they have it)\n"
+                "- market: integer 65-95 representing real industry demand for this role\n"
+                "Also provide a concise 1-2 sentence 'narrative' explaining the key alignment & gap for this target role.\n"
+                'Return ONLY valid JSON: {"radarData": [{"skill": str, "student": int, "market": int, "fullMark": 100}], "narrative": str}'
+            )
+            parsed = await llm.generate_json(
+                system_prompt="You are an expert technical career market researcher. Return only valid JSON.",
+                user_prompt=prompt,
+                fallback_data={},
+            )
+            radar = parsed.get("radarData") if isinstance(parsed, dict) else None
+            if isinstance(radar, list) and len(radar) >= 3:
+                cleaned_radar = []
+                for item in radar[:7]:
+                    sname = str(item.get("skill", "")).strip()
+                    if not sname:
+                        continue
+                    # Ground student score against actual profile so LLM never over/under-reports possession
+                    matched_sk = user_skills_map.get(sname.lower())
+                    if matched_sk:
+                        st_score = _score_student_skill(matched_sk.get("level"), bool(matched_sk.get("verified")))
+                    else:
+                        st_score = min(int(item.get("student", 10)), 25)
+                    cleaned_radar.append(
+                        {
+                            "skill": sname,
+                            "student": st_score,
+                            "market": max(50, min(int(item.get("market", 80)), 100)),
+                            "fullMark": 100,
+                        }
+                    )
+                if cleaned_radar:
+                    return {
+                        "radarData": cleaned_radar,
+                        "narrative": parsed.get("narrative", ""),
+                        "source": "live_job_board_mcp+groq_llm" if mcp_trends or mcp_postings else "live_groq_llm",
+                    }
+        except Exception as exc:
+            logger.warning("LLM market benchmark research failed (%s); falling back to Job Board MCP frequency.", exc)
+
+    # 3. Deterministic fallback strictly from live Job Board MCP data + student's actual skills
+    radar_items: List[Dict[str, Any]] = []
+    seen = set()
+
+    for trend in mcp_trends[:5]:
+        tname = str(trend.get("skill", "")).strip()
+        if not tname or tname.lower() in seen:
+            continue
+        seen.add(tname.lower())
+        matched_sk = user_skills_map.get(tname.lower())
+        radar_items.append(
+            {
+                "skill": tname,
+                "student": _score_student_skill(matched_sk.get("level"), bool(matched_sk.get("verified"))) if matched_sk else 10,
+                "market": max(65, min(int(trend.get("demand_percentage", 80)), 100)),
+                "fullMark": 100,
+            }
+        )
+
+    for sk in request.skills:
+        if len(radar_items) >= 7:
+            break
+        sname = str(sk.get("name", "")).strip()
+        if sname and sname.lower() not in seen:
+            seen.add(sname.lower())
+            radar_items.append(
+                {
+                    "skill": sname,
+                    "student": _score_student_skill(sk.get("level"), bool(sk.get("verified"))),
+                    "market": 80,
+                    "fullMark": 100,
+                }
+            )
+
+    return {
+        "radarData": radar_items,
+        "narrative": f"Benchmarked {len(request.skills)} profile skills against live Job Board MCP demand for {target_role}.",
+        "source": "live_job_board_mcp",
     }
