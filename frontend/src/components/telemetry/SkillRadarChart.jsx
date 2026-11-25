@@ -47,47 +47,75 @@ export default function SkillRadarChart({ data, targetRole = 'Full-Stack Develop
   const criticalGaps = chartData.filter((item) => item.market - item.student >= 25);
 
   return (
-    <div className="flex flex-col h-full justify-between font-mono">
-      <div className="h-[250px] w-full bg-[#FAF5E6] border-2 border-black p-2 shadow-[3px_3px_0px_0px_#000]">
-        <ResponsiveContainer width="100%" height="100%">
-          <RadarChart data={chartData}>
-            <PolarGrid stroke="#000000" strokeDasharray="3 3" />
-            <PolarAngleAxis
-              dataKey="skill"
-              tick={{ fill: '#000000', fontSize: 11, fontWeight: 700 }}
-            />
-            <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#000000" fontSize={9} />
-            <Radar
-              name="Student Proficiency"
-              dataKey="student"
-              stroke="#000000"
-              fill="#FFE600"
-              fillOpacity={0.6}
-              strokeWidth={2}
-            />
-            <Radar
-              name="Market Benchmark"
-              dataKey="market"
-              stroke="#000000"
-              fill="#70E000"
-              fillOpacity={0.4}
-              strokeWidth={2}
-            />
-            <Legend
-              iconType="square"
-              wrapperStyle={{ fontSize: '11px', paddingTop: '6px', fontWeight: 700 }}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#ffffff',
-                border: '2px solid #000000',
-                boxShadow: '3px 3px 0px 0px #000000',
-                fontSize: '12px',
-                fontWeight: 700
-              }}
-            />
-          </RadarChart>
-        </ResponsiveContainer>
+    <div className="flex flex-col h-full justify-between font-mono space-y-3">
+      <div className="w-full bg-[#FAF5E6] border-2 border-black p-3 shadow-[3px_3px_0px_0px_#000]">
+        {/* Custom High-Contrast Legend */}
+        <div className="flex flex-wrap items-center justify-center gap-4 pb-2 text-[11px] font-black uppercase">
+          <div className="flex items-center gap-1.5">
+            <span className="w-3.5 h-3.5 inline-block bg-[#38B6FF] border-2 border-black shadow-[1px_1px_0px_0px_#000]" />
+            <span>Market Benchmark</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-3.5 h-3.5 inline-block bg-[#70E000] border-2 border-black shadow-[1px_1px_0px_0px_#000]" />
+            <span>Your Proficiency</span>
+          </div>
+        </div>
+
+        <div className="h-[225px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <RadarChart data={chartData}>
+              <PolarGrid stroke="#94A3B8" strokeDasharray="3 3" />
+              <PolarAngleAxis
+                dataKey="skill"
+                tick={{ fill: '#000000', fontSize: 11, fontWeight: 800 }}
+              />
+              <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#475569" fontSize={9} />
+              <Radar
+                name="Market Benchmark"
+                dataKey="market"
+                stroke="#2563EB"
+                fill="#38B6FF"
+                fillOpacity={0.22}
+                strokeWidth={2}
+                strokeDasharray="4 3"
+              />
+              <Radar
+                name="Your Proficiency"
+                dataKey="student"
+                stroke="#15803D"
+                fill="#70E000"
+                fillOpacity={0.55}
+                strokeWidth={2.5}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#ffffff',
+                  border: '2px solid #000000',
+                  boxShadow: '3px 3px 0px 0px #000000',
+                  fontSize: '12px',
+                  fontWeight: 700
+                }}
+              />
+            </RadarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* At-a-glance Skill vs Market Pills */}
+        <div className="mt-2 pt-2 border-t border-black/20 flex flex-wrap gap-1.5 justify-center">
+          {chartData.map((item, idx) => {
+            const isGap = item.market - item.student >= 25;
+            return (
+              <span
+                key={idx}
+                className={`px-2 py-0.5 border border-black text-[10px] font-bold ${
+                  isGap ? 'bg-[#FF70A6]/30 text-black' : 'bg-[#70E000]/30 text-black'
+                }`}
+              >
+                {item.skill}: <span className="font-black">{item.student}</span>/{item.market}
+              </span>
+            );
+          })}
+        </div>
       </div>
 
       {criticalGaps.length > 0 ? (
