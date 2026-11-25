@@ -66,7 +66,9 @@ function ClerkActiveAuthProvider({ children, state, dispatch }) {
 
   // Sync logged-in Clerk user on mount / session change
   useEffect(() => {
-    if (isUserLoaded && isSignedIn && clerkUser) {
+    if (!isUserLoaded) return;
+
+    if (isSignedIn && clerkUser) {
       const email = clerkUser.primaryEmailAddress?.emailAddress || 'student@careerpilot.io';
       const name = clerkUser.fullName || clerkUser.firstName || email.split('@')[0];
       const syncedUser = {
@@ -85,6 +87,15 @@ function ClerkActiveAuthProvider({ children, state, dispatch }) {
         type: 'AUTH_SUCCESS',
         payload: { user: syncedUser, token }
       });
+    } else {
+      // Clerk finished loading and no active Clerk session exists;
+      // Only log out if not currently in Demo Sandbox mode
+      const storedToken = localStorage.getItem('token');
+      if (storedToken !== 'demo-jwt-preview-token') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('clerk_user');
+        dispatch({ type: 'AUTH_LOGOUT' });
+      }
     }
   }, [isUserLoaded, isSignedIn, clerkUser, dispatch]);
 
@@ -402,7 +413,12 @@ export function AuthProvider({ children }) {
     const initAuth = async () => {
       const storedToken = localStorage.getItem('token');
       if (!storedToken) {
-        return dispatch({ type: 'AUTH_LOGOUT' });
+        // When Clerk is configured, wait for ClerkActiveAuthProvider's isUserLoaded check
+        // instead of prematurely dispatching AUTH_LOGOUT before OAuth hydration completes
+        if (!isClerkConfigured) {
+          dispatch({ type: 'AUTH_LOGOUT' });
+        }
+        return;
       }
 
       if (storedToken.startsWith('clerk-jwt-')) {

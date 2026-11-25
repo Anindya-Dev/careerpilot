@@ -5,7 +5,7 @@
  * @author Md Hussain Ansari (Member 1)
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Alert from '../components/Alert';
@@ -13,8 +13,15 @@ import SocialAuthButtons from '../components/SocialAuthButtons';
 import { Compass, UserPlus, Shield, Terminal } from 'lucide-react';
 
 export default function RegisterPage() {
-  const { register, verifyEmailCode, enterDemoMode } = useAuth();
+  const { user, register, verifyEmailCode, enterDemoMode } = useAuth();
   const navigate = useNavigate();
+
+  // Auto-redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
