@@ -12,6 +12,15 @@ import { useAuth } from './AuthContext';
 
 const ProfileContext = createContext(null);
 
+function safeJsonParse(raw, fallback = null) {
+  if (!raw || raw === 'undefined' || raw === 'null') return fallback;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+}
+
 function computeCompleteness(p) {
   let score = 15; // Base identity (name, email, major)
   if (p.target_role && p.target_role.trim() !== '') score += 15;
@@ -34,7 +43,7 @@ export function ProfileProvider({ children }) {
 
     // 1. Explicit Demo Sandbox mode: load sample evaluation data
     if (user.isDemoSession) {
-      const demoProfile = JSON.parse(localStorage.getItem('demo_profile') || 'null') || {
+      const demoProfile = safeJsonParse(localStorage.getItem('demo_profile'), null) || {
         userId: 'demo-student-id-001',
         name: user.name || 'Sample Student (Demo Sandbox)',
         email: user.email || 'demo@careerpilot.io',
@@ -91,7 +100,7 @@ export function ProfileProvider({ children }) {
       setError(null);
     } catch (err) {
       // Profile service offline: load user's own saved profile or a clean empty slate (NO fake data)
-      const savedUserProfile = JSON.parse(localStorage.getItem(storageKey) || 'null');
+      const savedUserProfile = safeJsonParse(localStorage.getItem(storageKey), null);
       if (savedUserProfile) {
         setProfile(savedUserProfile);
       } else {

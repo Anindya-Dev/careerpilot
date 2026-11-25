@@ -20,6 +20,15 @@ const initialState = {
   error: null
 };
 
+function safeJsonParse(raw, fallback = null) {
+  if (!raw || raw === 'undefined' || raw === 'null') return fallback;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+}
+
 function authReducer(state, action) {
   switch (action.type) {
     case 'AUTH_SUCCESS':
@@ -422,7 +431,7 @@ export function AuthProvider({ children }) {
       }
 
       if (storedToken.startsWith('clerk-jwt-')) {
-        const savedClerkUser = JSON.parse(localStorage.getItem('clerk_user') || 'null');
+        const savedClerkUser = safeJsonParse(localStorage.getItem('clerk_user'), null);
         if (savedClerkUser) {
           return dispatch({
             type: 'AUTH_SUCCESS',
@@ -432,7 +441,7 @@ export function AuthProvider({ children }) {
       }
 
       if (storedToken === 'demo-jwt-preview-token') {
-        const saved = JSON.parse(localStorage.getItem('demo_user') || 'null') || {
+        const saved = safeJsonParse(localStorage.getItem('demo_user'), null) || {
           userId: 'demo-student-id-001',
           name: 'Sample Student (Demo Sandbox)',
           email: 'demo@careerpilot.io',
