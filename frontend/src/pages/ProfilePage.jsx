@@ -16,6 +16,7 @@ import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import Alert from '../components/Alert';
+import VerificationBadge from '../components/VerificationBadge';
 import {
   Save,
   Plus,
@@ -741,9 +742,7 @@ export default function ProfilePage() {
                           </span>
                           <span className="text-[11px] font-mono text-slate-700">({skill.category})</span>
                           {skill.verified && (
-                            <span className="inline-flex items-center text-[10px] font-mono font-bold border border-black bg-[#70E000] text-black px-1.5 py-0.2">
-                              <CheckCircle className="w-3 h-3 mr-1 stroke-[2.5]" /> AUDITED
-                            </span>
+                            <VerificationBadge skill={skill} verifiedLabel="AUDITED" />
                           )}
                         </div>
                         <button

@@ -15,6 +15,7 @@ import { useLiveSkillBenchmark } from '../hooks/useLiveSkillBenchmark';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Card from '../components/Card';
+import VerificationBadge from '../components/VerificationBadge';
 import { SkillRadarChart } from '../components/telemetry';
 import {
   Target,
@@ -209,15 +210,7 @@ export default function SkillsPage() {
                               </span>
                             </td>
                             <td className="py-3 px-3 text-right">
-                              {skill.verified ? (
-                                <span className="inline-flex items-center border border-black bg-[#70E000] text-black text-[10px] font-bold px-2 py-0.5 shadow-[1px_1px_0px_0px_#000]">
-                                  <CheckCircle2 className="w-3 h-3 mr-1 stroke-[2.5]" /> VERIFIED
-                                </span>
-                              ) : (
-                                <span className="border border-black bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-0.5">
-                                  UNAUDITED
-                                </span>
-                              )}
+                              <VerificationBadge skill={skill} verifiedLabel="VERIFIED" />
                             </td>
                           </tr>
                         ))}
