@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Alert from './Alert';
 import SocialAuthButtons from './SocialAuthButtons';
-import { Compass, X, ArrowRight, UserPlus, Shield } from 'lucide-react';
+import { Compass, X, ArrowRight, UserPlus, Shield, Eye, EyeOff } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
   const { user, login, register, verifyEmailCode, enterDemoMode } = useAuth();
@@ -49,6 +49,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -259,14 +261,24 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                   <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1.5">
                     Password
                   </label>
-                  <input
-                    type="password"
-                    placeholder="••••••••"
-                    value={loginData.password}
-                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                    className="w-full px-3 py-2 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-[#FFFDF0]"
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={loginData.password}
+                      onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                      className="w-full px-3 py-2 pr-9 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-[#FFFDF0]"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-black focus:outline-none cursor-pointer"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4 stroke-[2.5]" /> : <Eye className="w-4 h-4 stroke-[2.5]" />}
+                    </button>
+                  </div>
                   {errors.password && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.password}</p>}
                 </div>
 
@@ -395,14 +407,24 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                   <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">
                     Password (Min 8 Chars)
                   </label>
-                  <input
-                    type="password"
-                    placeholder="••••••••"
-                    value={regData.password}
-                    onChange={(e) => setRegData({ ...regData, password: e.target.value })}
-                    className="w-full px-3 py-2 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-[#FFFDF0]"
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={regData.password}
+                      onChange={(e) => setRegData({ ...regData, password: e.target.value })}
+                      className="w-full px-3 py-2 pr-9 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-[#FFFDF0]"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-black focus:outline-none cursor-pointer"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4 stroke-[2.5]" /> : <Eye className="w-4 h-4 stroke-[2.5]" />}
+                    </button>
+                  </div>
                   {errors.password && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.password}</p>}
                 </div>
 
@@ -410,14 +432,24 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                   <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1">
                     Confirm Password
                   </label>
-                  <input
-                    type="password"
-                    placeholder="••••••••"
-                    value={regData.confirmPassword}
-                    onChange={(e) => setRegData({ ...regData, confirmPassword: e.target.value })}
-                    className="w-full px-3 py-2 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-[#FFFDF0]"
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={regData.confirmPassword}
+                      onChange={(e) => setRegData({ ...regData, confirmPassword: e.target.value })}
+                      className="w-full px-3 py-2 pr-9 text-xs font-mono bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-[#FFFDF0]"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-black focus:outline-none cursor-pointer"
+                      aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4 stroke-[2.5]" /> : <Eye className="w-4 h-4 stroke-[2.5]" />}
+                    </button>
+                  </div>
                   {errors.confirmPassword && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.confirmPassword}</p>}
                 </div>
 

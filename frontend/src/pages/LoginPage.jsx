@@ -10,7 +10,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Alert from '../components/Alert';
 import SocialAuthButtons from '../components/SocialAuthButtons';
-import { Compass, ArrowRight, Shield, Terminal } from 'lucide-react';
+import { Compass, ArrowRight, Shield, Terminal, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const { user, login, enterDemoMode } = useAuth();
@@ -30,6 +30,7 @@ export default function LoginPage() {
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const validate = () => {
     const errs = {};
@@ -125,18 +126,28 @@ export default function LoginPage() {
               <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black mb-1.5">
                 Password
               </label>
-              <input
-                type="password"
-                autoComplete="current-password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  if (errors.password) setErrors({ ...errors, password: '' });
-                }}
-                className="w-full px-3 py-2 text-xs font-mono bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-white"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (errors.password) setErrors({ ...errors, password: '' });
+                  }}
+                  className="w-full px-3 py-2 pr-9 text-xs font-mono bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] text-black placeholder-slate-400 focus:outline-none focus:bg-white"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-black focus:outline-none cursor-pointer"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4 stroke-[2.5]" /> : <Eye className="w-4 h-4 stroke-[2.5]" />}
+                </button>
+              </div>
               {errors.password && <p className="mt-1 text-[11px] font-mono font-bold text-[#FF5757]">{errors.password}</p>}
             </div>
 
