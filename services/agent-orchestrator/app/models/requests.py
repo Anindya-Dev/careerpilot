@@ -8,7 +8,7 @@ that does not match — so invalid input never reaches our orchestration logic.
 from enum import Enum
 from typing import Any, Dict
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class AgentName(str, Enum):
@@ -43,6 +43,14 @@ class InvokeRequest(BaseModel):
         default_factory=dict,
         description="Dynamic agent parameters",
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def handle_agent_aliases(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            if "agent" not in data and "agent_name" in data:
+                data["agent"] = data["agent_name"]
+        return data
 
     model_config = {
         "json_schema_extra": {

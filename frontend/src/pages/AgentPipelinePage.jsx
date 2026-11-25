@@ -119,7 +119,15 @@ export default function AgentPipelinePage() {
 
     try {
       const studentId = user?.id || user?.userId || 'eval-std-001';
-      const invokeRes = await orchestratorClient.post('/orchestrator/invoke', {
+      const invokePath = orchestratorClient.defaults.baseURL?.endsWith('/orchestrator')
+        ? '/invoke'
+        : '/orchestrator/invoke';
+      const jobsPath = orchestratorClient.defaults.baseURL?.endsWith('/orchestrator')
+        ? '/jobs'
+        : '/orchestrator/jobs';
+
+      const invokeRes = await orchestratorClient.post(invokePath, {
+        agent: 'career_health',
         agent_name: 'career_health',
         user_id: studentId,
         params: { student_id: studentId, trigger: 'frontend_pipeline_dag' },
@@ -131,7 +139,7 @@ export default function AgentPipelinePage() {
         const poller = setInterval(async () => {
           attempts += 1;
           try {
-            const statusRes = await orchestratorClient.get(`/orchestrator/jobs/${jobId}`);
+            const statusRes = await orchestratorClient.get(`${jobsPath}/${jobId}`);
             if (statusRes.data?.status === 'completed' || attempts >= 8) {
               clearInterval(poller);
               setIsRunning(false);
