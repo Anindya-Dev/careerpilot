@@ -82,8 +82,28 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="flex-1 min-w-0 p-5 sm:p-7 lg:p-8"
+          className="flex-1 min-w-0 p-5 sm:p-7 lg:p-8 space-y-6"
         >
+          {isFreshProfile && (
+            <div className="border-2 border-black bg-[#FFE600] shadow-[4px_4px_0px_0px_#000] p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="font-mono">
+                <div className="text-xs font-black uppercase text-black">
+                  WELCOME TO CAREERPILOT — INITIALIZE YOUR REAL PROFILE
+                </div>
+                <p className="text-xs font-bold text-black/80 mt-1">
+                  Upload your resume to auto-extract skills, connect your GitHub to audit repositories, and link LeetCode for DSA diagnostics.
+                </p>
+              </div>
+              <Link
+                to="/profile"
+                className="inline-flex items-center justify-center px-4 py-2.5 border-2 border-black bg-[#70E000] hover:bg-[#85FF0A] text-black font-mono text-xs font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 transition-all shrink-0"
+              >
+                <span>Setup Resume, GitHub & LeetCode</span>
+                <ArrowRight className="w-4 h-4 ml-1.5 stroke-[2.5]" />
+              </Link>
+            </div>
+          )}
+
           {/* 2 Independent Column Stacks: Prevents CSS Grid Row-Height Stretching */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
             

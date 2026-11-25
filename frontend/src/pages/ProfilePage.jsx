@@ -9,6 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../context/ProfileContext';
+import integrationService from '../services/integrationService';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Card from '../components/Card';
@@ -22,7 +23,14 @@ import {
   CheckCircle,
   Github,
   Linkedin,
-  Terminal
+  Terminal,
+  Upload,
+  FileText,
+  Code2,
+  Star,
+  ExternalLink,
+  RefreshCw,
+  Sparkles
 } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -39,8 +47,11 @@ export default function ProfilePage() {
     certifications: [],
     linked_accounts: {
       github: '',
-      linkedin: ''
-    }
+      linkedin: '',
+      leetcode: ''
+    },
+    github_data: null,
+    leetcode_data: null
   });
 
   const [newSkill, setNewSkill] = useState({
@@ -60,6 +71,9 @@ export default function ProfilePage() {
 
   const [notification, setNotification] = useState({ type: '', message: '' });
   const [isSaving, setIsSaving] = useState(false);
+  const [isParsingResume, setIsParsingResume] = useState(false);
+  const [isFetchingGithub, setIsFetchingGithub] = useState(false);
+  const [isFetchingLeetcode, setIsFetchingLeetcode] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -73,8 +87,11 @@ export default function ProfilePage() {
         certifications: profile.certifications || [],
         linked_accounts: {
           github: profile.linked_accounts?.github || '',
-          linkedin: profile.linked_accounts?.linkedin || ''
-        }
+          linkedin: profile.linked_accounts?.linkedin || '',
+          leetcode: profile.linked_accounts?.leetcode || ''
+        },
+        github_data: profile.github_data || null,
+        leetcode_data: profile.leetcode_data || null
       });
     }
   }, [profile, user]);
@@ -164,6 +181,157 @@ export default function ProfilePage() {
     }));
   };
 
+  // Production Resume Upload & Skill Extraction
+  const handleResumeUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsParsingResume(true);
+    setNotification({ type: '', message: '' });
+
+    try {
+      const parsed = await integrationService.parseResume(file);
+      const extractedSkills = parsed.skills || [];
+
+      const existingMap = new Map(
+        (formData.skills || []).map((s) => [s.name.toLowerCase(), s])
+      );
+      let addedCount = 0;
+      for (const sk of extractedSkills) {
+        const key = sk.name.toLowerCase();
+        if (!existingMap.has(key)) {
+          existingMap.set(key, sk);
+          addedCount += 1;
+        }
+      }
+
+      const updatedForm = {
+        ...formData,
+        skills: Array.from(existingMap.values()),
+        target_role: formData.target_role || parsed.suggested_target_role || ''
+      };
+      setFormData(updatedForm);
+      await updateProfile(updatedForm);
+
+      setNotification({
+        type: 'success',
+        message: `Parsed "${file.name}": extracted ${extractedSkills.length} skills (${addedCount} new added to Skills & Competencies).`
+      });
+    } catch (err) {
+      const detail = err.response?.data?.detail || err.message || 'Failed to parse resume.';
+      setNotification({ type: 'error', message: detail });
+    } finally {
+      setIsParsingResume(false);
+      e.target.value = '';
+    }
+  };
+
+  // Production Live GitHub Connection & Repo Ingestion
+  const handleConnectGithub = async () => {
+    const username = formData.linked_accounts.github?.trim();
+    if (!username) {
+      setNotification({ type: 'error', message: 'Enter your GitHub username first.' });
+      return;
+    }
+    setIsFetchingGithub(true);
+    setNotification({ type: '', message: '' });
+
+    try {
+      const data = await integrationService.fetchGithubProfile(username);
+      const existingMap = new Map(
+        (formData.skills || []).map((s) => [s.name.toLowerCase(), s])
+      );
+      for (const sk of data.detected_skills || []) {
+        const key = sk.name.toLowerCase();
+        const prev = existingMap.get(key);
+        existingMap.set(key, {
+          ...(prev || sk),
+          verified: true,
+          source: 'github'
+        });
+      }
+
+      const updatedForm = {
+        ...formData,
+        skills: Array.from(existingMap.values()),
+        github_data: data
+      };
+      setFormData(updatedForm);
+      await updateProfile(updatedForm);
+
+      setNotification({
+        type: 'success',
+        message: `Connected GitHub @${data.profile.username}: synced ${data.repositories.length} live repositories and verified ${data.detected_skills.length} languages.`
+      });
+    } catch (err) {
+      const detail = err.response?.data?.detail || err.message || 'Failed to fetch GitHub repositories.';
+      setNotification({ type: 'error', message: detail });
+    } finally {
+      setIsFetchingGithub(false);
+    }
+  };
+
+  // Import top non-fork GitHub repos into Engineering Projects
+  const handleImportGithubRepos = async () => {
+    const repos = formData.github_data?.repositories || [];
+    const existingUrls = new Set((formData.projects || []).map((p) => p.repo_url));
+    const candidates = repos
+      .filter((r) => !r.is_fork && !existingUrls.has(r.html_url))
+      .slice(0, 4)
+      .map((r) => ({
+        title: r.name,
+        description: r.description || `GitHub repository (${r.language})`,
+        repo_url: r.html_url,
+        technologies: [r.language, ...(r.topics || [])].filter((t) => t && t !== 'Unknown')
+      }));
+
+    if (candidates.length === 0) {
+      setNotification({ type: 'info', message: 'Top GitHub repositories are already in your Projects list.' });
+      return;
+    }
+
+    const updatedForm = {
+      ...formData,
+      projects: [...formData.projects, ...candidates]
+    };
+    setFormData(updatedForm);
+    await updateProfile(updatedForm);
+    setNotification({
+      type: 'success',
+      message: `Imported ${candidates.length} repositories into Engineering Projects.`
+    });
+  };
+
+  // Production Live LeetCode DSA Standard Analysis
+  const handleConnectLeetcode = async () => {
+    const username = formData.linked_accounts.leetcode?.trim();
+    if (!username) {
+      setNotification({ type: 'error', message: 'Enter your LeetCode username first.' });
+      return;
+    }
+    setIsFetchingLeetcode(true);
+    setNotification({ type: '', message: '' });
+
+    try {
+      const data = await integrationService.fetchLeetcodeStats(username);
+      const updatedForm = {
+        ...formData,
+        leetcode_data: data
+      };
+      setFormData(updatedForm);
+      await updateProfile(updatedForm);
+
+      setNotification({
+        type: 'success',
+        message: `Analyzed LeetCode @${data.username}: ${data.stats.total} solved (${data.dsa_standard.tier} - ${data.dsa_standard.score}/100).`
+      });
+    } catch (err) {
+      const detail = err.response?.data?.detail || err.message || 'Failed to fetch LeetCode profile.';
+      setNotification({ type: 'error', message: detail });
+    } finally {
+      setIsFetchingLeetcode(false);
+    }
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     setIsSaving(true);
@@ -233,6 +401,41 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Primary Details (7 cols) */}
             <div className="lg:col-span-7 space-y-6">
+              {/* Production Resume Upload & Auto-Skill Extractor */}
+              <Card
+                title="Resume Intelligence Parser"
+                subtitle="Upload your PDF or TXT resume to automatically extract & populate verified skills"
+                headerBg="bg-[#70E000]"
+              >
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-[#FAF5E6] border-2 border-black shadow-[3px_3px_0px_0px_#000]">
+                  <div className="flex items-start space-x-3">
+                    <div className="p-2.5 bg-white border-2 border-black shadow-[2px_2px_0px_0px_#000] shrink-0">
+                      <FileText className="w-5 h-5 text-black stroke-[2.5]" />
+                    </div>
+                    <div className="font-mono">
+                      <p className="text-xs font-black uppercase text-black">
+                        Auto-Extract Skills & Role
+                      </p>
+                      <p className="text-[11px] font-bold text-slate-700 mt-0.5">
+                        Supports .PDF, .TXT, and .MD resumes. Parsed skills are added directly below.
+                      </p>
+                    </div>
+                  </div>
+
+                  <label className="inline-flex items-center px-4 py-2.5 border-2 border-black bg-[#FFE600] hover:bg-[#FFF04D] text-black text-xs font-mono font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer shrink-0">
+                    <Upload className="w-4 h-4 mr-1.5 stroke-[2.5]" />
+                    <span>{isParsingResume ? 'Parsing...' : 'Upload Resume'}</span>
+                    <input
+                      type="file"
+                      accept=".pdf,.txt,.md"
+                      onChange={handleResumeUpload}
+                      disabled={isParsingResume}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              </Card>
+
               {/* Core Information */}
               <Card
                 title="Foundational Information"
@@ -448,75 +651,185 @@ export default function ProfilePage() {
 
             {/* Sidebar Column: Evidence Links, Goals (5 cols) */}
             <div className="lg:col-span-5 space-y-6">
-              {/* Linked Accounts with OAuth Stubs */}
+              {/* Live Evidence Connectors (GitHub + LeetCode + LinkedIn) */}
               <Card
                 title="External Evidence Links"
-                subtitle="OAuth 2.0 connectors for Evidence Agent ingestion"
+                subtitle="Live GitHub Repository & LeetCode DSA Ingestion"
                 headerBg="bg-[#FF70A6]"
               >
-                <div className="space-y-3.5">
-                  <div className="p-3 bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] space-y-2">
+                <div className="space-y-4">
+                  {/* 1. Live GitHub Connector */}
+                  <div className="p-3.5 bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] space-y-2.5">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Github className="w-4 h-4 text-black stroke-[2.5]" />
-                        <span className="text-xs font-mono font-bold text-black">GitHub OAuth</span>
+                        <span className="text-xs font-mono font-black text-black uppercase">GitHub Repositories</span>
                       </div>
-                      {formData.linked_accounts.github ? (
+                      {formData.github_data ? (
                         <span className="text-[10px] font-mono font-black border border-black bg-[#70E000] text-black px-1.5 py-0.5 flex items-center">
-                          <CheckCircle className="w-3 h-3 mr-1 stroke-[2.5]" /> LINKED
+                          <CheckCircle className="w-3 h-3 mr-1 stroke-[2.5]" /> {formData.github_data.repositories?.length || 0} REPOS
                         </span>
-                      ) : (
+                      ) : null}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        placeholder="GitHub username (e.g. Anindya-Dev)"
+                        name="github"
+                        value={formData.linked_accounts.github}
+                        onChange={handleLinkedAccountChange}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleConnectGithub}
+                        disabled={isFetchingGithub}
+                        className="px-3 py-2 border-2 border-black bg-[#38B6FF] hover:bg-[#5CC5FF] text-black text-xs font-mono font-black uppercase shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all shrink-0 cursor-pointer disabled:opacity-50"
+                      >
+                        {isFetchingGithub ? 'Scanning...' : 'Connect'}
+                      </button>
+                    </div>
+
+                    {/* Live GitHub Repos Display */}
+                    {formData.github_data && (
+                      <div className="mt-2 pt-2.5 border-t-2 border-black space-y-2">
+                        <div className="flex items-center justify-between text-[11px] font-mono font-bold">
+                          <span className="flex items-center gap-2">
+                            {formData.github_data.profile?.avatar_url && (
+                              <img
+                                src={formData.github_data.profile.avatar_url}
+                                alt="GitHub avatar"
+                                className="w-5 h-5 border border-black"
+                              />
+                            )}
+                            <span>@{formData.github_data.profile?.username}</span>
+                          </span>
+                          <span>
+                            {formData.github_data.profile?.public_repos} repos · {formData.github_data.profile?.total_stars} ★
+                          </span>
+                        </div>
+
+                        <div className="max-h-52 overflow-y-auto space-y-1.5 pr-1">
+                          {(formData.github_data.repositories || []).map((repo) => (
+                            <a
+                              key={repo.id || repo.name}
+                              href={repo.html_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block p-2 bg-white border border-black hover:bg-[#FFE600] transition-colors text-xs font-mono"
+                            >
+                              <div className="flex items-center justify-between font-bold">
+                                <span className="truncate">{repo.name}</span>
+                                <span className="flex items-center gap-2 shrink-0 text-[10px]">
+                                  <span className="px-1 bg-[#FAF5E6] border border-black">{repo.language}</span>
+                                  <span className="flex items-center">
+                                    <Star className="w-3 h-3 mr-0.5" />{repo.stars}
+                                  </span>
+                                  <ExternalLink className="w-3 h-3" />
+                                </span>
+                              </div>
+                              {repo.description && (
+                                <p className="text-[10px] text-slate-600 truncate mt-0.5">{repo.description}</p>
+                              )}
+                            </a>
+                          ))}
+                        </div>
+
                         <button
                           type="button"
-                          onClick={() => {
-                            const handle = window.prompt('Simulating GitHub OAuth flow. Enter GitHub username:', 'octocat');
-                            if (handle) {
-                              setFormData((prev) => ({
-                                ...prev,
-                                linked_accounts: { ...prev.linked_accounts, github: handle }
-                              }));
-                            }
-                          }}
-                          className="text-xs font-mono font-bold text-black underline hover:bg-[#FFE600] px-1"
+                          onClick={handleImportGithubRepos}
+                          className="w-full py-1.5 border-2 border-black bg-[#FFE600] hover:bg-[#FFF04D] text-black text-[11px] font-mono font-black uppercase shadow-[2px_2px_0px_0px_#000] cursor-pointer"
                         >
-                          + Connect
+                          + Import Top Repos into Projects
                         </button>
-                      )}
-                    </div>
-                    <Input
-                      placeholder="e.g. octocat"
-                      name="github"
-                      value={formData.linked_accounts.github}
-                      onChange={handleLinkedAccountChange}
-                    />
+                      </div>
+                    )}
                   </div>
 
+                  {/* 2. Live LeetCode DSA Analyzer */}
+                  <div className="p-3.5 bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Code2 className="w-4 h-4 text-black stroke-[2.5]" />
+                        <span className="text-xs font-mono font-black text-black uppercase">LeetCode DSA Standard</span>
+                      </div>
+                      {formData.leetcode_data && (
+                        <span className="text-[10px] font-mono font-black border border-black bg-[#FFE600] text-black px-1.5 py-0.5">
+                          {formData.leetcode_data.dsa_standard?.tier}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        placeholder="LeetCode username"
+                        name="leetcode"
+                        value={formData.linked_accounts.leetcode}
+                        onChange={handleLinkedAccountChange}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleConnectLeetcode}
+                        disabled={isFetchingLeetcode}
+                        className="px-3 py-2 border-2 border-black bg-[#70E000] hover:bg-[#85FF0A] text-black text-xs font-mono font-black uppercase shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all shrink-0 cursor-pointer disabled:opacity-50"
+                      >
+                        {isFetchingLeetcode ? 'Analyzing...' : 'Analyze'}
+                      </button>
+                    </div>
+
+                    {/* Live LeetCode DSA Diagnostics */}
+                    {formData.leetcode_data && (
+                      <div className="mt-2 pt-2.5 border-t-2 border-black space-y-2.5 font-mono text-xs">
+                        <div className="grid grid-cols-4 gap-1.5 text-center">
+                          <div className="p-1.5 bg-white border border-black">
+                            <div className="text-[9px] font-bold text-slate-500">TOTAL</div>
+                            <div className="font-black text-black">{formData.leetcode_data.stats?.total}</div>
+                          </div>
+                          <div className="p-1.5 bg-[#70E000]/30 border border-black">
+                            <div className="text-[9px] font-bold text-black">EASY</div>
+                            <div className="font-black text-black">{formData.leetcode_data.stats?.easy}</div>
+                          </div>
+                          <div className="p-1.5 bg-[#FFE600]/60 border border-black">
+                            <div className="text-[9px] font-bold text-black">MED</div>
+                            <div className="font-black text-black">{formData.leetcode_data.stats?.medium}</div>
+                          </div>
+                          <div className="p-1.5 bg-[#FF5757]/30 border border-black">
+                            <div className="text-[9px] font-bold text-black">HARD</div>
+                            <div className="font-black text-black">{formData.leetcode_data.stats?.hard}</div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between text-[11px] font-bold bg-white border border-black px-2 py-1">
+                          <span>DSA Readiness: {formData.leetcode_data.dsa_standard?.score}/100</span>
+                          {formData.leetcode_data.ranking && (
+                            <span className="text-slate-600">Rank #{formData.leetcode_data.ranking.toLocaleString()}</span>
+                          )}
+                        </div>
+
+                        {formData.leetcode_data.suggestions?.length > 0 && (
+                          <div className="space-y-1 bg-white border border-black p-2">
+                            <div className="text-[10px] font-black uppercase flex items-center text-black">
+                              <Sparkles className="w-3 h-3 mr-1 stroke-[2.5]" /> DSA Improvement Suggestions
+                            </div>
+                            <ul className="space-y-1 text-[10px] font-bold text-slate-700 list-disc pl-4">
+                              {formData.leetcode_data.suggestions.map((sug, i) => (
+                                <li key={i}>{sug}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 3. LinkedIn Profile Link */}
                   <div className="p-3 bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Linkedin className="w-4 h-4 text-black stroke-[2.5]" />
-                        <span className="text-xs font-mono font-bold text-black">LinkedIn OAuth</span>
+                        <span className="text-xs font-mono font-bold text-black">LinkedIn Profile</span>
                       </div>
-                      {formData.linked_accounts.linkedin ? (
+                      {formData.linked_accounts.linkedin && (
                         <span className="text-[10px] font-mono font-black border border-black bg-[#70E000] text-black px-1.5 py-0.5 flex items-center">
                           <CheckCircle className="w-3 h-3 mr-1 stroke-[2.5]" /> LINKED
                         </span>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const handle = window.prompt('Simulating LinkedIn OAuth flow. Enter LinkedIn handle:', 'username');
-                            if (handle) {
-                              setFormData((prev) => ({
-                                ...prev,
-                                linked_accounts: { ...prev.linked_accounts, linkedin: handle }
-                              }));
-                            }
-                          }}
-                          className="text-xs font-mono font-bold text-black underline hover:bg-[#FFE600] px-1"
-                        >
-                          + Connect
-                        </button>
                       )}
                     </div>
                     <Input
