@@ -340,6 +340,35 @@ export default function ProfilePage() {
     }
   };
 
+  // Import a single selected GitHub repo into Engineering Projects
+  const handleImportSingleRepo = async (repo) => {
+    const exists = (formData.projects || []).some(
+      (p) => p.repo_url === repo.html_url || p.title?.toLowerCase() === repo.name?.toLowerCase()
+    );
+    if (exists) {
+      setNotification({ type: 'info', message: `"${repo.name}" is already in your Projects.` });
+      return;
+    }
+
+    const newProj = {
+      title: repo.name,
+      description: repo.description || `GitHub repository (${repo.language})`,
+      repo_url: repo.html_url,
+      technologies: [repo.language, ...(repo.topics || [])].filter((t) => t && t !== 'Unknown')
+    };
+
+    const updatedForm = {
+      ...formData,
+      projects: [...(formData.projects || []), newProj]
+    };
+    setFormData(updatedForm);
+    await updateProfile(updatedForm);
+    setNotification({
+      type: 'success',
+      message: `Imported "${repo.name}" into Engineering Projects!`
+    });
+  };
+
   // Import top non-fork GitHub repos into Engineering Projects
   const handleImportGithubRepos = async () => {
     const repos = formData.github_data?.repositories || [];
@@ -790,30 +819,54 @@ export default function ProfilePage() {
                           </span>
                         </div>
 
-                        <div className="max-h-52 overflow-y-auto space-y-1.5 pr-1">
-                          {(formData.github_data.repositories || []).map((repo) => (
-                            <a
-                              key={repo.id || repo.name}
-                              href={repo.html_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="block p-2 bg-white border border-black hover:bg-[#FFE600] transition-colors text-xs font-mono"
-                            >
-                              <div className="flex items-center justify-between font-bold">
-                                <span className="truncate">{repo.name}</span>
-                                <span className="flex items-center gap-2 shrink-0 text-[10px]">
-                                  <span className="px-1 bg-[#FAF5E6] border border-black">{repo.language}</span>
-                                  <span className="flex items-center">
-                                    <Star className="w-3 h-3 mr-0.5" />{repo.stars}
-                                  </span>
-                                  <ExternalLink className="w-3 h-3" />
-                                </span>
+                        <div className="max-h-56 overflow-y-auto space-y-1.5 pr-1">
+                          {(formData.github_data.repositories || []).map((repo) => {
+                            const isImported = (formData.projects || []).some(
+                              (p) =>
+                                p.repo_url === repo.html_url ||
+                                p.title?.toLowerCase() === repo.name?.toLowerCase()
+                            );
+                            return (
+                              <div
+                                key={repo.id || repo.name}
+                                className="p-2 bg-white border border-black hover:bg-[#FFFDF0] transition-colors text-xs font-mono space-y-1"
+                              >
+                                <div className="flex items-center justify-between gap-2 font-bold">
+                                  <a
+                                    href={repo.html_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="truncate hover:underline flex items-center gap-1 text-black"
+                                  >
+                                    <span className="truncate">{repo.name}</span>
+                                    <ExternalLink className="w-3 h-3 shrink-0" />
+                                  </a>
+                                  <div className="flex items-center gap-1.5 shrink-0 text-[10px]">
+                                    <span className="px-1 bg-[#FAF5E6] border border-black">{repo.language}</span>
+                                    <span className="flex items-center">
+                                      <Star className="w-3 h-3 mr-0.5" />{repo.stars}
+                                    </span>
+                                    {isImported ? (
+                                      <span className="px-1.5 py-0.5 border border-black bg-[#70E000] text-black font-black">
+                                        ✓ ADDED
+                                      </span>
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleImportSingleRepo(repo)}
+                                        className="px-1.5 py-0.5 border border-black bg-[#FFE600] hover:bg-[#FFF04D] text-black font-black cursor-pointer"
+                                      >
+                                        + IMPORT
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                                {repo.description && (
+                                  <p className="text-[10px] text-slate-600 truncate">{repo.description}</p>
+                                )}
                               </div>
-                              {repo.description && (
-                                <p className="text-[10px] text-slate-600 truncate mt-0.5">{repo.description}</p>
-                              )}
-                            </a>
-                          ))}
+                            );
+                          })}
                         </div>
 
                         <button
