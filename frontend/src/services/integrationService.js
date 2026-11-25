@@ -28,6 +28,19 @@ export const integrationService = {
   },
 
   /**
+   * Upload official LinkedIn Profile PDF ("More -> Save to PDF") to extract certifications & skills.
+   */
+  async parseLinkedinPdf(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await orchestratorClient.post(getEndpoint('/linkedin/parse'), formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 30000
+    });
+    return res.data;
+  },
+
+  /**
    * Fetch live GitHub profile, repositories, and verified language skills.
    */
   async fetchGithubProfile(username) {
@@ -51,3 +64,4 @@ export const integrationService = {
 };
 
 export default integrationService;
+

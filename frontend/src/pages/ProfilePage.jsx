@@ -72,6 +72,7 @@ export default function ProfilePage() {
   const [notification, setNotification] = useState({ type: '', message: '' });
   const [isSaving, setIsSaving] = useState(false);
   const [isParsingResume, setIsParsingResume] = useState(false);
+  const [isParsingLinkedin, setIsParsingLinkedin] = useState(false);
   const [isFetchingGithub, setIsFetchingGithub] = useState(false);
   const [isFetchingLeetcode, setIsFetchingLeetcode] = useState(false);
 
@@ -232,6 +233,66 @@ export default function ProfilePage() {
       setIsParsingResume(false);
       e.target.value = '';
     }
+  };
+
+  // Production LinkedIn "Save to PDF" Certifications & Skills Extractor
+  const handleLinkedinPdfUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsParsingLinkedin(true);
+    setNotification({ type: '', message: '' });
+
+    try {
+      const parsed = await integrationService.parseLinkedinPdf(file);
+      const extractedCerts = parsed.certifications || [];
+      const extractedSkills = parsed.skills || [];
+
+      const existingCertNames = new Set(
+        (formData.certifications || []).map((c) => (typeof c === 'string' ? c : c.name).toLowerCase())
+      );
+      const newCerts = extractedCerts.filter(
+        (c) => c.name && !existingCertNames.has(c.name.toLowerCase())
+      );
+
+      const existingSkillMap = new Map(
+        (formData.skills || []).map((s) => [s.name.toLowerCase(), s])
+      );
+      let addedSkills = 0;
+      for (const sk of extractedSkills) {
+        const key = sk.name.toLowerCase();
+        if (!existingSkillMap.has(key)) {
+          existingSkillMap.set(key, sk);
+          addedSkills += 1;
+        }
+      }
+
+      const updatedForm = {
+        ...formData,
+        certifications: [...(formData.certifications || []), ...newCerts],
+        skills: Array.from(existingSkillMap.values()),
+        target_role: formData.target_role || parsed.suggested_target_role || ''
+      };
+      setFormData(updatedForm);
+      await updateProfile(updatedForm);
+
+      setNotification({
+        type: 'success',
+        message: `Imported ${newCerts.length} certifications and ${addedSkills} new skills from LinkedIn PDF!`
+      });
+    } catch (err) {
+      const detail = err.response?.data?.detail || err.message || 'Failed to parse LinkedIn PDF.';
+      setNotification({ type: 'error', message: detail });
+    } finally {
+      setIsParsingLinkedin(false);
+      e.target.value = '';
+    }
+  };
+
+  const removeCertification = async (index) => {
+    const updatedCerts = (formData.certifications || []).filter((_, i) => i !== index);
+    const updatedForm = { ...formData, certifications: updatedCerts };
+    setFormData(updatedForm);
+    await updateProfile(updatedForm);
   };
 
   // Production Live GitHub Connection & Repo Ingestion
@@ -856,18 +917,35 @@ export default function ProfilePage() {
                     )}
                   </div>
 
-                  {/* 3. LinkedIn Profile Link */}
-                  <div className="p-3 bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] space-y-2">
-                    <div className="flex items-center justify-between">
+                  {/* 3. LinkedIn Profile & PDF Importer */}
+                  <div className="p-3.5 bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] space-y-2.5">
+                    <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center space-x-2">
                         <Linkedin className="w-4 h-4 text-black stroke-[2.5]" />
-                        <span className="text-xs font-mono font-bold text-black">LinkedIn Profile</span>
+                        <span className="text-xs font-mono font-black text-black uppercase">LinkedIn & Certifications</span>
                       </div>
-                      {formData.linked_accounts.linkedin && (
-                        <span className="text-[10px] font-mono font-black border border-black bg-[#70E000] text-black px-1.5 py-0.5 flex items-center">
-                          <CheckCircle className="w-3 h-3 mr-1 stroke-[2.5]" /> LINKED
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {formData.certifications?.length > 0 && (
+                          <span className="text-[10px] font-mono font-black border border-black bg-[#70E000] text-black px-1.5 py-0.5 flex items-center">
+                            <CheckCircle className="w-3 h-3 mr-1 stroke-[2.5]" /> {formData.certifications.length} CERTS
+                          </span>
+                        )}
+                        <a
+                          href={
+                            formData.linked_accounts.linkedin?.trim()
+                              ? formData.linked_accounts.linkedin.startsWith('http')
+                                ? formData.linked_accounts.linkedin
+                                : `https://${formData.linked_accounts.linkedin}`
+                              : 'https://www.linkedin.com/in/me/'
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] font-mono font-bold underline text-black hover:bg-[#FFE600] px-1 flex items-center"
+                          title="Open LinkedIn in new tab"
+                        >
+                          Open LinkedIn <ExternalLink className="w-2.5 h-2.5 ml-0.5" />
+                        </a>
+                      </div>
                     </div>
                     <Input
                       placeholder="e.g. linkedin.com/in/username"
@@ -875,6 +953,29 @@ export default function ProfilePage() {
                       value={formData.linked_accounts.linkedin}
                       onChange={handleLinkedAccountChange}
                     />
+
+                    {/* Instructions + Official LinkedIn PDF Upload Button */}
+                    <div className="p-2.5 bg-white border border-black space-y-2 font-mono">
+                      <div className="text-[10px] font-black uppercase text-black">
+                        How to import Certifications & Skills from LinkedIn:
+                      </div>
+                      <ol className="text-[10px] font-bold text-slate-700 list-decimal pl-4 space-y-0.5">
+                        <li>Open your LinkedIn profile (click <strong>Open LinkedIn</strong> above).</li>
+                        <li>Click <strong>More</strong> (or <strong>Resources</strong>) &rarr; <strong>Save to PDF</strong>.</li>
+                        <li>Upload the downloaded <code>Profile.pdf</code> below:</li>
+                      </ol>
+                      <label className="w-full inline-flex items-center justify-center px-3 py-2 border-2 border-black bg-[#38B6FF] hover:bg-[#5CC5FF] text-black text-xs font-mono font-black uppercase shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer">
+                        <Upload className="w-3.5 h-3.5 mr-1.5 stroke-[2.5]" />
+                        <span>{isParsingLinkedin ? 'Extracting Certifications...' : 'Upload LinkedIn Profile PDF'}</span>
+                        <input
+                          type="file"
+                          accept=".pdf"
+                          onChange={handleLinkedinPdfUpload}
+                          disabled={isParsingLinkedin}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -919,6 +1020,46 @@ export default function ProfilePage() {
                     ))}
                   </ul>
                 </div>
+              </Card>
+
+              {/* Verified Certifications List */}
+              <Card
+                title="Licenses & Certifications"
+                subtitle="Imported from LinkedIn Profile PDF or added manually"
+                headerBg="bg-[#70E000]"
+              >
+                {(!formData.certifications || formData.certifications.length === 0) ? (
+                  <div className="p-4 bg-[#FAF5E6] border-2 border-black text-center font-mono text-xs font-bold text-slate-600">
+                    No certifications added yet. Upload your LinkedIn Profile PDF above to auto-import them.
+                  </div>
+                ) : (
+                  <ul className="space-y-2">
+                    {formData.certifications.map((cert, idx) => (
+                      <li
+                        key={idx}
+                        className="flex items-center justify-between text-xs font-mono bg-[#FAF5E6] p-2.5 border-2 border-black shadow-[2px_2px_0px_0px_#000] text-black"
+                      >
+                        <div>
+                          <div className="font-black text-black">
+                            {typeof cert === 'string' ? cert : cert.name}
+                          </div>
+                          {(cert.issuer || cert.issue_date) && (
+                            <div className="text-[10px] font-bold text-slate-600 mt-0.5">
+                              {[cert.issuer, cert.issue_date].filter(Boolean).join(' · ')}
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeCertification(idx)}
+                          className="p-1 border border-black bg-[#FF5757] text-white hover:bg-[#FF7070] transition-colors shrink-0 ml-2"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 stroke-[2.5]" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </Card>
             </div>
           </div>

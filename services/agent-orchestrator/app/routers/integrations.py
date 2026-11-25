@@ -247,6 +247,140 @@ async def parse_resume(file: UploadFile = File(...)) -> Dict[str, Any]:
     }
 
 
+def _extract_certifications_from_text(text: str) -> List[Dict[str, str]]:
+    """Deterministically parse certifications from LinkedIn 'Save to PDF' text."""
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    section_headers = {
+        "certifications",
+        "licenses & certifications",
+        "licenses and certifications",
+    }
+    stop_headers = {
+        "experience",
+        "education",
+        "skills",
+        "top skills",
+        "languages",
+        "honors-awards",
+        "honors & awards",
+        "projects",
+        "publications",
+        "summary",
+        "contact",
+        "patents",
+        "volunteer experience",
+    }
+
+    certs: List[Dict[str, str]] = []
+    in_section = False
+    for line in lines:
+        low = line.lower()
+        if low in section_headers:
+            in_section = True
+            continue
+        if in_section:
+            if low in stop_headers or re.match(r"^page \d+ of \d+$", low):
+                break
+            if low.startswith(("http://", "https://", "credential id", "see credential")):
+                continue
+            if len(line) >= 4:
+                certs.append({"name": line, "issuer": "LinkedIn PDF", "issue_date": ""})
+    return certs
+
+
+@router.post(
+    "/api/v1/orchestrator/integrations/linkedin/parse",
+    summary="Parse LinkedIn 'Save to PDF' export for certifications and skills",
+)
+@router.post(
+    "/api/v1/integrations/linkedin/parse",
+    summary="Parse LinkedIn 'Save to PDF' export for certifications and skills (alias)",
+)
+async def parse_linkedin_pdf(file: UploadFile = File(...)) -> Dict[str, Any]:
+    """Extract certifications, skills, and target role from an official LinkedIn Profile PDF."""
+    filename = (file.filename or "Profile.pdf").lower()
+    content = await file.read()
+
+    if not content:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Uploaded file is empty.")
+    if not filename.endswith(".pdf"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please upload the official PDF file exported from LinkedIn (More -> Save to PDF).",
+        )
+
+    try:
+        reader = PdfReader(io.BytesIO(content))
+        extracted_text = "\n".join(page.extract_text() or "" for page in reader.pages).strip()
+    except Exception as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Failed to read PDF: {exc}")
+
+    if len(extracted_text) < 20:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Could not extract readable text from the uploaded LinkedIn PDF.",
+        )
+
+    skills = _extract_skills_from_text(extracted_text)
+    certifications = _extract_certifications_from_text(extracted_text)
+    suggested_role = _infer_target_role(extracted_text, skills)
+
+    llm = get_llm_service()
+    if llm._get_llm() is not None:
+        try:
+            prompt = (
+                "Extract all Licenses & Certifications and technical skills from this LinkedIn Profile PDF text. "
+                "Return ONLY valid JSON with keys: "
+                '{"certifications": [{"name": str, "issuer": str, "issue_date": str}], '
+                '"skills": [{"name": str, "category": str, "level": "intermediate"}], '
+                '"target_role": str}.\n\n'
+                f"LINKEDIN PDF TEXT:\n{extracted_text[:7000]}"
+            )
+            parsed = await llm.generate_json(
+                system_prompt="You are a precise LinkedIn PDF parser. Return only valid JSON. Never invent entries not present in the text.",
+                user_prompt=prompt,
+                fallback_data={},
+            )
+            if isinstance(parsed, dict) and parsed:
+                if parsed.get("certifications"):
+                    certifications = [
+                        {
+                            "name": str(c.get("name", "")).strip(),
+                            "issuer": str(c.get("issuer", "")).strip(),
+                            "issue_date": str(c.get("issue_date", "")).strip(),
+                        }
+                        for c in parsed["certifications"]
+                        if str(c.get("name", "")).strip()
+                    ]
+                existing_names = {s["name"].lower() for s in skills}
+                for item in parsed.get("skills", []):
+                    sname = str(item.get("name", "")).strip()
+                    if sname and sname.lower() not in existing_names:
+                        existing_names.add(sname.lower())
+                        skills.append(
+                            {
+                                "name": sname,
+                                "level": item.get("level", "intermediate"),
+                                "category": item.get("category", "General"),
+                                "verified": False,
+                                "source": "linkedin",
+                            }
+                        )
+                if parsed.get("target_role"):
+                    suggested_role = parsed["target_role"]
+        except Exception as exc:
+            logger.warning("LLM LinkedIn PDF enrichment skipped (%s); using deterministic extraction.", exc)
+
+    return {
+        "filename": file.filename,
+        "certifications_count": len(certifications),
+        "certifications": certifications,
+        "skills_count": len(skills),
+        "skills": skills,
+        "suggested_target_role": suggested_role,
+    }
+
+
 @router.get(
     "/api/v1/orchestrator/integrations/github/{username}",
     summary="Fetch live GitHub profile and public repositories",
