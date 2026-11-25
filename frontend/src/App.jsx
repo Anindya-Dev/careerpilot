@@ -20,6 +20,7 @@ import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
 import SkillsPage from './pages/SkillsPage';
 import CareerHealthPage from './pages/CareerHealthPage';
+import JobFinderPage from './pages/JobFinderPage';
 import AgentPipelinePage from './pages/AgentPipelinePage';
 import NotFoundPage from './pages/NotFoundPage';
 import LandingPage from './pages/LandingPage';
@@ -118,6 +119,14 @@ export default function App() {
                   element={
                     <ProtectedRoute>
                       <CareerHealthPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/jobs"
+                  element={
+                    <ProtectedRoute>
+                      <JobFinderPage />
                     </ProtectedRoute>
                   }
                 />

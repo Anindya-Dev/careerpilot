@@ -73,6 +73,48 @@ export const integrationService = {
       { timeout: 25000 }
     );
     return res.data;
+  },
+
+  async discoverJobs({ targetRole, skills = [], category = 'all', search = '', limit = 30 } = {}) {
+    const res = await orchestratorClient.post(
+      getEndpoint('/jobs/discover'),
+      {
+        target_role: targetRole || 'Software Engineer',
+        skills: skills || [],
+        category,
+        search,
+        limit
+      },
+      { timeout: 30000 }
+    );
+    return res.data;
+  },
+
+  async generateOutreachEmail({
+    jobTitle,
+    company,
+    contactEmail = '',
+    jobDescription = '',
+    studentName = 'Candidate',
+    targetRole = 'Software Engineer',
+    skills = [],
+    projects = []
+  }) {
+    const res = await orchestratorClient.post(
+      getEndpoint('/jobs/outreach'),
+      {
+        job_title: jobTitle,
+        company,
+        contact_email: contactEmail,
+        job_description: jobDescription,
+        student_name: studentName,
+        target_role: targetRole,
+        skills,
+        projects
+      },
+      { timeout: 25000 }
+    );
+    return res.data;
   }
 };
 

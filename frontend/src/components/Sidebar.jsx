@@ -15,6 +15,7 @@ import {
   Target,
   Activity,
   Cpu,
+  Briefcase,
   Menu,
   X
 } from 'lucide-react';
@@ -36,6 +37,7 @@ export default function Sidebar() {
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Career Profile', path: '/profile', icon: UserCheck },
     { name: 'Skills & Evidence', path: '/skills', icon: Target },
+    { name: 'Auto JobFinder', path: '/jobs', icon: Briefcase, badge: 'Live' },
     { name: 'Career Health', path: '/health', icon: Activity, badge: 'Live' },
     { name: 'Agent Pipeline', path: '/pipeline', icon: Cpu }
   ];
