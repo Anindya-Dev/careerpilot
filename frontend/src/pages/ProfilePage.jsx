@@ -75,6 +75,15 @@ export default function ProfilePage() {
   const [isFetchingGithub, setIsFetchingGithub] = useState(false);
   const [isFetchingLeetcode, setIsFetchingLeetcode] = useState(false);
 
+  // Auto-dismiss toast notification after 4 seconds
+  useEffect(() => {
+    if (!notification.message) return;
+    const timer = setTimeout(() => {
+      setNotification({ type: '', message: '' });
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [notification.message]);
+
   useEffect(() => {
     if (profile) {
       setFormData({
@@ -391,11 +400,13 @@ export default function ProfilePage() {
           </div>
 
           {notification.message && (
-            <Alert
-              type={notification.type}
-              message={notification.message}
-              onClose={() => setNotification({ type: '', message: '' })}
-            />
+            <div className="fixed top-20 right-4 sm:right-6 z-50 max-w-md w-full sm:w-auto">
+              <Alert
+                type={notification.type}
+                message={notification.message}
+                onClose={() => setNotification({ type: '', message: '' })}
+              />
+            </div>
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -660,16 +671,27 @@ export default function ProfilePage() {
                 <div className="space-y-4">
                   {/* 1. Live GitHub Connector */}
                   <div className="p-3.5 bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] space-y-2.5">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center space-x-2">
                         <Github className="w-4 h-4 text-black stroke-[2.5]" />
                         <span className="text-xs font-mono font-black text-black uppercase">GitHub Repositories</span>
                       </div>
-                      {formData.github_data ? (
-                        <span className="text-[10px] font-mono font-black border border-black bg-[#70E000] text-black px-1.5 py-0.5 flex items-center">
-                          <CheckCircle className="w-3 h-3 mr-1 stroke-[2.5]" /> {formData.github_data.repositories?.length || 0} REPOS
-                        </span>
-                      ) : null}
+                      <div className="flex items-center gap-2">
+                        {formData.github_data && (
+                          <span className="text-[10px] font-mono font-black border border-black bg-[#70E000] text-black px-1.5 py-0.5 flex items-center">
+                            <CheckCircle className="w-3 h-3 mr-1 stroke-[2.5]" /> {formData.github_data.repositories?.length || 0} REPOS
+                          </span>
+                        )}
+                        <a
+                          href={`https://github.com/${formData.linked_accounts.github?.trim() || ''}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] font-mono font-bold underline text-black hover:bg-[#FFE600] px-1 flex items-center"
+                          title="Open GitHub in new tab"
+                        >
+                          Open GitHub <ExternalLink className="w-2.5 h-2.5 ml-0.5" />
+                        </a>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Input
@@ -746,16 +768,31 @@ export default function ProfilePage() {
 
                   {/* 2. Live LeetCode DSA Analyzer */}
                   <div className="p-3.5 bg-[#FAF5E6] border-2 border-black shadow-[2px_2px_0px_0px_#000] space-y-2.5">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center space-x-2">
                         <Code2 className="w-4 h-4 text-black stroke-[2.5]" />
                         <span className="text-xs font-mono font-black text-black uppercase">LeetCode DSA Standard</span>
                       </div>
-                      {formData.leetcode_data && (
-                        <span className="text-[10px] font-mono font-black border border-black bg-[#FFE600] text-black px-1.5 py-0.5">
-                          {formData.leetcode_data.dsa_standard?.tier}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {formData.leetcode_data && (
+                          <span className="text-[10px] font-mono font-black border border-black bg-[#FFE600] text-black px-1.5 py-0.5">
+                            {formData.leetcode_data.dsa_standard?.tier}
+                          </span>
+                        )}
+                        <a
+                          href={
+                            formData.linked_accounts.leetcode?.trim()
+                              ? `https://leetcode.com/u/${formData.linked_accounts.leetcode.trim()}/`
+                              : 'https://leetcode.com/'
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] font-mono font-bold underline text-black hover:bg-[#FFE600] px-1 flex items-center"
+                          title="Open LeetCode in new tab"
+                        >
+                          Open LeetCode <ExternalLink className="w-2.5 h-2.5 ml-0.5" />
+                        </a>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Input
