@@ -48,6 +48,27 @@ export default function DashboardPage() {
   const isFreshProfile = !user?.isDemoSession && skillsCount === 0 && !profile?.target_role;
   const healthScore = isFreshProfile ? 0 : (profile?.career_health_score || telemetry?.healthScore || 0);
   const healthGrade = isFreshProfile ? 'N/A' : (telemetry?.healthGrade || 'B+');
+  const dimensions = isFreshProfile
+    ? [
+        { name: 'Skill Alignment', score: 0, status: 'Pending' },
+        { name: 'Evidence & Code', score: 0, status: 'Pending' },
+        { name: 'Market Readiness', score: 0, status: 'Pending' },
+        { name: 'Goal Alignment', score: 0, status: 'Pending' },
+        { name: 'Interview Prep', score: 0, status: 'Pending' }
+      ]
+    : (telemetry?.dimensions || []);
+  const recommendations = isFreshProfile
+    ? [
+        {
+          id: 1,
+          title: 'Initialize Your Career Profile',
+          description: 'Add your target role, technical skills, and GitHub projects in Career Profile to unlock live AI scoring.',
+          priority: 'high'
+        }
+      ]
+    : (telemetry?.recommendations || []);
+  const trendHistory = isFreshProfile ? [] : telemetry?.trendHistory;
+  const radarData = isFreshProfile ? [] : skillIntel?.radarData;
 
   return (
     <div className="min-h-screen bg-[#F4F0EA] text-black flex flex-col font-sans relative selection:bg-[#FFE600] selection:text-black">
@@ -205,7 +226,7 @@ export default function DashboardPage() {
                   </Link>
                 }
               >
-                <HealthTrendChart history={telemetry?.trendHistory} />
+                <HealthTrendChart history={trendHistory} />
               </Card>
             </div>
 
@@ -232,7 +253,7 @@ export default function DashboardPage() {
                 <CareerHealthDial
                   score={healthScore}
                   grade={healthGrade}
-                  dimensions={telemetry?.dimensions || []}
+                  dimensions={dimensions}
                 />
               </Card>
 
@@ -253,7 +274,7 @@ export default function DashboardPage() {
                 }
               >
                 <SkillRadarChart
-                  data={skillIntel?.radarData}
+                  data={radarData}
                   targetRole={targetRole}
                 />
               </Card>
@@ -274,7 +295,7 @@ export default function DashboardPage() {
                   </Link>
                 }
               >
-                <RecommendationFeed recommendations={telemetry?.recommendations || []} />
+                <RecommendationFeed recommendations={recommendations} />
               </Card>
             </div>
 

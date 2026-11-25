@@ -40,13 +40,34 @@ export default function CareerHealthPage() {
   const isFreshProfile = !user?.isDemoSession && (profile?.skills?.length || 0) === 0 && !profile?.target_role;
   const healthScore = isFreshProfile ? 0 : (profile?.career_health_score || telemetry?.healthScore || 0);
   const healthGrade = isFreshProfile ? 'N/A' : (telemetry?.healthGrade || 'B+');
-  const dimensions = telemetry?.dimensions || [
-    { name: 'Technical Depth', score: 88, status: 'Optimal' },
-    { name: 'Git Commit Velocity', score: 82, status: 'Healthy' },
-    { name: 'Architecture Purity', score: 79, status: 'Needs Review' },
-    { name: 'Testing & Coverage', score: 85, status: 'Optimal' },
-    { name: 'Market Vector Match', score: 91, status: 'Optimal' }
-  ];
+  const dimensions = isFreshProfile
+    ? [
+        { name: 'Technical Depth', score: 0, status: 'Pending' },
+        { name: 'Git Commit Velocity', score: 0, status: 'Pending' },
+        { name: 'Architecture Purity', score: 0, status: 'Pending' },
+        { name: 'Testing & Coverage', score: 0, status: 'Pending' },
+        { name: 'Market Vector Match', score: 0, status: 'Pending' }
+      ]
+    : (telemetry?.dimensions || [
+        { name: 'Technical Depth', score: 88, status: 'Optimal' },
+        { name: 'Git Commit Velocity', score: 82, status: 'Healthy' },
+        { name: 'Architecture Purity', score: 79, status: 'Needs Review' },
+        { name: 'Testing & Coverage', score: 85, status: 'Optimal' },
+        { name: 'Market Vector Match', score: 91, status: 'Optimal' }
+      ]);
+
+  const recommendations = isFreshProfile
+    ? [
+        {
+          id: 1,
+          title: 'Initialize Your Career Profile',
+          description: 'Add your target role, technical skills, and GitHub projects in Career Profile to unlock live AI scoring.',
+          priority: 'high'
+        }
+      ]
+    : (telemetry?.recommendations || []);
+
+  const trendHistory = isFreshProfile ? [] : telemetry?.trendHistory;
 
   return (
     <div className="min-h-screen bg-[#F4F0EA] text-black flex flex-col font-sans relative selection:bg-[#FFE600] selection:text-black">
@@ -147,7 +168,7 @@ export default function CareerHealthPage() {
                 headerBg="bg-[#38B6FF]"
                 bodyClassName="p-6 sm:p-7"
               >
-                <HealthTrendChart history={telemetry?.trendHistory} />
+                <HealthTrendChart history={trendHistory} />
               </Card>
             </div>
 
@@ -159,7 +180,7 @@ export default function CareerHealthPage() {
                 headerBg="bg-[#FFE600]"
                 bodyClassName="p-6 sm:p-7"
               >
-                <RecommendationFeed recommendations={telemetry?.recommendations || []} />
+                <RecommendationFeed recommendations={recommendations} />
               </Card>
 
               {/* Diagnostic Explainer Card */}
