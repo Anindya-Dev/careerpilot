@@ -76,6 +76,7 @@ export default function ProfilePage() {
   const [isParsingLinkedin, setIsParsingLinkedin] = useState(false);
   const [isFetchingGithub, setIsFetchingGithub] = useState(false);
   const [isFetchingLeetcode, setIsFetchingLeetcode] = useState(false);
+  const [showAddProject, setShowAddProject] = useState(false);
 
   // Auto-dismiss toast notification after 4 seconds
   useEffect(() => {
@@ -205,6 +206,7 @@ export default function ProfilePage() {
       repo_url: '',
       technologies: ''
     });
+    setShowAddProject(false);
     await updateProfile(updatedForm);
   };
 
@@ -690,53 +692,78 @@ export default function ProfilePage() {
                 title="Engineering Projects"
                 subtitle="Repository evidence evaluated by Career Evidence Agent"
                 headerBg="bg-[#C4A1FF]"
+                actions={
+                  <button
+                    type="button"
+                    onClick={() => setShowAddProject((prev) => !prev)}
+                    className="inline-flex items-center px-3 py-1 border-2 border-black bg-[#FFE600] hover:bg-[#FFF066] text-black font-mono text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+                  >
+                    {showAddProject ? 'Cancel' : '+ Add Project'}
+                  </button>
+                }
               >
                 <div className="space-y-4">
-                  <div className="p-3.5 bg-[#FAF5E6] border-2 border-black shadow-[3px_3px_0px_0px_#000] space-y-3">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {showAddProject && (
+                    <div className="p-3.5 bg-[#FAF5E6] border-2 border-black shadow-[3px_3px_0px_0px_#000] space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <Input
+                          label="Project Title"
+                          placeholder="e.g. CareerPilot AI"
+                          value={newProject.title}
+                          onChange={(e) =>
+                            setNewProject({ ...newProject, title: e.target.value })
+                          }
+                        />
+                        <Input
+                          label="Repository URL"
+                          placeholder="https://github.com/..."
+                          value={newProject.repo_url}
+                          onChange={(e) =>
+                            setNewProject({ ...newProject, repo_url: e.target.value })
+                          }
+                        />
+                      </div>
                       <Input
-                        label="Project Title"
-                        placeholder="e.g. CareerPilot AI"
-                        value={newProject.title}
+                        label="Technologies (comma separated)"
+                        placeholder="React, Express, MongoDB, Python"
+                        value={newProject.technologies}
                         onChange={(e) =>
-                          setNewProject({ ...newProject, title: e.target.value })
+                          setNewProject({ ...newProject, technologies: e.target.value })
                         }
                       />
                       <Input
-                        label="Repository URL"
-                        placeholder="https://github.com/..."
-                        value={newProject.repo_url}
+                        label="Brief Overview"
+                        placeholder="Summary of architectural contributions..."
+                        value={newProject.description}
                         onChange={(e) =>
-                          setNewProject({ ...newProject, repo_url: e.target.value })
+                          setNewProject({ ...newProject, description: e.target.value })
                         }
                       />
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={addProject}
+                          className="px-4 py-2 border-2 border-black bg-[#FFE600] hover:bg-[#FFF066] text-black text-xs font-mono font-black shadow-[2px_2px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75 flex items-center justify-center cursor-pointer"
+                        >
+                          <Plus className="w-3.5 h-3.5 mr-1 stroke-[2.5]" /> Save Project
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowAddProject(false)}
+                          className="px-3 py-2 border-2 border-black bg-white hover:bg-slate-100 text-black text-xs font-mono font-bold cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </div>
-                    <Input
-                      label="Technologies (comma separated)"
-                      placeholder="React, Express, MongoDB, Python"
-                      value={newProject.technologies}
-                      onChange={(e) =>
-                        setNewProject({ ...newProject, technologies: e.target.value })
-                      }
-                    />
-                    <Input
-                      label="Brief Overview"
-                      placeholder="Summary of architectural contributions..."
-                      value={newProject.description}
-                      onChange={(e) =>
-                        setNewProject({ ...newProject, description: e.target.value })
-                      }
-                    />
-                    <button
-                      type="button"
-                      onClick={addProject}
-                      className="px-4 py-2 border-2 border-black bg-[#FFE600] hover:bg-[#FFF066] text-black text-xs font-mono font-black shadow-[2px_2px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75 flex items-center justify-center"
-                    >
-                      <Plus className="w-3.5 h-3.5 mr-1 stroke-[2.5]" /> Add Project
-                    </button>
-                  </div>
+                  )}
 
-                  <div className="space-y-3">
+                  {formData.projects.length === 0 && !showAddProject ? (
+                    <div className="p-4 bg-[#FAF5E6] border-2 border-black text-center font-mono text-xs font-bold text-slate-600">
+                      No projects added yet. Click <strong>+ Add Project</strong> above or import repositories from GitHub.
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
                     {formData.projects.map((proj, idx) => (
                       <div
                         key={idx}
@@ -775,7 +802,8 @@ export default function ProfilePage() {
                         </button>
                       </div>
                     ))}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </Card>
             </div>
