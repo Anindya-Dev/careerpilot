@@ -93,10 +93,12 @@ async def run_career_vision(
 
     logger.info("Executing Career Vision Agent for student %s targeting '%s'", user_id, target_role)
 
-    student_name = "Student"
-    verified_skills: List[str] = []
+    student_name = params_dict.get("student_name") or "Student"
+    param_skills = [str(s).strip() for s in (params_dict.get("skills") or []) if str(s).strip()]
+    param_projects = [str(p).strip() for p in (params_dict.get("projects") or []) if str(p).strip()]
+    verified_skills: List[str] = list(param_skills)
 
-    if neo4j_client is not None:
+    if not verified_skills and neo4j_client is not None:
         try:
             query = """
             MATCH (s:Student { student_id: $user_id })
@@ -115,27 +117,28 @@ async def run_career_vision(
     if not verified_skills:
         verified_skills = ["Python", "FastAPI"]
 
-    # Compute missing skills dynamically based on role ontology
+    # Compute missing skills dynamically based on role ontology & user's actual skills
     missing_skills = get_role_gaps(target_role, verified_skills)
+    match_score = round(min(96.0, max(35.0, 45.0 + len(verified_skills) * 2.2 - len(missing_skills) * 4.0)), 1)
 
     fallback_output = {
         "user_id": user_id,
         "target_role": target_role,
-        "current_match_score": 72.0,
+        "current_match_score": match_score,
         "verified_skills_count": len(verified_skills),
         "missing_prerequisites": missing_skills,
         "milestones": [
             {
                 "timeframe": "Year 1",
                 "target_title": f"Junior {target_role}",
-                "key_competencies": missing_skills[:2],
+                "key_competencies": missing_skills[:2] if missing_skills else ["Production Testing", "CI/CD"],
                 "recommended_projects": [f"Full-stack {target_role} Starter Portfolio"],
                 "key_deliverables": ["Production code deployed to cloud"],
             },
             {
                 "timeframe": "Year 3",
                 "target_title": f"Mid-Level {target_role}",
-                "key_competencies": missing_skills[2:] + ["Distributed Systems"],
+                "key_competencies": (missing_skills[2:] or ["Observability"]) + ["Distributed Systems"],
                 "recommended_projects": [f"High-Scale {target_role} Architecture"],
                 "key_deliverables": ["Industry Certification attained"],
             },
@@ -148,21 +151,40 @@ async def run_career_vision(
             },
         ],
         "strategic_advice": (
-            f"You possess strong foundational capabilities in {', '.join(verified_skills[:2])}. "
-            f"Bridge the primary ontological gaps ({', '.join(missing_skills[:2])}) through verified portfolio builds."
+            f"You possess strong capabilities across {len(verified_skills)} skills ({', '.join(verified_skills[:4])}). "
+            f"Bridge your remaining gaps ({', '.join(missing_skills[:3]) or 'System Architecture'}) through production builds."
         ),
     }
 
     if llm_service is not None:
         try:
-            user_prompt = f"Student: {student_name}\nTarget: {target_role}\nVerified: {verified_skills}\nGaps: {missing_skills}"
+            user_prompt = (
+                f"Student Name: {student_name}\n"
+                f"Target Role: {target_role}\n"
+                f"Skills Already Acquired ({len(verified_skills)}): {verified_skills[:35]}\n"
+                f"Current Projects: {param_projects[:10]}\n"
+                f"Initial Gap Signals: {missing_skills}\n\n"
+                "Generate a personalized 3-stage career roadmap (Year 1, Year 3, Year 5) tailored specifically to this student.\n"
+                "Rules:\n"
+                "- Do NOT list skills the student ALREADY has in 'Skills Already Acquired' as missing/to-learn.\n"
+                "- Identify the real next-level skills, production projects, and verifiable deliverables needed to reach Senior "
+                f"{target_role}.\n"
+                "- Return ONLY valid JSON with keys: user_id, target_role, current_match_score (number 0-100), "
+                "verified_skills_count (int), missing_prerequisites (list of str), "
+                "milestones (list of 3 objects with timeframe, target_title, key_competencies, recommended_projects, key_deliverables), "
+                "strategic_advice (str)."
+            )
             result = await llm_service.generate_json(
                 system_prompt=CAREER_VISION_SYSTEM_PROMPT,
                 user_prompt=user_prompt,
-                schema=CareerVisionOutput,
                 fallback_data=fallback_output,
             )
-            return result
+            if isinstance(result, dict) and result.get("milestones"):
+                result.setdefault("user_id", user_id)
+                result.setdefault("target_role", target_role)
+                result.setdefault("verified_skills_count", len(verified_skills))
+                result.setdefault("current_match_score", match_score)
+                return result
         except Exception as exc:
             logger.warning("LLM generation fallback: %s", exc)
 

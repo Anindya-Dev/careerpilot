@@ -6,7 +6,7 @@
  * @author Md Hussain Ansari (Member 1) & Sargam Banerjee (Member 4)
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -121,6 +121,28 @@ export default function AgentPipelinePage() {
     { level: 'warn', text: '[SCORER] Ready — click TRIGGER_RUN to execute full DAG & generate roadmap' }
   ]);
   const [pipelineResult, setPipelineResult] = useState(null);
+
+  const userSkillSet = useMemo(
+    () => new Set((profile?.skills || []).map((s) => (s.name || '').toLowerCase())),
+    [profile?.skills]
+  );
+  const skillsSignature = useMemo(
+    () =>
+      `${profile?.target_role || ''}::${(profile?.skills || [])
+        .map((s) => `${s.name}:${s.verified ? 1 : 0}`)
+        .sort()
+        .join(',')}`,
+    [profile?.target_role, profile?.skills]
+  );
+  const lastAutoSigRef = useRef('');
+
+  useEffect(() => {
+    if (!profile) return;
+    if (lastAutoSigRef.current === skillsSignature) return;
+    lastAutoSigRef.current = skillsSignature;
+    handleTriggerRun();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [skillsSignature]);
 
   const appendLog = (text, level = 'ok') => {
     const ts = new Date().toLocaleTimeString('en-US', { hour12: false });
@@ -481,30 +503,6 @@ export default function AgentPipelinePage() {
                   )}
                 </div>
 
-                {pipelineResult && (
-                  <div className="p-3 bg-[#FFFDF0] border-2 border-black text-[11px] space-y-1.5">
-                    <div className="font-black uppercase text-black flex items-center justify-between">
-                      <span>Generated Roadmap & Output</span>
-                      <span className="px-1.5 py-0.5 bg-[#70E000] border border-black text-[10px]">
-                        {pipelineResult.totalMs}ms
-                      </span>
-                    </div>
-                    {(
-                      pipelineResult.vision?.milestones ||
-                      pipelineResult.vision?.roadmap ||
-                      pipelineResult.health?.recommendations ||
-                      telemetry?.recommendations ||
-                      []
-                    )
-                      .slice(0, 4)
-                      .map((item, idx) => (
-                        <div key={idx} className="border-t border-black/15 pt-1 text-black/80">
-                          • {typeof item === 'string' ? item : item.title || item.description || JSON.stringify(item)}
-                        </div>
-                      ))}
-                  </div>
-                )}
-
                 <div className="p-3 bg-[#FAF5E6] border-2 border-black text-[11px] space-y-1 font-bold">
                   <div className="flex items-center justify-between text-black">
                     <span>ASYNC_DISPATCH</span>
@@ -541,6 +539,141 @@ export default function AgentPipelinePage() {
               </div>
             </div>
           </div>
+
+          {/* Graphical Career Trajectory Roadmap (Auto-updates with skills) */}
+          {pipelineResult?.vision?.milestones?.length > 0 && (
+            <Card
+              title={`Graphical Career Roadmap :: ${pipelineResult.vision.target_role || profile?.target_role || 'Target Role'}`}
+              subtitle="Dynamically synthesized from your verified skills & projects — auto-updates as you add skills"
+              headerBg="bg-[#C4A1FF]"
+              bodyClassName="p-6 space-y-6"
+            >
+              {/* Top Telemetry Strip */}
+              <div className="flex flex-wrap items-center justify-between gap-4 border-2 border-black bg-[#FAF5E6] p-4">
+                <div className="flex flex-wrap items-center gap-4 font-mono text-xs">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-black/60 block">Role Alignment</span>
+                    <span className="text-xl font-black">{pipelineResult.vision.current_match_score ?? 75}%</span>
+                  </div>
+                  <div className="h-8 w-[2px] bg-black/20" />
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-black/60 block">Profile Skills</span>
+                    <span className="text-xl font-black">{(profile?.skills || []).length}</span>
+                  </div>
+                  <div className="h-8 w-[2px] bg-black/20" />
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-black/60 block">Generation Time</span>
+                    <span className="text-xl font-black">{pipelineResult.totalMs}ms</span>
+                  </div>
+                </div>
+
+                {/* Live Prerequisite Gap Status */}
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="font-mono text-[10px] font-black uppercase mr-1">Prerequisites:</span>
+                  {(pipelineResult.vision.missing_prerequisites || []).map((req) => {
+                    const acquired = userSkillSet.has(req.toLowerCase());
+                    return (
+                      <span
+                        key={req}
+                        className={`px-2 py-0.5 border border-black font-mono text-[10px] font-black ${
+                          acquired ? 'bg-[#70E000] text-black' : 'bg-[#FFE600] text-black'
+                        }`}
+                      >
+                        {acquired ? `✓ ${req}` : `+ ${req}`}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 3-Stage Visual Timeline */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative">
+                {pipelineResult.vision.milestones.map((m, idx) => {
+                  const stageColors = ['bg-[#38B6FF]', 'bg-[#FFE600]', 'bg-[#70E000]'];
+                  return (
+                    <div
+                      key={m.timeframe || idx}
+                      className="border-2 border-black bg-white shadow-[4px_4px_0px_0px_#000] flex flex-col justify-between relative"
+                    >
+                      <div className={`${stageColors[idx % stageColors.length]} border-b-2 border-black px-4 py-3 flex items-center justify-between`}>
+                        <div>
+                          <span className="font-mono text-[10px] font-black uppercase tracking-wider block">
+                            STAGE 0{idx + 1} • {m.timeframe}
+                          </span>
+                          <h3 className="text-base font-black text-black leading-tight mt-0.5">
+                            {m.target_title}
+                          </h3>
+                        </div>
+                        <span className="w-8 h-8 border-2 border-black bg-white font-mono font-black text-sm flex items-center justify-center shadow-[2px_2px_0px_0px_#000]">
+                          {idx + 1}
+                        </span>
+                      </div>
+
+                      <div className="p-4 space-y-4 font-mono text-xs flex-1">
+                        {/* Competencies with live acquired check */}
+                        <div>
+                          <div className="text-[10px] font-black uppercase text-black/60 mb-1.5">
+                            Key Competencies
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {(m.key_competencies || []).map((comp) => {
+                              const acquired = userSkillSet.has(comp.toLowerCase());
+                              return (
+                                <span
+                                  key={comp}
+                                  className={`px-2 py-0.5 border border-black text-[11px] font-bold ${
+                                    acquired ? 'bg-[#70E000] text-black' : 'bg-[#FFF3B0] text-black'
+                                  }`}
+                                >
+                                  {acquired ? `✓ ${comp}` : comp}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Recommended Projects */}
+                        <div>
+                          <div className="text-[10px] font-black uppercase text-black/60 mb-1.5">
+                            Recommended Builds
+                          </div>
+                          <ul className="space-y-1 text-[11px]">
+                            {(m.recommended_projects || []).map((proj, pIdx) => (
+                              <li key={pIdx} className="p-2 bg-[#FAF5E6] border border-black font-bold">
+                                ▸ {proj}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {/* Key Deliverables */}
+                        <div>
+                          <div className="text-[10px] font-black uppercase text-black/60 mb-1.5">
+                            Verifiable Deliverables
+                          </div>
+                          <ul className="space-y-1 text-[11px] text-black/80">
+                            {(m.key_deliverables || []).map((deliv, dIdx) => (
+                              <li key={dIdx} className="flex items-start gap-1.5">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-green-700 shrink-0 mt-0.5" />
+                                <span>{deliv}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {pipelineResult.vision.strategic_advice && (
+                <div className="border-2 border-black bg-[#E2ECE9] p-4 font-mono text-xs font-bold flex items-start gap-2.5">
+                  <Zap className="w-4 h-4 shrink-0 mt-0.5 text-black" />
+                  <span>{pipelineResult.vision.strategic_advice}</span>
+                </div>
+              )}
+            </Card>
+          )}
         </motion.main>
       </div>
     </div>
