@@ -84,6 +84,7 @@ export default function ProfilePage() {
   const [auditLog, setAuditLog] = useState([]);
   const [showAuditLog, setShowAuditLog] = useState(false);
   const [isEditingGithubUsername, setIsEditingGithubUsername] = useState(false);
+  const [isEditingLeetcodeUsername, setIsEditingLeetcodeUsername] = useState(false);
 
   // Auto-dismiss toast notification after 4 seconds
   useEffect(() => {
@@ -492,6 +493,61 @@ export default function ProfilePage() {
     });
   };
 
+  // Clear cached GitHub data, audit logs, and GitHub-loaded skills/projects
+  const handleClearGithubCache = async () => {
+    const githubRepoUrls = new Set(
+      (formData.github_data?.repositories || []).map((r) => r.html_url).filter(Boolean)
+    );
+    const updatedSkills = (formData.skills || []).filter(
+      (s) => (s.source || '').toLowerCase() !== 'github'
+    );
+    const updatedProjects = (formData.projects || []).filter(
+      (p) => !p.repo_url || !githubRepoUrls.has(p.repo_url)
+    );
+    const updatedForm = {
+      ...formData,
+      linked_accounts: {
+        ...formData.linked_accounts,
+        github: ''
+      },
+      github_data: null,
+      skills: updatedSkills,
+      projects: updatedProjects
+    };
+    setAuditLog([]);
+    setShowAuditLog(false);
+    setIsEditingGithubUsername(false);
+    setFormData(updatedForm);
+    await updateProfile(updatedForm);
+    setNotification({
+      type: 'info',
+      message: 'Cleared GitHub cache, audit logs, and GitHub-loaded skills & projects.'
+    });
+  };
+
+  // Clear cached LeetCode data and username
+  const handleClearLeetcodeCache = async () => {
+    const updatedSkills = (formData.skills || []).filter(
+      (s) => (s.source || '').toLowerCase() !== 'leetcode'
+    );
+    const updatedForm = {
+      ...formData,
+      linked_accounts: {
+        ...formData.linked_accounts,
+        leetcode: ''
+      },
+      leetcode_data: null,
+      skills: updatedSkills
+    };
+    setIsEditingLeetcodeUsername(false);
+    setFormData(updatedForm);
+    await updateProfile(updatedForm);
+    setNotification({
+      type: 'info',
+      message: 'Cleared LeetCode cache and loaded DSA diagnostics.'
+    });
+  };
+
   // Production Live LeetCode DSA Standard Analysis
   const handleConnectLeetcode = async () => {
     const username = formData.linked_accounts.leetcode?.trim();
@@ -501,6 +557,7 @@ export default function ProfilePage() {
     }
     setIsFetchingLeetcode(true);
     setNotification({ type: '', message: '' });
+    setIsEditingLeetcodeUsername(false);
 
     try {
       const data = await integrationService.fetchLeetcodeStats(username);
@@ -998,6 +1055,15 @@ export default function ProfilePage() {
                             <><RefreshCw className="w-3 h-3" /> Re-audit</>
                           )}
                         </button>
+                        <button
+                          type="button"
+                          onClick={handleClearGithubCache}
+                          disabled={isFetchingGithub}
+                          className="px-2.5 py-2 border-2 border-black bg-[#FF70A6] hover:bg-[#FF8BB8] text-black text-[10px] font-mono font-black uppercase shadow-[2px_2px_0px_0px_#000] shrink-0 cursor-pointer disabled:opacity-50"
+                          title="Delete GitHub cache & all GitHub-loaded skills/repos"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
@@ -1230,22 +1296,57 @@ export default function ProfilePage() {
                         </a>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Input
-                        placeholder="LeetCode username"
-                        name="leetcode"
-                        value={formData.linked_accounts.leetcode}
-                        onChange={handleLinkedAccountChange}
-                      />
-                      <button
-                        type="button"
-                        onClick={handleConnectLeetcode}
-                        disabled={isFetchingLeetcode}
-                        className="px-3 py-2 border-2 border-black bg-[#70E000] hover:bg-[#85FF0A] text-black text-xs font-mono font-black uppercase shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all shrink-0 cursor-pointer disabled:opacity-50"
-                      >
-                        {isFetchingLeetcode ? 'Analyzing...' : 'Analyze'}
-                      </button>
-                    </div>
+                    {formData.leetcode_data && !isEditingLeetcodeUsername ? (
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 px-3 py-2 border-2 border-black bg-white font-mono text-xs font-bold flex items-center gap-2">
+                          <Code2 className="w-3.5 h-3.5 shrink-0" />
+                          @{formData.linked_accounts.leetcode || formData.leetcode_data.username}
+                          <span className="ml-auto text-[10px] text-black/50">cached</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingLeetcodeUsername(true)}
+                          className="px-2.5 py-2 border-2 border-black bg-white hover:bg-[#FFE600] text-black text-[10px] font-mono font-black uppercase shadow-[2px_2px_0px_0px_#000] shrink-0 cursor-pointer"
+                          title="Change LeetCode username"
+                        >
+                          <Pencil className="w-3 h-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleConnectLeetcode}
+                          disabled={isFetchingLeetcode}
+                          className="px-3 py-2 border-2 border-black bg-[#70E000] hover:bg-[#85FF0A] text-black text-xs font-mono font-black uppercase shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all shrink-0 cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                        >
+                          {isFetchingLeetcode ? 'Analyzing...' : <><RefreshCw className="w-3 h-3" /> Re-sync</>}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleClearLeetcodeCache}
+                          disabled={isFetchingLeetcode}
+                          className="px-2.5 py-2 border-2 border-black bg-[#FF70A6] hover:bg-[#FF8BB8] text-black text-[10px] font-mono font-black uppercase shadow-[2px_2px_0px_0px_#000] shrink-0 cursor-pointer disabled:opacity-50"
+                          title="Delete LeetCode cache & loaded DSA diagnostics"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Input
+                          placeholder="LeetCode username"
+                          name="leetcode"
+                          value={formData.linked_accounts.leetcode}
+                          onChange={handleLinkedAccountChange}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleConnectLeetcode}
+                          disabled={isFetchingLeetcode}
+                          className="px-3 py-2 border-2 border-black bg-[#70E000] hover:bg-[#85FF0A] text-black text-xs font-mono font-black uppercase shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all shrink-0 cursor-pointer disabled:opacity-50"
+                        >
+                          {isFetchingLeetcode ? 'Analyzing...' : 'Analyze'}
+                        </button>
+                      </div>
+                    )}
 
                     {/* Live LeetCode DSA Diagnostics */}
                     {formData.leetcode_data && (
