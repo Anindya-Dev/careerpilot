@@ -420,8 +420,68 @@ async def audit_github_profile(request: GithubAuditRequest) -> Dict[str, Any]:
     return await _run_github_audit(request.username, candidate_skills=request.skills)
 
 
+async def _fetch_github_via_html_fallback(clean_user: str) -> tuple[Dict[str, Any], List[Dict[str, Any]]]:
+    """Rate-limit-free fallback using public GitHub HTML profile & repositories tab."""
+    async with httpx.AsyncClient(timeout=12.0, follow_redirects=True) as client:
+        resp = await client.get(
+            f"https://github.com/{clean_user}?tab=repositories",
+            headers={"User-Agent": "Mozilla/5.0 (compatible; CareerPilot/1.0)"},
+        )
+        if resp.status_code == 404:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"GitHub user '{clean_user}' not found.",
+            )
+        if resp.status_code != 200:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail=f"GitHub fallback failed (HTTP {resp.status_code}).",
+            )
+        page = resp.text
+
+    # Parse repo blocks from GitHub repositories tab
+    repo_blocks = re.split(r'<li[^>]*class="[^"]*col-12[^"]*"[^>]*>', page)[1:]
+    raw_repos: List[Dict[str, Any]] = []
+    for idx, blk in enumerate(repo_blocks[:30]):
+        name_m = re.search(r'itemprop="name codeRepository"[^>]*>\s*([^\s<]+)', blk)
+        if not name_m:
+            continue
+        rname = html.unescape(name_m.group(1).strip())
+        desc_m = re.search(r'itemprop="description"[^>]*>(.*?)</p>', blk, flags=re.S)
+        desc = html.unescape(re.sub(r"<[^>]+>", "", desc_m.group(1)).strip()) if desc_m else ""
+        lang_m = re.search(r'itemprop="programmingLanguage"[^>]*>([^<]+)<', blk)
+        lang = html.unescape(lang_m.group(1).strip()) if lang_m else None
+        is_fork = "Forked from" in blk
+        raw_repos.append({
+            "id": idx + 1,
+            "name": rname,
+            "description": desc,
+            "html_url": f"https://github.com/{clean_user}/{rname}",
+            "language": lang,
+            "stargazers_count": 0,
+            "forks_count": 0,
+            "topics": [],
+            "fork": is_fork,
+            "default_branch": "main",
+            "owner": {"login": clean_user},
+            "updated_at": None,
+        })
+
+    user_data = {
+        "login": clean_user,
+        "name": clean_user,
+        "avatar_url": f"https://github.com/{clean_user}.png",
+        "bio": "",
+        "html_url": f"https://github.com/{clean_user}",
+        "public_repos": len(raw_repos),
+        "followers": 0,
+    }
+    return user_data, raw_repos
+
+
 async def _run_github_audit(username: str, candidate_skills: List[str]) -> Dict[str, Any]:
-    """Query live GitHub REST API v3, scan recursive repo trees & files, and verify skills."""
+    """Query live GitHub REST API v3 (with HTML/raw fallback), scan repo files, and verify skills."""
+    import os
     clean_user = username.strip().lstrip("@")
     if not clean_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="GitHub username is required.")
@@ -430,7 +490,11 @@ async def _run_github_audit(username: str, candidate_skills: List[str]) -> Dict[
         "Accept": "application/vnd.github.v3+json",
         "User-Agent": "CareerPilot-Orchestrator/1.0",
     }
+    gh_token = os.getenv("GITHUB_TOKEN", "").strip()
+    if gh_token:
+        headers["Authorization"] = f"Bearer {gh_token}"
 
+    used_html_fallback = False
     async with httpx.AsyncClient(timeout=10.0) as client:
         user_resp, repos_resp = await client.get(
             f"https://api.github.com/users/{clean_user}", headers=headers
@@ -445,18 +509,17 @@ async def _run_github_audit(username: str, candidate_skills: List[str]) -> Dict[
             detail=f"GitHub user '{clean_user}' not found.",
         )
     if user_resp.status_code in (403, 429) or repos_resp.status_code in (403, 429):
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="GitHub API rate limit reached. Please try again shortly.",
-        )
-    if user_resp.status_code != 200 or repos_resp.status_code != 200:
+        logger.info("GitHub REST API rate-limited; using HTML + raw.githubusercontent.com fallback for %s", clean_user)
+        user_data, raw_repos = await _fetch_github_via_html_fallback(clean_user)
+        used_html_fallback = True
+    elif user_resp.status_code != 200 or repos_resp.status_code != 200:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=f"GitHub API error (HTTP {user_resp.status_code}).",
         )
-
-    user_data = user_resp.json()
-    raw_repos = repos_resp.json()
+    else:
+        user_data = user_resp.json()
+        raw_repos = repos_resp.json()
 
     repositories: List[Dict[str, Any]] = []
     language_counts: Dict[str, int] = {}
@@ -512,18 +575,19 @@ async def _run_github_audit(username: str, candidate_skills: List[str]) -> Dict[
         branch = repo.get("default_branch") or "main"
 
         tree_paths: List[str] = []
-        try:
-            tree_url = f"https://api.github.com/repos/{owner}/{repo_name}/git/trees/{branch}?recursive=1"
-            t_resp = await client.get(tree_url, headers=headers)
-            if t_resp.status_code == 200:
-                tree_paths = [
-                    item.get("path", "")
-                    for item in t_resp.json().get("tree", [])
-                    if item.get("type") == "blob"
-                    and not any(sd in item.get("path", "").lower() for sd in SKIP_DIRS)
-                ]
-        except Exception:
-            pass
+        if not used_html_fallback:
+            try:
+                tree_url = f"https://api.github.com/repos/{owner}/{repo_name}/git/trees/{branch}?recursive=1"
+                t_resp = await client.get(tree_url, headers=headers)
+                if t_resp.status_code == 200:
+                    tree_paths = [
+                        item.get("path", "")
+                        for item in t_resp.json().get("tree", [])
+                        if item.get("type") == "blob"
+                        and not any(sd in item.get("path", "").lower() for sd in SKIP_DIRS)
+                    ]
+            except Exception:
+                pass
 
         # Pick manifests anywhere in repo (prioritize shallower paths)
         manifest_paths = sorted(
@@ -539,13 +603,23 @@ async def _run_github_audit(username: str, candidate_skills: List[str]) -> Dict[
 
         target_paths = manifest_paths + code_paths
         if not target_paths:
-            # Fallback to root manifests if tree endpoint was unavailable
-            target_paths = ["requirements.txt", "pyproject.toml", "package.json", "README.md"]
+            # Fallback to common manifest & entry file paths via raw.githubusercontent.com (no API rate limit)
+            target_paths = [
+                "requirements.txt", "backend/requirements.txt", "pyproject.toml",
+                "package.json", "frontend/package.json", "README.md",
+                "main.py", "app.py", "backend/main.py", "backend/app.py", "app/main.py",
+            ]
 
         fetched = await asyncio.gather(*[
             _fetch_raw_file(client, owner, repo_name, branch, p) for p in target_paths
         ])
         file_contents = {p: txt for p, txt in fetched if txt}
+        if not file_contents and branch == "main":
+            # Retry master branch if repo uses master instead of main
+            fetched_master = await asyncio.gather(*[
+                _fetch_raw_file(client, owner, repo_name, "master", p) for p in target_paths[:6]
+            ])
+            file_contents = {p: txt for p, txt in fetched_master if txt}
 
         return {
             "repo": repo_name,
