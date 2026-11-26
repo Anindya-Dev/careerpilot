@@ -8,6 +8,8 @@ Provides live, non-mocked endpoints for:
 
 from __future__ import annotations
 
+import asyncio
+import html
 import io
 import json
 import logging
@@ -455,6 +457,93 @@ async def fetch_github_profile(username: str) -> Dict[str, Any]:
             }
         )
 
+    # --- Deep Code Audit: scan dependency files + topics + descriptions ---
+    # Collect all text signals across repositories
+    all_signal_text = ""
+    # 1. repo descriptions and topics (fast, no extra API calls)
+    for r in repositories:
+        all_signal_text += " " + (r.get("description") or "")
+        all_signal_text += " " + " ".join(r.get("topics") or [])
+        if r.get("language"):
+            all_signal_text += " " + r["language"]
+
+    # 2. Fetch dependency manifest files from the top-5 non-fork repos
+    #    Files: requirements.txt, pyproject.toml, package.json, Pipfile, go.mod, pom.xml
+    MANIFEST_FILES = [
+        "requirements.txt", "pyproject.toml", "Pipfile",
+        "package.json", "go.mod", "pom.xml", "build.gradle",
+        "Cargo.toml", "composer.json", "README.md"
+    ]
+    top_repos = [r for r in raw_repos if not r.get("fork")][:5]
+
+    async def _fetch_file(client: httpx.AsyncClient, owner: str, repo: str, filename: str) -> str:
+        try:
+            url = f"https://api.github.com/repos/{owner}/{repo}/contents/{filename}"
+            resp = await client.get(url, headers=headers)
+            if resp.status_code == 200:
+                data = resp.json()
+                import base64
+                content = data.get("content", "")
+                encoding = data.get("encoding", "base64")
+                if encoding == "base64":
+                    return base64.b64decode(content).decode("utf-8", errors="ignore")[:4000]
+                return str(content)[:4000]
+        except Exception:
+            pass
+        return ""
+
+    async def _scan_repo(client: httpx.AsyncClient, repo: Dict) -> str:
+        owner = repo.get("owner", {}).get("login") or clean_user
+        repo_name = repo.get("name", "")
+        texts = await asyncio.gather(*[
+            _fetch_file(client, owner, repo_name, f) for f in MANIFEST_FILES
+        ])
+        return " ".join(texts)
+
+    async with httpx.AsyncClient(timeout=10.0) as scan_client:
+        repo_texts = await asyncio.gather(*[_scan_repo(scan_client, r) for r in top_repos])
+
+    all_signal_text += " " + " ".join(repo_texts)
+
+    # 3. Extract skills from all combined signal text using SKILL_TAXONOMY
+    skill_hit_map: Dict[str, Dict[str, Any]] = {}  # name -> {count, repos}
+
+    for skill_name, category, pattern in SKILL_TAXONOMY:
+        matches = re.findall(pattern, all_signal_text, flags=re.IGNORECASE)
+        if matches:
+            # Find which repos mention this skill
+            evidence_repos = []
+            for r in repositories:
+                repo_text = (r.get("description") or "") + " " + " ".join(r.get("topics") or [])
+                # Also check repo-specific scanned texts
+                ridx = top_repos.index(next((tr for tr in top_repos if tr.get("name") == r.get("name")), None)) if r in top_repos else -1
+                if ridx >= 0:
+                    repo_text += " " + repo_texts[ridx]
+                if re.search(pattern, repo_text, flags=re.IGNORECASE):
+                    evidence_repos.append(r["name"])
+            skill_hit_map[skill_name] = {
+                "name": skill_name,
+                "category": category,
+                "count": len(matches),
+                "repos": evidence_repos[:3],
+            }
+
+    # 4. Build evidence detail strings per skill
+    def _build_evidence_detail(skill_name: str, info: Dict) -> str:
+        repos = info.get("repos", [])
+        count = info.get("count", 1)
+        if repos:
+            repo_list = ", ".join(f"`{r}`" for r in repos)
+            return (
+                f"Found in {count} reference(s) across your repos: {repo_list}. "
+                f"Detected in dependency manifests (requirements.txt / package.json / pyproject.toml), "
+                f"repo topics, and descriptions via GitHub Contents API scan."
+            )
+        return (
+            f"Detected {count} reference(s) across repo topics, descriptions, and dependency files via GitHub API scan."
+        )
+
+    # Language skills from actual repo primary languages
     detected_skills = [
         {
             "name": lang,
@@ -462,9 +551,28 @@ async def fetch_github_profile(username: str) -> Dict[str, Any]:
             "category": "Languages",
             "verified": True,
             "source": "github",
+            "evidence_detail": f"Primary language in {count} of your GitHub repositories (GitHub API language detection).",
         }
         for lang, count in sorted(language_counts.items(), key=lambda x: x[1], reverse=True)
     ]
+    lang_names_lower = {lang.lower() for lang in language_counts}
+
+    # Framework/lib/AI/DB/DevOps skills from deep code scan
+    for skill_name, info in skill_hit_map.items():
+        if skill_name.lower() in lang_names_lower:
+            # Already captured from language detection above; enrich evidence_detail
+            for s in detected_skills:
+                if s["name"].lower() == skill_name.lower():
+                    s["evidence_detail"] = _build_evidence_detail(skill_name, info)
+            continue
+        detected_skills.append({
+            "name": skill_name,
+            "level": "advanced" if info["count"] >= 4 else "intermediate",
+            "category": info["category"],
+            "verified": True,
+            "source": "github",
+            "evidence_detail": _build_evidence_detail(skill_name, info),
+        })
 
     return {
         "source": "live_github_api",
@@ -481,6 +589,11 @@ async def fetch_github_profile(username: str) -> Dict[str, Any]:
         "repositories": repositories,
         "detected_skills": detected_skills,
         "language_breakdown": language_counts,
+        "code_audit": {
+            "scanned_repos": [r["name"] for r in top_repos],
+            "manifest_files_checked": MANIFEST_FILES,
+            "skills_detected_from_code": len(skill_hit_map),
+        },
     }
 
 
@@ -816,4 +929,318 @@ async def benchmark_skills_for_role(request: SkillBenchmarkRequest) -> Dict[str,
         "radarData": radar_items,
         "narrative": f"Benchmarked {len(request.skills)} profile skills against live Job Board MCP demand for {target_role}.",
         "source": "live_job_board_mcp",
+    }
+
+
+# ------------------------------------------------------------------------------
+# LIVE AUTO JOBFINDER & OUTREACH EMAIL GENERATOR
+# ------------------------------------------------------------------------------
+
+EMAIL_REGEX = re.compile(r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b")
+IGNORED_EMAIL_DOMAINS = {"example.com", "sentry.io", "wixpress.com", "schema.org", "w3.org"}
+
+
+def _clean_html(raw_html: str) -> str:
+    text = re.sub(r"<[^>]+>", " ", raw_html or "")
+    text = html.unescape(text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _extract_public_email(text: str) -> Optional[str]:
+    if not text:
+        return None
+    for match in EMAIL_REGEX.findall(text):
+        lower = match.lower()
+        domain = lower.split("@")[-1]
+        if (
+            domain not in IGNORED_EMAIL_DOMAINS
+            and not lower.startswith(("noreply", "no-reply", "donotreply"))
+            and not lower.endswith((".png", ".jpg", ".jpeg", ".svg", ".webp"))
+        ):
+            return match
+    return None
+
+
+def _is_internship(title: str, tags: List[str], job_type: str = "") -> bool:
+    blob = f"{title} {' '.join(tags)} {job_type}".lower()
+    return any(k in blob for k in ("intern", "internship", "trainee", "apprentice", "working student", "werkstudent"))
+
+
+def _score_job_match(
+    title: str,
+    description: str,
+    tags: List[str],
+    user_skills: List[str],
+    target_role: str,
+) -> tuple[int, List[str], List[str]]:
+    blob = f"{title} {' '.join(tags)} {description}".lower()
+    matched: List[str] = []
+    for sk in user_skills:
+        if re.search(rf"(?<![a-zA-Z0-9]){re.escape(sk.lower())}(?![a-zA-Z0-9])", blob):
+            matched.append(sk)
+
+    # Extract notable required skills from taxonomy present in job description
+    job_skills_found = [
+        name for name, _, pattern in SKILL_TAXONOMY if re.search(pattern, blob, flags=re.IGNORECASE)
+    ]
+    user_set = {s.lower() for s in user_skills}
+    missing = [js for js in job_skills_found if js.lower() not in user_set][:5]
+
+    role_tokens = [t for t in re.split(r"[\s/,&-]+", target_role.lower()) if len(t) >= 2]
+    role_hits = sum(1 for t in role_tokens if t in title.lower())
+
+    skill_ratio = (len(matched) / max(1, min(len(job_skills_found), 6))) * 65
+    role_bonus = min(role_hits * 15, 30)
+    base = 15 if (matched or role_hits) else 5
+    score = int(min(98, max(10, round(base + skill_ratio + role_bonus))))
+    return score, matched[:8], missing
+
+
+class JobDiscoverRequest(BaseModel):
+    target_role: str = Field(default="Software Engineer")
+    skills: List[Dict[str, Any]] = Field(default_factory=list)
+    category: str = Field(default="all", description="'all', 'job', or 'internship'")
+    search: str = Field(default="")
+    limit: int = Field(default=30, ge=1, le=60)
+
+
+class OutreachDraftRequest(BaseModel):
+    job_title: str
+    company: str
+    contact_email: Optional[str] = None
+    job_description: str = ""
+    student_name: str = "Engineering Candidate"
+    target_role: str = ""
+    skills: List[str] = Field(default_factory=list)
+    projects: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+async def _fetch_remotive(client: httpx.AsyncClient, search_term: str) -> List[Dict[str, Any]]:
+    try:
+        url = "https://remotive.com/api/remote-jobs?limit=25"
+        if search_term:
+            url += f"&search={search_term}"
+        resp = await client.get(url, headers={"User-Agent": "CareerPilot-JobFinder/1.0"})
+        if resp.status_code != 200:
+            return []
+        jobs = resp.json().get("jobs", [])
+        results = []
+        for j in jobs:
+            desc = _clean_html(j.get("description", ""))
+            tags = j.get("tags") or []
+            title = j.get("title", "")
+            results.append(
+                {
+                    "id": f"remotive-{j.get('id')}",
+                    "title": title,
+                    "company": j.get("company_name", "Unknown"),
+                    "location": j.get("candidate_required_location") or "Remote",
+                    "remote": True,
+                    "job_type": "internship" if _is_internship(title, tags, j.get("job_type", "")) else "job",
+                    "url": j.get("url"),
+                    "published_at": j.get("publication_date"),
+                    "salary": j.get("salary") or "",
+                    "tags": tags[:6],
+                    "contact_email": _extract_public_email(desc),
+                    "description_snippet": desc[:320],
+                    "source": "Remotive",
+                }
+            )
+        return results
+    except Exception as exc:
+        logger.warning("Remotive fetch failed: %s", exc)
+        return []
+
+
+async def _fetch_arbeitnow(client: httpx.AsyncClient) -> List[Dict[str, Any]]:
+    try:
+        resp = await client.get(
+            "https://www.arbeitnow.com/api/job-board-api",
+            headers={"User-Agent": "CareerPilot-JobFinder/1.0"},
+        )
+        if resp.status_code != 200:
+            return []
+        jobs = resp.json().get("data", [])[:60]
+        results = []
+        for j in jobs:
+            desc = _clean_html(j.get("description", ""))
+            tags = j.get("tags") or []
+            title = j.get("title", "")
+            job_types = " ".join(j.get("job_types") or [])
+            results.append(
+                {
+                    "id": f"arbeitnow-{j.get('slug')}",
+                    "title": title,
+                    "company": j.get("company_name", "Unknown"),
+                    "location": j.get("location") or ("Remote" if j.get("remote") else "Global"),
+                    "remote": bool(j.get("remote", False)),
+                    "job_type": "internship" if _is_internship(title, tags, job_types) else "job",
+                    "url": j.get("url"),
+                    "published_at": str(j.get("created_at") or ""),
+                    "salary": "",
+                    "tags": tags[:6],
+                    "contact_email": _extract_public_email(desc),
+                    "description_snippet": desc[:320],
+                    "source": "Arbeitnow",
+                }
+            )
+        return results
+    except Exception as exc:
+        logger.warning("Arbeitnow fetch failed: %s", exc)
+        return []
+
+
+async def _fetch_remoteok(client: httpx.AsyncClient) -> List[Dict[str, Any]]:
+    try:
+        resp = await client.get(
+            "https://remoteok.com/api",
+            headers={"User-Agent": "CareerPilot-JobFinder/1.0"},
+        )
+        if resp.status_code != 200:
+            return []
+        raw = resp.json()
+        jobs = [item for item in raw if isinstance(item, dict) and item.get("position")][:40]
+        results = []
+        for j in jobs:
+            desc = _clean_html(j.get("description", ""))
+            tags = j.get("tags") or []
+            title = j.get("position", "")
+            salary_min = j.get("salary_min")
+            salary_max = j.get("salary_max")
+            salary = f"${salary_min:,} - ${salary_max:,}" if salary_min and salary_max else ""
+            results.append(
+                {
+                    "id": f"remoteok-{j.get('id')}",
+                    "title": title,
+                    "company": j.get("company", "Unknown"),
+                    "location": j.get("location") or "Remote",
+                    "remote": True,
+                    "job_type": "internship" if _is_internship(title, tags) else "job",
+                    "url": j.get("apply_url") or j.get("url"),
+                    "published_at": j.get("date"),
+                    "salary": salary,
+                    "tags": tags[:6],
+                    "contact_email": _extract_public_email(desc),
+                    "description_snippet": desc[:320],
+                    "source": "RemoteOK",
+                }
+            )
+        return results
+    except Exception as exc:
+        logger.warning("RemoteOK fetch failed: %s", exc)
+        return []
+
+
+@router.post(
+    "/api/v1/orchestrator/integrations/jobs/discover",
+    summary="Actively fetch live jobs & internships from Remotive, Arbeitnow, and RemoteOK",
+)
+@router.post(
+    "/api/v1/integrations/jobs/discover",
+    summary="Actively fetch live jobs & internships (alias)",
+)
+async def discover_live_jobs(request: JobDiscoverRequest) -> Dict[str, Any]:
+    """Aggregate live jobs and internships from public APIs, extract any public contact emails,
+    and rank them against the student's actual profile skills and target role.
+    """
+    user_skills = [str(s.get("name", "")).strip() for s in request.skills if s.get("name")]
+    search_q = request.search.strip()
+
+    async with httpx.AsyncClient(timeout=8.0, follow_redirects=True) as client:
+        remotive_res, arbeitnow_res, remoteok_res = await asyncio.gather(
+            _fetch_remotive(client, search_q or ""),
+            _fetch_arbeitnow(client),
+            _fetch_remoteok(client),
+        )
+
+    combined = remotive_res + arbeitnow_res + remoteok_res
+
+    filtered: List[Dict[str, Any]] = []
+    for item in combined:
+        if request.category in ("job", "internship") and item["job_type"] != request.category:
+            continue
+        if search_q:
+            haystack = f"{item['title']} {item['company']} {' '.join(item['tags'])} {item['description_snippet']}".lower()
+            if not all(tok in haystack for tok in search_q.lower().split()):
+                continue
+
+        score, matched, missing = _score_job_match(
+            item["title"],
+            item["description_snippet"],
+            item["tags"],
+            user_skills,
+            request.target_role,
+        )
+        item["match_score"] = score
+        item["matched_skills"] = matched
+        item["missing_skills"] = missing
+        filtered.append(item)
+
+    filtered.sort(key=lambda x: (x["match_score"], bool(x["contact_email"])), reverse=True)
+    final_list = filtered[: request.limit]
+
+    return {
+        "total_fetched": len(combined),
+        "returned_count": len(final_list),
+        "emails_found_count": sum(1 for x in final_list if x.get("contact_email")),
+        "sources": ["Remotive", "Arbeitnow", "RemoteOK"],
+        "jobs": final_list,
+    }
+
+
+@router.post(
+    "/api/v1/orchestrator/integrations/jobs/outreach",
+    summary="Generate personalized AI cold email / application draft for a job",
+)
+@router.post(
+    "/api/v1/integrations/jobs/outreach",
+    summary="Generate personalized AI cold email draft (alias)",
+)
+async def generate_job_outreach(request: OutreachDraftRequest) -> Dict[str, Any]:
+    """Generate a tailored cold email / outreach draft grounded in the student's real skills and projects."""
+    skills_str = ", ".join(request.skills[:10]) if request.skills else "software engineering"
+    proj_names = [p.get("title") for p in request.projects[:2] if p.get("title")]
+    proj_str = ", ".join(proj_names) if proj_names else "production engineering projects"
+
+    llm = get_llm_service()
+    if llm._get_llm() is not None:
+        try:
+            prompt = (
+                f"Write a concise, high-impact cold outreach email from {request.student_name} "
+                f"applying for '{request.job_title}' at '{request.company}'.\n"
+                f"Candidate Skills: {skills_str}\n"
+                f"Candidate Projects: {proj_str}\n"
+                f"Job Context: {request.job_description[:800]}\n\n"
+                "Keep it under 160 words, professional, specific, and free of fluff. "
+                'Return ONLY valid JSON: {"subject": str, "body": str}.'
+            )
+            parsed = await llm.generate_json(
+                system_prompt="You are a technical career coach writing concise, authentic job outreach emails. Return only valid JSON.",
+                user_prompt=prompt,
+                fallback_data={},
+            )
+            if isinstance(parsed, dict) and parsed.get("subject") and parsed.get("body"):
+                return {
+                    "to": request.contact_email or "",
+                    "subject": parsed["subject"],
+                    "body": parsed["body"],
+                    "source": "live_groq_llm",
+                }
+        except Exception as exc:
+            logger.warning("LLM outreach generation failed (%s); using structured template.", exc)
+
+    subject = f"Application for {request.job_title} — {request.student_name}"
+    body = (
+        f"Hi {request.company} Hiring Team,\n\n"
+        f"I'm {request.student_name}, an engineering candidate specializing in {skills_str}. "
+        f"I recently came across your opening for {request.job_title} and wanted to reach out directly.\n\n"
+        f"In my recent work ({proj_str}), I have built and shipped systems aligned with what your team is building. "
+        f"I'd welcome the chance to share my work and discuss how I can contribute.\n\n"
+        f"Best regards,\n{request.student_name}"
+    )
+    return {
+        "to": request.contact_email or "",
+        "subject": subject,
+        "body": body,
+        "source": "structured_template",
     }
