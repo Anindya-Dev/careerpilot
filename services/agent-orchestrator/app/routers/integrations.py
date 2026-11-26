@@ -1245,8 +1245,8 @@ def _score_job_match(
 
 class JobDiscoverRequest(BaseModel):
     target_role: str = Field(default="Software Engineer")
-    skills: List[Dict[str, Any]] = Field(default_factory=list)
-    category: str = Field(default="all", description="'all', 'job', or 'internship'")
+    skills: List[Any] = Field(default_factory=list)
+    category: str = Field(default="all", description="'all', 'job'/'jobs', or 'internship'/'internships'")
     search: str = Field(default="")
     limit: int = Field(default=30, ge=1, le=60)
 
@@ -1390,7 +1390,12 @@ async def discover_live_jobs(request: JobDiscoverRequest) -> Dict[str, Any]:
     """Aggregate live jobs and internships from public APIs, extract any public contact emails,
     and rank them against the student's actual profile skills and target role.
     """
-    user_skills = [str(s.get("name", "")).strip() for s in request.skills if s.get("name")]
+    user_skills = [
+        str(s if isinstance(s, str) else s.get("name", "")).strip()
+        for s in request.skills
+        if (s if isinstance(s, str) else s.get("name"))
+    ]
+    norm_cat = (request.category or "all").strip().lower().rstrip("s")
     search_q = request.search.strip()
 
     async with httpx.AsyncClient(timeout=8.0, follow_redirects=True) as client:
@@ -1404,7 +1409,7 @@ async def discover_live_jobs(request: JobDiscoverRequest) -> Dict[str, Any]:
 
     filtered: List[Dict[str, Any]] = []
     for item in combined:
-        if request.category in ("job", "internship") and item["job_type"] != request.category:
+        if norm_cat in ("job", "internship") and item["job_type"] != norm_cat:
             continue
         if search_q:
             haystack = f"{item['title']} {item['company']} {' '.join(item['tags'])} {item['description_snippet']}".lower()

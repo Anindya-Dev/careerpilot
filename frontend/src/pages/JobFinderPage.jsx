@@ -49,6 +49,17 @@ const STATUS_STYLES = {
   REPLIED: 'bg-[#70E000] text-black border-black'
 };
 
+function formatApiError(err, fallback) {
+  const detail = err?.response?.data?.detail;
+  if (Array.isArray(detail)) {
+    return detail.map((d) => d?.msg || JSON.stringify(d)).join('; ') || fallback;
+  }
+  if (detail && typeof detail === 'object') {
+    return detail.msg || JSON.stringify(detail);
+  }
+  return detail || err?.message || fallback;
+}
+
 export default function JobFinderPage() {
   const { user } = useAuth();
   const { profile } = useProfile();
@@ -126,9 +137,7 @@ export default function JobFinderPage() {
         });
         setJobsData(data);
       } catch (err) {
-        setFetchError(
-          err?.response?.data?.detail || err?.message || 'Failed to scrape live job boards.'
-        );
+        setFetchError(formatApiError(err, 'Failed to scrape live job boards.'));
       } finally {
         setIsLoading(false);
       }
@@ -238,7 +247,7 @@ export default function JobFinderPage() {
         source: res.source || 'template'
       });
     } catch (err) {
-      setModalError(err?.response?.data?.detail || 'Could not generate AI email draft.');
+      setModalError(formatApiError(err, 'Could not generate AI email draft.'));
     } finally {
       setIsGeneratingEmail(false);
     }
