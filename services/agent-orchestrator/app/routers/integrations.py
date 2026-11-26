@@ -801,6 +801,25 @@ async def _run_github_audit(username: str, candidate_skills: List[str]) -> Dict[
             "evidence_detail": _build_evidence_detail(skill_name, info),
         })
 
+    # Build repo-wise scan & founds log for each scanned repository
+    repo_logs: List[Dict[str, Any]] = []
+    for bundle in repo_bundles:
+        rname = bundle["repo"]
+        found_in_repo = [
+            info["name"]
+            for info in skill_hit_map.values()
+            if any(r.lower() == rname.lower() for r in (info.get("repos") or []))
+        ]
+        if bundle.get("language") and bundle["language"] not in found_in_repo:
+            if bundle["language"] not in ("Jupyter Notebook", "HTML", "CSS", "Makefile"):
+                found_in_repo.insert(0, bundle["language"])
+        repo_logs.append({
+            "repo": rname,
+            "language": bundle.get("language") or "Unknown",
+            "files_scanned": list(bundle.get("files", {}).keys()),
+            "skills_found": found_in_repo,
+        })
+
     return {
         "source": "live_github_api",
         "profile": {
@@ -820,6 +839,7 @@ async def _run_github_audit(username: str, candidate_skills: List[str]) -> Dict[
             "scanned_repos": [r["name"] for r in top_repos],
             "files_scanned_count": files_scanned_count,
             "skills_detected_from_code": len(skill_hit_map),
+            "repo_logs": repo_logs,
         },
     }
 

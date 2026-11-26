@@ -82,6 +82,7 @@ export default function ProfilePage() {
   const [isEditingFoundational, setIsEditingFoundational] = useState(false);
   // GitHub audit log — live step-by-step progress shown in terminal panel
   const [auditLog, setAuditLog] = useState([]);
+  const [showAuditLog, setShowAuditLog] = useState(false);
   const [isEditingGithubUsername, setIsEditingGithubUsername] = useState(false);
 
   // Auto-dismiss toast notification after 4 seconds
@@ -340,24 +341,28 @@ export default function ProfilePage() {
     }
     setIsFetchingGithub(true);
     setAuditLog([]);
+    setShowAuditLog(true);
     setNotification({ type: '', message: '' });
     setIsEditingGithubUsername(false);
 
+    const logEntries = [];
     const log = (msg, status = 'running') => {
-      setAuditLog((prev) => [
-        ...prev,
-        { msg, status, ts: new Date().toLocaleTimeString('en-US', { hour12: false }) }
-      ]);
+      logEntries.push({ msg, status, ts: new Date().toLocaleTimeString('en-US', { hour12: false }) });
+      setAuditLog([...logEntries]);
     };
     const done = (idx, extraMsg) => {
-      setAuditLog((prev) =>
-        prev.map((e, i) => (i === idx ? { ...e, status: 'done', msg: extraMsg || e.msg } : e))
-      );
+      if (logEntries[idx]) {
+        logEntries[idx] = { ...logEntries[idx], status: 'done', msg: extraMsg || logEntries[idx].msg };
+        setAuditLog([...logEntries]);
+      }
     };
     const fail = (idx, errMsg) => {
-      setAuditLog((prev) =>
-        prev.map((e, i) => (i === idx ? { ...e, status: 'error', msg: errMsg || e.msg } : e))
-      );
+      if (logEntries[idx]) {
+        logEntries[idx] = { ...logEntries[idx], status: 'error', msg: errMsg || logEntries[idx].msg };
+        setAuditLog([...logEntries]);
+      } else {
+        log(errMsg, 'error');
+      }
     };
 
     try {
@@ -401,14 +406,18 @@ export default function ProfilePage() {
       done(3, `✓ ${data.detected_skills.length} skills verified, ${newSkillsAdded} newly added`);
 
       log(`Saving profile to CareerPilot...`);
+      done(4, `✓ Profile saved — GitHub audit complete`);
       const updatedForm = {
         ...formData,
         skills: Array.from(existingMap.values()),
-        github_data: data
+        github_data: {
+          ...data,
+          audit_log: [...logEntries],
+          audited_at: new Date().toISOString()
+        }
       };
       setFormData(updatedForm);
       await updateProfile(updatedForm);
-      done(4, `✓ Profile saved — GitHub audit complete`);
 
       setNotification({
         type: 'success',
@@ -1009,42 +1018,107 @@ export default function ProfilePage() {
                       </div>
                     )}
 
-                    {/* Live Audit Log Terminal */}
-                    {auditLog.length > 0 && (
-                      <div className="mt-1 border-2 border-black bg-black rounded-none overflow-hidden">
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-white/10 bg-[#111]">
-                          <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F57] inline-block" />
-                          <span className="w-2.5 h-2.5 rounded-full bg-[#FEBC2E] inline-block" />
-                          <span className="w-2.5 h-2.5 rounded-full bg-[#28C840] inline-block" />
-                          <span className="font-mono text-[10px] text-white/40 ml-2">GITHUB_AUDIT_LOG</span>
-                        </div>
-                        <div className="p-3 space-y-1 max-h-44 overflow-y-auto font-mono text-[11px]">
-                          {auditLog.map((entry, i) => (
-                            <div key={i} className="flex items-start gap-2">
-                              <span className="text-white/30 shrink-0 w-16">{entry.ts}</span>
-                              <span
-                                className={
-                                  entry.status === 'done'
-                                    ? 'text-[#70E000]'
-                                    : entry.status === 'error'
-                                    ? 'text-[#FF70A6]'
-                                    : 'text-white/80'
-                                }
-                              >
-                                {entry.status === 'running' && (
-                                  <span className="inline-block w-2 h-2 border border-white/60 border-t-transparent rounded-full animate-spin mr-1.5" />
-                                )}
-                                {entry.msg}
-                              </span>
-                            </div>
-                          ))}
-                          {isFetchingGithub && (
-                            <div className="flex items-center gap-2 text-white/40">
-                              <span className="inline-block w-2 h-2 border border-white/40 border-t-transparent rounded-full animate-spin" />
-                              <span>Processing...</span>
-                            </div>
+                    {/* Live & Cached Audit Log Toggle + Terminal */}
+                    {(auditLog.length > 0 ||
+                      formData.github_data?.audit_log?.length > 0 ||
+                      formData.github_data?.code_audit?.repo_logs?.length > 0) && (
+                      <div className="mt-1 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <button
+                            type="button"
+                            onClick={() => setShowAuditLog((v) => !v)}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 border-2 border-black bg-[#FFE600] hover:bg-[#FFF066] text-black text-[10px] font-mono font-black uppercase shadow-[2px_2px_0px_0px_#000] cursor-pointer"
+                          >
+                            <Terminal className="w-3 h-3" />
+                            {showAuditLog ? 'Hide Audit Log' : 'View Audit Log'}
+                          </button>
+                          {formData.github_data?.audited_at && (
+                            <span className="font-mono text-[10px] text-black/60">
+                              Last audit: {new Date(formData.github_data.audited_at).toLocaleString()}
+                            </span>
                           )}
                         </div>
+
+                        {showAuditLog && (
+                          <div className="border-2 border-black bg-black rounded-none overflow-hidden">
+                            <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-[#111]">
+                              <div className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F57] inline-block" />
+                                <span className="w-2.5 h-2.5 rounded-full bg-[#FEBC2E] inline-block" />
+                                <span className="w-2.5 h-2.5 rounded-full bg-[#28C840] inline-block" />
+                                <span className="font-mono text-[10px] text-white/50 ml-2">GITHUB_AUDIT_LOG</span>
+                              </div>
+                              <span className="font-mono text-[10px] text-[#70E000]">
+                                {(formData.github_data?.code_audit?.repo_logs || []).length} repos scanned
+                              </span>
+                            </div>
+
+                            <div className="p-3 space-y-1 max-h-72 overflow-y-auto font-mono text-[11px]">
+                              {(auditLog.length > 0 ? auditLog : formData.github_data?.audit_log || []).map((entry, i) => (
+                                <div key={i} className="flex items-start gap-2">
+                                  <span className="text-white/30 shrink-0 w-16">{entry.ts}</span>
+                                  <span
+                                    className={
+                                      entry.status === 'done'
+                                        ? 'text-[#70E000]'
+                                        : entry.status === 'error'
+                                        ? 'text-[#FF70A6]'
+                                        : 'text-white/80'
+                                    }
+                                  >
+                                    {entry.status === 'running' && (
+                                      <span className="inline-block w-2 h-2 border border-white/60 border-t-transparent rounded-full animate-spin mr-1.5" />
+                                    )}
+                                    {entry.msg}
+                                  </span>
+                                </div>
+                              ))}
+                              {isFetchingGithub && (
+                                <div className="flex items-center gap-2 text-white/40">
+                                  <span className="inline-block w-2 h-2 border border-white/40 border-t-transparent rounded-full animate-spin" />
+                                  <span>Processing...</span>
+                                </div>
+                              )}
+
+                              {/* Repo-wise Scan & Founds */}
+                              {(formData.github_data?.code_audit?.repo_logs || []).length > 0 && (
+                                <div className="pt-2.5 mt-2.5 border-t border-white/15 space-y-2">
+                                  <div className="text-[10px] font-black uppercase tracking-wider text-[#FFE600]">
+                                    REPO-WISE SCAN & FOUNDS
+                                  </div>
+                                  {(formData.github_data?.code_audit?.repo_logs || []).map((rlog) => (
+                                    <div key={rlog.repo} className="border border-white/15 bg-white/5 p-2 space-y-1">
+                                      <div className="flex items-center justify-between gap-2">
+                                        <span className="text-[#38B6FF] font-bold">▸ {rlog.repo}</span>
+                                        <span className="text-[10px] text-white/50">{rlog.language}</span>
+                                      </div>
+                                      <div className="text-[10px] text-white/60">
+                                        Files:{' '}
+                                        {rlog.files_scanned?.length > 0
+                                          ? rlog.files_scanned.join(', ')
+                                          : 'metadata / description only'}
+                                      </div>
+                                      <div className="flex flex-wrap gap-1 pt-0.5">
+                                        {rlog.skills_found?.length > 0 ? (
+                                          rlog.skills_found.map((sk) => (
+                                            <span
+                                              key={sk}
+                                              className="px-1.5 py-0.5 bg-[#70E000]/20 border border-[#70E000]/60 text-[#70E000] text-[9px] font-bold"
+                                            >
+                                              ✓ {sk}
+                                            </span>
+                                          ))
+                                        ) : (
+                                          <span className="text-[10px] text-white/35">No taxonomy skills matched</span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
 
