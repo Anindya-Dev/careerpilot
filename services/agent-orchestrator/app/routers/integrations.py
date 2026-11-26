@@ -385,6 +385,13 @@ async def parse_linkedin_pdf(file: UploadFile = File(...)) -> Dict[str, Any]:
     }
 
 
+class GithubAuditRequest(BaseModel):
+    """Request payload for deep GitHub repository & skill auditing."""
+
+    username: str = Field(..., min_length=1)
+    skills: List[str] = Field(default_factory=list)
+
+
 @router.get(
     "/api/v1/orchestrator/integrations/github/{username}",
     summary="Fetch live GitHub profile and public repositories",
@@ -395,6 +402,26 @@ async def parse_linkedin_pdf(file: UploadFile = File(...)) -> Dict[str, Any]:
 )
 async def fetch_github_profile(username: str) -> Dict[str, Any]:
     """Query live GitHub REST API v3 for a user's profile and repositories."""
+    return await _run_github_audit(username, candidate_skills=[])
+
+
+@router.post(
+    "/api/v1/orchestrator/integrations/github/audit",
+    summary="Deep-audit GitHub repositories against candidate profile skills",
+)
+@router.post(
+    "/api/v1/integrations/github/audit",
+    summary="Deep-audit GitHub repositories against candidate profile skills (alias)",
+)
+async def audit_github_profile(request: GithubAuditRequest) -> Dict[str, Any]:
+    """Scan full repository trees, dependency manifests, and source code to verify
+    the user's skills without hardcoding fixed skill lists.
+    """
+    return await _run_github_audit(request.username, candidate_skills=request.skills)
+
+
+async def _run_github_audit(username: str, candidate_skills: List[str]) -> Dict[str, Any]:
+    """Query live GitHub REST API v3, scan recursive repo trees & files, and verify skills."""
     clean_user = username.strip().lstrip("@")
     if not clean_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="GitHub username is required.")
@@ -404,7 +431,7 @@ async def fetch_github_profile(username: str) -> Dict[str, Any]:
         "User-Agent": "CareerPilot-Orchestrator/1.0",
     }
 
-    async with httpx.AsyncClient(timeout=8.0) as client:
+    async with httpx.AsyncClient(timeout=10.0) as client:
         user_resp, repos_resp = await client.get(
             f"https://api.github.com/users/{clean_user}", headers=headers
         ), await client.get(
@@ -457,87 +484,214 @@ async def fetch_github_profile(username: str) -> Dict[str, Any]:
             }
         )
 
-    # --- Deep Code Audit: scan dependency files + topics + descriptions ---
-    # Collect all text signals across repositories
-    all_signal_text = ""
-    # 1. repo descriptions and topics (fast, no extra API calls)
-    for r in repositories:
-        all_signal_text += " " + (r.get("description") or "")
-        all_signal_text += " " + " ".join(r.get("topics") or [])
-        if r.get("language"):
-            all_signal_text += " " + r["language"]
-
-    # 2. Fetch dependency manifest files from the top-5 non-fork repos
-    #    Files: requirements.txt, pyproject.toml, package.json, Pipfile, go.mod, pom.xml
-    MANIFEST_FILES = [
-        "requirements.txt", "pyproject.toml", "Pipfile",
+    # --- Deep Code Audit: recursive repo tree + manifests + source imports + LLM semantic audit ---
+    MANIFEST_NAMES = {
+        "requirements.txt", "pyproject.toml", "pipfile",
         "package.json", "go.mod", "pom.xml", "build.gradle",
-        "Cargo.toml", "composer.json", "README.md"
-    ]
-    top_repos = [r for r in raw_repos if not r.get("fork")][:5]
+        "cargo.toml", "composer.json", "readme.md", "dockerfile",
+    }
+    CODE_EXTENSIONS = (".py", ".js", ".ts", ".tsx", ".jsx", ".ipynb")
+    SKIP_DIRS = ("node_modules/", ".venv/", "venv/", "__pycache__/", "dist/", "build/", ".git/")
 
-    async def _fetch_file(client: httpx.AsyncClient, owner: str, repo: str, filename: str) -> str:
+    top_repos = [r for r in raw_repos if not r.get("fork")][:8]
+    files_scanned_count = 0
+
+    async def _fetch_raw_file(client: httpx.AsyncClient, owner: str, repo: str, branch: str, path: str) -> tuple[str, str]:
         try:
-            url = f"https://api.github.com/repos/{owner}/{repo}/contents/{filename}"
-            resp = await client.get(url, headers=headers)
+            url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}"
+            resp = await client.get(url, headers={"User-Agent": "CareerPilot-Orchestrator/1.0"})
             if resp.status_code == 200:
-                data = resp.json()
-                import base64
-                content = data.get("content", "")
-                encoding = data.get("encoding", "base64")
-                if encoding == "base64":
-                    return base64.b64decode(content).decode("utf-8", errors="ignore")[:4000]
-                return str(content)[:4000]
+                return path, resp.text[:4500]
         except Exception:
             pass
-        return ""
+        return path, ""
 
-    async def _scan_repo(client: httpx.AsyncClient, repo: Dict) -> str:
+    async def _scan_repo_tree(client: httpx.AsyncClient, repo: Dict[str, Any]) -> Dict[str, Any]:
         owner = repo.get("owner", {}).get("login") or clean_user
         repo_name = repo.get("name", "")
-        texts = await asyncio.gather(*[
-            _fetch_file(client, owner, repo_name, f) for f in MANIFEST_FILES
+        branch = repo.get("default_branch") or "main"
+
+        tree_paths: List[str] = []
+        try:
+            tree_url = f"https://api.github.com/repos/{owner}/{repo_name}/git/trees/{branch}?recursive=1"
+            t_resp = await client.get(tree_url, headers=headers)
+            if t_resp.status_code == 200:
+                tree_paths = [
+                    item.get("path", "")
+                    for item in t_resp.json().get("tree", [])
+                    if item.get("type") == "blob"
+                    and not any(sd in item.get("path", "").lower() for sd in SKIP_DIRS)
+                ]
+        except Exception:
+            pass
+
+        # Pick manifests anywhere in repo (prioritize shallower paths)
+        manifest_paths = sorted(
+            [p for p in tree_paths if p.rsplit("/", 1)[-1].lower() in MANIFEST_NAMES],
+            key=lambda p: (p.count("/"), len(p)),
+        )[:5]
+
+        # Pick top source files to inspect real imports & usage
+        code_paths = sorted(
+            [p for p in tree_paths if p.lower().endswith(CODE_EXTENSIONS)],
+            key=lambda p: (p.count("/"), len(p)),
+        )[:4]
+
+        target_paths = manifest_paths + code_paths
+        if not target_paths:
+            # Fallback to root manifests if tree endpoint was unavailable
+            target_paths = ["requirements.txt", "pyproject.toml", "package.json", "README.md"]
+
+        fetched = await asyncio.gather(*[
+            _fetch_raw_file(client, owner, repo_name, branch, p) for p in target_paths
         ])
-        return " ".join(texts)
+        file_contents = {p: txt for p, txt in fetched if txt}
 
-    async with httpx.AsyncClient(timeout=10.0) as scan_client:
-        repo_texts = await asyncio.gather(*[_scan_repo(scan_client, r) for r in top_repos])
+        return {
+            "repo": repo_name,
+            "language": repo.get("language") or "",
+            "description": repo.get("description") or "",
+            "topics": repo.get("topics") or [],
+            "file_paths_sample": tree_paths[:40],
+            "files": file_contents,
+        }
 
-    all_signal_text += " " + " ".join(repo_texts)
+    async with httpx.AsyncClient(timeout=12.0) as scan_client:
+        repo_bundles = await asyncio.gather(*[_scan_repo_tree(scan_client, r) for r in top_repos])
 
-    # 3. Extract skills from all combined signal text using SKILL_TAXONOMY
-    skill_hit_map: Dict[str, Dict[str, Any]] = {}  # name -> {count, repos}
+    repo_text_by_name: Dict[str, str] = {}
+    all_signal_text = ""
+    for bundle in repo_bundles:
+        files_scanned_count += len(bundle["files"])
+        combined = " ".join([
+            bundle["description"],
+            " ".join(bundle["topics"]),
+            bundle["language"],
+            " ".join(bundle["file_paths_sample"]),
+            " ".join(bundle["files"].values()),
+        ])
+        repo_text_by_name[bundle["repo"]] = combined
+        all_signal_text += " " + combined
+
+    for r in repositories:
+        if r["name"] not in repo_text_by_name:
+            repo_text_by_name[r["name"]] = (
+                (r.get("description") or "") + " " + " ".join(r.get("topics") or []) + " " + (r.get("language") or "")
+            )
+            all_signal_text += " " + repo_text_by_name[r["name"]]
+
+    # 3. Deterministic regex scan (SKILL_TAXONOMY + normalized candidate_skills)
+    skill_hit_map: Dict[str, Dict[str, Any]] = {}
 
     for skill_name, category, pattern in SKILL_TAXONOMY:
         matches = re.findall(pattern, all_signal_text, flags=re.IGNORECASE)
         if matches:
-            # Find which repos mention this skill
-            evidence_repos = []
-            for r in repositories:
-                repo_text = (r.get("description") or "") + " " + " ".join(r.get("topics") or [])
-                # Also check repo-specific scanned texts
-                ridx = top_repos.index(next((tr for tr in top_repos if tr.get("name") == r.get("name")), None)) if r in top_repos else -1
-                if ridx >= 0:
-                    repo_text += " " + repo_texts[ridx]
-                if re.search(pattern, repo_text, flags=re.IGNORECASE):
-                    evidence_repos.append(r["name"])
+            evidence_repos = [
+                rname for rname, rtxt in repo_text_by_name.items()
+                if re.search(pattern, rtxt, flags=re.IGNORECASE)
+            ]
             skill_hit_map[skill_name] = {
                 "name": skill_name,
                 "category": category,
                 "count": len(matches),
                 "repos": evidence_repos[:3],
+                "evidence_detail": None,
             }
 
-    # 4. Build evidence detail strings per skill
-    def _build_evidence_detail(skill_name: str, info: Dict) -> str:
+    # Normalized matching for any custom/user-provided skills (e.g. SQLAlchemy, Sentence Transformers)
+    for raw_skill in candidate_skills:
+        cname = str(raw_skill or "").strip()
+        if not cname or cname.lower() in {k.lower() for k in skill_hit_map}:
+            continue
+        # Match space/hyphen/underscore variants, e.g. "Sentence Transformers" -> sentence[-_\s]?transformers
+        tokens = [re.escape(t) for t in re.split(r"[\s_\-/]+", cname) if t]
+        if not tokens:
+            continue
+        flex_pattern = r"\b" + r"[-_\s]*".join(tokens) + r"\b"
+        matches = re.findall(flex_pattern, all_signal_text, flags=re.IGNORECASE)
+        if matches:
+            evidence_repos = [
+                rname for rname, rtxt in repo_text_by_name.items()
+                if re.search(flex_pattern, rtxt, flags=re.IGNORECASE)
+            ]
+            skill_hit_map[cname] = {
+                "name": cname,
+                "category": "Technical",
+                "count": len(matches),
+                "repos": evidence_repos[:3],
+                "evidence_detail": None,
+            }
+
+    # 4. Semantic Code Audit via Groq LLM (maps libraries/imports -> conceptual & custom skills without hardcoding)
+    llm = get_llm_service()
+    if llm._get_llm() is not None and repo_bundles:
+        try:
+            compact_evidence = [
+                {
+                    "repo": b["repo"],
+                    "language": b["language"],
+                    "description": b["description"][:200],
+                    "topics": b["topics"][:10],
+                    "files_scanned": list(b["files"].keys()),
+                    "code_and_manifest_excerpts": {
+                        p: txt[:1200] for p, txt in list(b["files"].items())[:4]
+                    },
+                }
+                for b in repo_bundles
+            ]
+            prompt = (
+                f"Candidate's Listed Skills to Audit: {json.dumps(candidate_skills[:40])}\n\n"
+                f"Scanned GitHub Repository Evidence:\n{json.dumps(compact_evidence)[:11000]}\n\n"
+                "Task: Inspect the actual dependency manifests, imports, file paths, descriptions, and code excerpts above. "
+                "Verify which of the candidate's listed skills (including conceptual or library-backed skills like "
+                "Computer Vision via opencv/cv2/yolo/torchvision/PIL, SQLAlchemy via sqlalchemy, Sentence Transformers via "
+                "sentence-transformers, Semantic Search via embeddings/vector search/chromadb/faiss, etc.) "
+                "have REAL evidence in the scanned repositories.\n"
+                "STRICT RULES:\n"
+                "- ONLY include skills that have genuine evidence in the provided repo data. NEVER guess or fabricate.\n"
+                "- Use the EXACT spelling from Candidate's Listed Skills when verifying one of their skills.\n"
+                "- For each verified skill, cite the exact repo name(s) and file/library/import that proves it.\n"
+                'Return ONLY valid JSON: {"verified_skills": [{"name": str, "category": str, "repos": [str], "evidence_detail": str}]}'
+            )
+            parsed = await llm.generate_json(
+                system_prompt="You are a strict, evidence-based code auditor. Return only valid JSON.",
+                user_prompt=prompt,
+                fallback_data={},
+            )
+            for item in parsed.get("verified_skills", []) if isinstance(parsed, dict) else []:
+                sname = str(item.get("name", "")).strip()
+                if not sname:
+                    continue
+                existing_key = next((k for k in skill_hit_map if k.lower() == sname.lower()), None)
+                repos_cited = [str(r) for r in (item.get("repos") or []) if r][:3]
+                ev_detail = str(item.get("evidence_detail") or "").strip()
+                if existing_key:
+                    if ev_detail:
+                        skill_hit_map[existing_key]["evidence_detail"] = ev_detail
+                    if repos_cited:
+                        skill_hit_map[existing_key]["repos"] = repos_cited
+                else:
+                    skill_hit_map[sname] = {
+                        "name": sname,
+                        "category": str(item.get("category") or "Technical"),
+                        "count": max(1, len(repos_cited)),
+                        "repos": repos_cited,
+                        "evidence_detail": ev_detail or None,
+                    }
+        except Exception as exc:
+            logger.warning("LLM semantic GitHub audit skipped: %s", exc)
+
+    # 5. Build evidence detail strings per skill
+    def _build_evidence_detail(skill_name: str, info: Dict[str, Any]) -> str:
+        if info.get("evidence_detail"):
+            return info["evidence_detail"]
         repos = info.get("repos", [])
         count = info.get("count", 1)
         if repos:
             repo_list = ", ".join(f"`{r}`" for r in repos)
             return (
                 f"Found in {count} reference(s) across your repos: {repo_list}. "
-                f"Detected in dependency manifests (requirements.txt / package.json / pyproject.toml), "
-                f"repo topics, and descriptions via GitHub Contents API scan."
+                f"Detected in dependency manifests, source imports, or repo metadata via GitHub tree scan."
             )
         return (
             f"Detected {count} reference(s) across repo topics, descriptions, and dependency files via GitHub API scan."
@@ -557,16 +711,15 @@ async def fetch_github_profile(username: str) -> Dict[str, Any]:
     ]
     lang_names_lower = {lang.lower() for lang in language_counts}
 
-    # Framework/lib/AI/DB/DevOps skills from deep code scan
+    # Framework/lib/AI/DB/DevOps/custom skills from deep code + semantic audit
     for skill_name, info in skill_hit_map.items():
         if skill_name.lower() in lang_names_lower:
-            # Already captured from language detection above; enrich evidence_detail
             for s in detected_skills:
                 if s["name"].lower() == skill_name.lower():
                     s["evidence_detail"] = _build_evidence_detail(skill_name, info)
             continue
         detected_skills.append({
-            "name": skill_name,
+            "name": info["name"],
             "level": "advanced" if info["count"] >= 4 else "intermediate",
             "category": info["category"],
             "verified": True,
@@ -591,7 +744,7 @@ async def fetch_github_profile(username: str) -> Dict[str, Any]:
         "language_breakdown": language_counts,
         "code_audit": {
             "scanned_repos": [r["name"] for r in top_repos],
-            "manifest_files_checked": MANIFEST_FILES,
+            "files_scanned_count": files_scanned_count,
             "skills_detected_from_code": len(skill_hit_map),
         },
     }

@@ -361,9 +361,10 @@ export default function ProfilePage() {
     };
 
     try {
-      log(`Connecting to GitHub API for @${username}...`);
+      log(`Connecting to GitHub API & scanning repo trees for @${username}...`);
       const t0 = Date.now();
-      const data = await integrationService.fetchGithubProfile(username);
+      const candidateSkillNames = (formData.skills || []).map((s) => s.name).filter(Boolean);
+      const data = await integrationService.fetchGithubProfile(username, candidateSkillNames);
       done(0, `✓ GitHub profile loaded — ${data.repositories.length} repos found (${((Date.now() - t0) / 1000).toFixed(1)}s)`);
 
       log(`Scanning repo languages, topics & descriptions...`);
@@ -371,12 +372,12 @@ export default function ProfilePage() {
       const langCount = Object.keys(data.language_breakdown || {}).length;
       done(1, `✓ Language scan complete — ${langCount} languages detected`);
 
-      log(`Reading dependency files (requirements.txt, package.json, pyproject.toml…)`);
+      log(`Reading manifests & source files across repo trees...`);
       await new Promise((r) => setTimeout(r, 180));
       const codeAudit = data.code_audit || {};
       done(
         2,
-        `✓ Manifest scan complete — ${codeAudit.skills_detected_from_code ?? data.detected_skills.length} skills found in ${(codeAudit.scanned_repos || []).length} repos`
+        `✓ Deep code & semantic audit complete — ${codeAudit.skills_detected_from_code ?? data.detected_skills.length} skills verified across ${(codeAudit.scanned_repos || []).length} repos (${codeAudit.files_scanned_count || 0} files)`
       );
 
       log(`Merging into skill profile (preserving existing verified skills)...`);

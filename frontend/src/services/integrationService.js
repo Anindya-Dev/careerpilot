@@ -41,13 +41,21 @@ export const integrationService = {
   },
 
   /**
-   * Fetch live GitHub profile, repositories, and verified language skills.
+   * Fetch live GitHub profile, repositories, and deep-audited skills.
+   * When candidateSkills are provided, uses POST /github/audit to verify
+   * custom/conceptual skills (e.g. Computer Vision, SQLAlchemy, Semantic Search)
+   * against full repo trees, dependency manifests, and source code.
    */
-  async fetchGithubProfile(username) {
-    const clean = encodeURIComponent(username.trim().replace(/^@/, ''));
-    const res = await orchestratorClient.get(getEndpoint(`/github/${clean}`), {
-      timeout: 15000
-    });
+  async fetchGithubProfile(username, candidateSkills = []) {
+    const clean = username.trim().replace(/^@/, '');
+    const res = await orchestratorClient.post(
+      getEndpoint('/github/audit'),
+      {
+        username: clean,
+        skills: (candidateSkills || []).filter(Boolean)
+      },
+      { timeout: 45000 }
+    );
     return res.data;
   },
 
