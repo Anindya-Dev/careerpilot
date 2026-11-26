@@ -617,10 +617,6 @@ export default function ProfilePage() {
         >
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
-              <div className="inline-flex items-center space-x-2 px-2.5 py-0.5 border-2 border-black bg-[#FFE600] text-[10px] font-mono font-bold text-black mb-1 shadow-[2px_2px_0px_0px_#000]">
-                <Terminal className="w-3 h-3 stroke-[2.5]" />
-                <span>PROFILE_SVC :: PORT_5002</span>
-              </div>
               <h1 className="text-2xl font-black text-black tracking-tight font-sans">Career Intelligence Profile</h1>
               <p className="text-xs font-mono font-bold text-slate-700">
                 Manage credentials, validated competencies, and target aspirations
