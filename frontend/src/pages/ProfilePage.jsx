@@ -80,6 +80,9 @@ export default function ProfilePage() {
   const [isFetchingLeetcode, setIsFetchingLeetcode] = useState(false);
   const [showAddProject, setShowAddProject] = useState(false);
   const [isEditingFoundational, setIsEditingFoundational] = useState(false);
+  // GitHub audit log — live step-by-step progress shown in terminal panel
+  const [auditLog, setAuditLog] = useState([]);
+  const [isEditingGithubUsername, setIsEditingGithubUsername] = useState(false);
 
   // Auto-dismiss toast notification after 4 seconds
   useEffect(() => {
@@ -328,7 +331,7 @@ export default function ProfilePage() {
     await updateProfile(updatedForm);
   };
 
-  // Production Live GitHub Connection & Repo Ingestion
+  // Production Live GitHub Connection & Repo Ingestion with live audit log
   const handleConnectGithub = async () => {
     const username = formData.linked_accounts.github?.trim();
     if (!username) {
@@ -336,25 +339,67 @@ export default function ProfilePage() {
       return;
     }
     setIsFetchingGithub(true);
+    setAuditLog([]);
     setNotification({ type: '', message: '' });
+    setIsEditingGithubUsername(false);
+
+    const log = (msg, status = 'running') => {
+      setAuditLog((prev) => [
+        ...prev,
+        { msg, status, ts: new Date().toLocaleTimeString('en-US', { hour12: false }) }
+      ]);
+    };
+    const done = (idx, extraMsg) => {
+      setAuditLog((prev) =>
+        prev.map((e, i) => (i === idx ? { ...e, status: 'done', msg: extraMsg || e.msg } : e))
+      );
+    };
+    const fail = (idx, errMsg) => {
+      setAuditLog((prev) =>
+        prev.map((e, i) => (i === idx ? { ...e, status: 'error', msg: errMsg || e.msg } : e))
+      );
+    };
 
     try {
+      log(`Connecting to GitHub API for @${username}...`);
+      const t0 = Date.now();
       const data = await integrationService.fetchGithubProfile(username);
+      done(0, `✓ GitHub profile loaded — ${data.repositories.length} repos found (${((Date.now() - t0) / 1000).toFixed(1)}s)`);
+
+      log(`Scanning repo languages, topics & descriptions...`);
+      await new Promise((r) => setTimeout(r, 120));
+      const langCount = Object.keys(data.language_breakdown || {}).length;
+      done(1, `✓ Language scan complete — ${langCount} languages detected`);
+
+      log(`Reading dependency files (requirements.txt, package.json, pyproject.toml…)`);
+      await new Promise((r) => setTimeout(r, 180));
+      const codeAudit = data.code_audit || {};
+      done(
+        2,
+        `✓ Manifest scan complete — ${codeAudit.skills_detected_from_code ?? data.detected_skills.length} skills found in ${(codeAudit.scanned_repos || []).length} repos`
+      );
+
+      log(`Merging into skill profile (preserving existing verified skills)...`);
       const dismissedSet = new Set((formData.dismissed_skills || []).map((d) => d.toLowerCase()));
       const existingMap = new Map(
         (formData.skills || []).map((s) => [s.name.toLowerCase(), s])
       );
+      let newSkillsAdded = 0;
       for (const sk of data.detected_skills || []) {
         const key = sk.name.toLowerCase();
         if (dismissedSet.has(key)) continue;
         const prev = existingMap.get(key);
+        if (!prev) newSkillsAdded++;
         existingMap.set(key, {
           ...(prev || sk),
           verified: true,
-          source: 'github'
+          source: 'github',
+          evidence_detail: sk.evidence_detail || prev?.evidence_detail
         });
       }
+      done(3, `✓ ${data.detected_skills.length} skills verified, ${newSkillsAdded} newly added`);
 
+      log(`Saving profile to CareerPilot...`);
       const updatedForm = {
         ...formData,
         skills: Array.from(existingMap.values()),
@@ -362,13 +407,15 @@ export default function ProfilePage() {
       };
       setFormData(updatedForm);
       await updateProfile(updatedForm);
+      done(4, `✓ Profile saved — GitHub audit complete`);
 
       setNotification({
         type: 'success',
-        message: `Connected GitHub @${data.profile.username}: synced ${data.repositories.length} live repositories and verified ${data.detected_skills.length} languages.`
+        message: `Audit complete for @${data.profile.username}: ${data.detected_skills.length} skills verified from ${data.repositories.length} repos.`
       });
     } catch (err) {
       const detail = err.response?.data?.detail || err.message || 'Failed to fetch GitHub repositories.';
+      fail(auditLog.length, `✗ ${detail}`);
       setNotification({ type: 'error', message: detail });
     } finally {
       setIsFetchingGithub(false);
@@ -912,22 +959,93 @@ export default function ProfilePage() {
                         </a>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Input
-                        placeholder="GitHub username (e.g. Anindya-Dev)"
-                        name="github"
-                        value={formData.linked_accounts.github}
-                        onChange={handleLinkedAccountChange}
-                      />
-                      <button
-                        type="button"
-                        onClick={handleConnectGithub}
-                        disabled={isFetchingGithub}
-                        className="px-3 py-2 border-2 border-black bg-[#38B6FF] hover:bg-[#5CC5FF] text-black text-xs font-mono font-black uppercase shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all shrink-0 cursor-pointer disabled:opacity-50"
-                      >
-                        {isFetchingGithub ? 'Scanning...' : 'Connect'}
-                      </button>
-                    </div>
+
+                    {/* Username row: read-only once connected, editable on demand */}
+                    {formData.github_data && !isEditingGithubUsername ? (
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 px-3 py-2 border-2 border-black bg-white font-mono text-xs font-bold flex items-center gap-2">
+                          <Github className="w-3.5 h-3.5 shrink-0" />
+                          @{formData.linked_accounts.github}
+                          <span className="ml-auto text-[10px] text-black/50">cached</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingGithubUsername(true)}
+                          className="px-2.5 py-2 border-2 border-black bg-white hover:bg-[#FFE600] text-black text-[10px] font-mono font-black uppercase shadow-[2px_2px_0px_0px_#000] shrink-0 cursor-pointer"
+                          title="Change GitHub username"
+                        >
+                          <Pencil className="w-3 h-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleConnectGithub}
+                          disabled={isFetchingGithub}
+                          className="px-3 py-2 border-2 border-black bg-[#38B6FF] hover:bg-[#5CC5FF] text-black text-xs font-mono font-black uppercase shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all shrink-0 cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                        >
+                          {isFetchingGithub ? (
+                            <><span className="animate-spin inline-block w-3 h-3 border-2 border-black border-t-transparent rounded-full" /> Auditing...</>
+                          ) : (
+                            <><RefreshCw className="w-3 h-3" /> Re-audit</>
+                          )}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Input
+                          placeholder="GitHub username (e.g. Anindya-Dev)"
+                          name="github"
+                          value={formData.linked_accounts.github}
+                          onChange={handleLinkedAccountChange}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleConnectGithub}
+                          disabled={isFetchingGithub}
+                          className="px-3 py-2 border-2 border-black bg-[#38B6FF] hover:bg-[#5CC5FF] text-black text-xs font-mono font-black uppercase shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all shrink-0 cursor-pointer disabled:opacity-50"
+                        >
+                          {isFetchingGithub ? 'Auditing...' : 'Connect & Audit'}
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Live Audit Log Terminal */}
+                    {auditLog.length > 0 && (
+                      <div className="mt-1 border-2 border-black bg-black rounded-none overflow-hidden">
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-white/10 bg-[#111]">
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F57] inline-block" />
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#FEBC2E] inline-block" />
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#28C840] inline-block" />
+                          <span className="font-mono text-[10px] text-white/40 ml-2">GITHUB_AUDIT_LOG</span>
+                        </div>
+                        <div className="p-3 space-y-1 max-h-44 overflow-y-auto font-mono text-[11px]">
+                          {auditLog.map((entry, i) => (
+                            <div key={i} className="flex items-start gap-2">
+                              <span className="text-white/30 shrink-0 w-16">{entry.ts}</span>
+                              <span
+                                className={
+                                  entry.status === 'done'
+                                    ? 'text-[#70E000]'
+                                    : entry.status === 'error'
+                                    ? 'text-[#FF70A6]'
+                                    : 'text-white/80'
+                                }
+                              >
+                                {entry.status === 'running' && (
+                                  <span className="inline-block w-2 h-2 border border-white/60 border-t-transparent rounded-full animate-spin mr-1.5" />
+                                )}
+                                {entry.msg}
+                              </span>
+                            </div>
+                          ))}
+                          {isFetchingGithub && (
+                            <div className="flex items-center gap-2 text-white/40">
+                              <span className="inline-block w-2 h-2 border border-white/40 border-t-transparent rounded-full animate-spin" />
+                              <span>Processing...</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Live GitHub Repos Display */}
                     {formData.github_data && (
