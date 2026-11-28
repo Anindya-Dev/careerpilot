@@ -347,10 +347,57 @@ export default function JobFinderPage() {
 
   const trackedCount = Object.keys(outreachMap).length;
 
+  // Watermark typewriter effect for read-only maintenance mode
+  const WATERMARK_PHRASE = 'Coming Soon...';
+  const [watermarkDisplayText, setWatermarkDisplayText] = useState('');
+  const [isWatermarkDeleting, setIsWatermarkDeleting] = useState(false);
+
+  useEffect(() => {
+    let timer;
+
+    if (!isWatermarkDeleting) {
+      if (watermarkDisplayText.length < WATERMARK_PHRASE.length) {
+        timer = setTimeout(() => {
+          setWatermarkDisplayText(WATERMARK_PHRASE.slice(0, watermarkDisplayText.length + 1));
+        }, 70);
+      } else {
+        // Hold the revealed text for 4 seconds so it functions as a persistent watermark
+        timer = setTimeout(() => {
+          setIsWatermarkDeleting(true);
+        }, 4000);
+      }
+    } else {
+      if (watermarkDisplayText.length > 0) {
+        timer = setTimeout(() => {
+          setWatermarkDisplayText(WATERMARK_PHRASE.slice(0, watermarkDisplayText.length - 1));
+        }, 30);
+      } else {
+        setIsWatermarkDeleting(false);
+      }
+    }
+
+    return () => clearTimeout(timer);
+  }, [watermarkDisplayText, isWatermarkDeleting]);
+
   return (
     <div className="min-h-screen bg-[#F4F0EA] text-black flex flex-col font-sans relative selection:bg-[#FFE600] selection:text-black">
       <div className="absolute inset-0 neo-grid pointer-events-none opacity-20 -z-0" />
       <Navbar />
+
+      {/* Non-clickable Fixed Watermark with Shiny Theme Text Reveal Animation */}
+      <div
+        className="fixed inset-0 z-30 pointer-events-none select-none flex items-center justify-center p-4"
+        aria-hidden="true"
+      >
+        <div className="text-center max-w-5xl mx-auto px-4">
+          <div className="inline-flex items-center justify-center flex-wrap font-sans font-black tracking-tight text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
+            <span className="shiny-theme-text break-words">
+              {watermarkDisplayText}
+            </span>
+            <span className="inline-block w-1.5 sm:w-2 md:w-2.5 lg:w-3 h-[0.85em] ml-1 sm:ml-2 bg-[#FFE600] border-2 border-black shadow-[2px_2px_0px_0px_#000] align-middle animate-pulse shrink-0" />
+          </div>
+        </div>
+      </div>
 
       <div className="flex-1 flex w-full relative z-10">
         <Sidebar />
@@ -359,7 +406,7 @@ export default function JobFinderPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="flex-1 min-w-0 p-6 sm:p-8 lg:p-10 space-y-6"
+          className="flex-1 min-w-0 p-6 sm:p-8 lg:p-10 space-y-6 pointer-events-none select-none filter blur-[2px] transition-all"
         >
           {/* Header Banner */}
           <div className="border-2 border-black bg-[#FFE600] shadow-[4px_4px_0px_0px_#000] px-6 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">

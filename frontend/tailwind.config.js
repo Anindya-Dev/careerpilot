@@ -32,6 +32,15 @@ export default {
         'neo': '4px 4px 0px 0px #000000',
         'neo-lg': '6px 6px 0px 0px #000000',
         'neo-xl': '8px 8px 0px 0px #000000',
+      },
+      keyframes: {
+        marquee: {
+          '0%': { transform: 'translate3d(0%, 0, 0)' },
+          '100%': { transform: 'translate3d(-50%, 0, 0)' },
+        }
+      },
+      animation: {
+        marquee: 'marquee 28s linear infinite',
       }
     },
   },

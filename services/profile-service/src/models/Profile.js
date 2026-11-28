@@ -95,7 +95,20 @@ const ProfileSchema = new mongoose.Schema(
     },
     linked_accounts: {
       github: { type: String, default: '' },
-      linkedin: { type: String, default: '' }
+      linkedin: { type: String, default: '' },
+      leetcode: { type: String, default: '' }
+    },
+    github_data: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null
+    },
+    leetcode_data: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null
+    },
+    dismissed_skills: {
+      type: [String],
+      default: []
     }
   },
   {

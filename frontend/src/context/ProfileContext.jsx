@@ -82,7 +82,94 @@ export function ProfileProvider({ children }) {
         profile_completeness: 85,
         linked_accounts: {
           github: 'demo-student-dev',
-          linkedin: 'linkedin.com/in/demo-student'
+          linkedin: 'linkedin.com/in/demo-student',
+          leetcode: 'demostudent'
+        },
+        github_data: {
+          profile: {
+            username: 'demo-student-dev',
+            name: 'Demo Student',
+            bio: 'Full Stack & Autonomous Agent Engineer',
+            avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+            public_repos: 14,
+            total_stars: 32,
+            followers: 48,
+            html_url: 'https://github.com/demo-student-dev'
+          },
+          repositories: [
+            {
+              id: 101,
+              name: 'careerpilot',
+              html_url: 'https://github.com/Anindya-Dev/careerpilot',
+              description: 'Autonomous Multi-Agent Career Intelligence & Graph Architecture Platform',
+              language: 'TypeScript',
+              stars: 18,
+              forks: 4,
+              topics: ['agents', 'multi-agent', 'career-intelligence', 'fastapi', 'react']
+            },
+            {
+              id: 102,
+              name: 'distributed-raft-kv',
+              html_url: 'https://github.com/example/raft-kv',
+              description: 'Fault-tolerant distributed key-value store using Raft consensus in Go',
+              language: 'Go',
+              stars: 9,
+              forks: 2,
+              topics: ['distributed-systems', 'raft', 'grpc']
+            },
+            {
+              id: 103,
+              name: 'neural-graph-evaluator',
+              html_url: 'https://github.com/example/neural-graph-evaluator',
+              description: 'PyTorch Graph Neural Network pipeline for knowledge graph inference',
+              language: 'Python',
+              stars: 5,
+              forks: 1,
+              topics: ['pytorch', 'gnn', 'machine-learning']
+            }
+          ],
+          code_audit: {
+            skills_detected_from_code: 6,
+            scanned_repos: ['careerpilot', 'distributed-raft-kv', 'neural-graph-evaluator'],
+            files_scanned_count: 28,
+            repo_logs: [
+              { repo: 'careerpilot', detected: ['TypeScript', 'React', 'Node.js', 'FastAPI'] },
+              { repo: 'distributed-raft-kv', detected: ['Go', 'gRPC', 'Docker'] },
+              { repo: 'neural-graph-evaluator', detected: ['Python', 'PyTorch'] }
+            ]
+          },
+          detected_skills: [
+            { name: 'Python', level: 'advanced', category: 'Languages', verified: true, source: 'github' },
+            { name: 'TypeScript', level: 'advanced', category: 'Languages', verified: true, source: 'github' },
+            { name: 'React', level: 'advanced', category: 'Frameworks', verified: true, source: 'github' },
+            { name: 'PyTorch', level: 'intermediate', category: 'Frameworks', verified: true, source: 'github' }
+          ],
+          audit_log: [
+            { msg: '✓ GitHub profile loaded — 14 repos found (0.4s)', status: 'done', ts: '10:50:00' },
+            { msg: '✓ Language scan complete — 4 languages detected', status: 'done', ts: '10:50:01' },
+            { msg: '✓ Deep code & semantic audit complete — 6 skills verified across 3 repos (28 files)', status: 'done', ts: '10:50:02' },
+            { msg: '✓ Profile saved — GitHub audit complete', status: 'done', ts: '10:50:03' }
+          ],
+          audited_at: new Date().toISOString()
+        },
+        leetcode_data: {
+          username: 'demostudent',
+          ranking: 42150,
+          stats: {
+            total: 284,
+            easy: 110,
+            medium: 142,
+            hard: 32
+          },
+          dsa_standard: {
+            score: 82,
+            status: 'strong',
+            label: 'Competitive DSA Baseline'
+          },
+          suggestions: [
+            'Practice Graph BFS/DFS dynamic programming transition problems',
+            'Target Monotonic Stack and Trie optimization questions'
+          ]
         }
       };
       setProfile(demoProfile);

@@ -7,7 +7,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -20,13 +20,17 @@ import {
   X
 } from 'lucide-react';
 import { useSidebar } from '../context/SidebarContext';
+import { useAuth } from '../context/AuthContext';
 import CareerPilotLogo from './CareerPilotLogo';
 
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { isCollapsed, toggleCollapsed, isMobileOpen, closeMobile } = useSidebar();
   const [activePath, setActivePath] = useState(location.pathname);
+
+  const initial = user?.name ? user.name.trim().charAt(0).toUpperCase() : 'A';
 
   // Synchronize active path on route changes
   useEffect(() => {
@@ -74,7 +78,7 @@ export default function Sidebar() {
           isMobileOpen ? 'translate-x-0 shadow-[8px_0px_0px_0px_#000]' : '-translate-x-full'
         }`}
       >
-        <div className="space-y-4">
+        <div className="space-y-4 flex-1">
           {/* Mobile Drawer Header with Close Action */}
           <div className="flex items-center justify-between pb-3 border-b-2 border-black">
             <CareerPilotLogo className="h-8 w-auto" />
@@ -123,7 +127,7 @@ export default function Sidebar() {
                     <span className="uppercase tracking-tight">{item.name}</span>
                   </div>
                   {item.badge && (
-                    <span className="relative z-10 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 border border-black bg-white text-black shadow-[1px_1px_0px_0px_#000]">
+                    <span className="relative z-10 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 border border-red-600 text-red-600 bg-transparent shadow-[1px_1px_0px_0px_#000]">
                       {item.badge}
                     </span>
                   )}
@@ -132,14 +136,33 @@ export default function Sidebar() {
             })}
           </div>
         </div>
+
+        {/* Mobile Drawer Bottom User Profile */}
+        {user && (
+          <div className="mt-auto pt-4 border-t-2 border-black">
+            <Link
+              to="/profile"
+              onClick={closeMobile}
+              className="flex items-center space-x-2.5 px-3 py-2 border-2 border-black bg-white shadow-[2px_2px_0px_0px_#000] hover:bg-[#FAF5E6] transition-all"
+            >
+              <div className="w-6 h-6 shrink-0 border-2 border-black bg-[#70E000] flex items-center justify-center text-black font-mono text-xs font-black">
+                {initial}
+              </div>
+              <div className="min-w-0 flex-1 text-left text-xs font-mono font-bold text-black truncate leading-tight">
+                {user.name}
+              </div>
+            </Link>
+          </div>
+        )}
       </aside>
 
       {/* ======================================================== */}
       {/* DESKTOP SIDEBAR WITH FRAMER MOTION GLIDING SELECTION     */}
       {/* Both Collapsed (Icon Rail) & Expanded (Full Menu) support */}
+      {/* Locked to side (sticky) so it never scrolls away with page */}
       {/* ======================================================== */}
       <aside
-        className={`shrink-0 bg-white border-r-2 border-black hidden md:flex flex-col min-h-[calc(100vh-4rem)] select-none overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`sticky top-16 self-start h-[calc(100vh-4rem)] shrink-0 bg-white border-r-2 border-black hidden md:flex flex-col justify-between z-30 select-none overflow-y-auto overflow-x-hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isCollapsed ? 'w-16 p-2.5' : 'w-64 p-4'
         }`}
       >
@@ -147,7 +170,7 @@ export default function Sidebar() {
           {/* Top Header: Hamburger Toggle Button */}
           <div
             className={`flex items-center ${
-              isCollapsed ? 'justify-center' : 'justify-between'
+              isCollapsed ? 'justify-center' : 'justify-start'
             } pb-2.5 border-b border-black/10 transition-all duration-300`}
           >
             <button
@@ -159,12 +182,6 @@ export default function Sidebar() {
             >
               <Menu className="w-4 h-4 stroke-[2.5] text-black" />
             </button>
-
-            {!isCollapsed && (
-              <span className="font-mono text-[10px] font-black uppercase tracking-wider text-slate-500 transition-opacity duration-300 truncate">
-                WORKSPACES
-              </span>
-            )}
           </div>
 
           {/* Navigation Items: Smooth Framer Motion selection glide in both collapsed and expanded modes */}
@@ -219,14 +236,14 @@ export default function Sidebar() {
                   </div>
 
                   {!isCollapsed && item.badge && (
-                    <span className="relative z-10 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 border border-black bg-white text-black shadow-[1px_1px_0px_0px_#000] shrink-0">
+                    <span className="relative z-10 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 border border-red-600 text-red-600 bg-transparent shadow-[1px_1px_0px_0px_#000] shrink-0">
                       {item.badge}
                     </span>
                   )}
 
                   {isCollapsed && item.badge && (
                     <span
-                      className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#70E000] border border-black z-20"
+                      className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-red-600 border border-black z-20"
                       title={item.badge}
                     />
                   )}
@@ -235,6 +252,36 @@ export default function Sidebar() {
             })}
           </div>
         </div>
+
+        {/* ======================================================== */}
+        {/* BOTTOM USER PROFILE BADGE                                */}
+        {/* Minimized: only shows the initial box ('A')              */}
+        {/* Expanded: shows initial box + full user name             */}
+        {/* ======================================================== */}
+        {user && (
+          <div className="mt-auto pt-3 border-t-2 border-black/10">
+            <Link
+              to="/profile"
+              title={user.name || 'Career Profile'}
+              className={`flex items-center border-2 border-black bg-white shadow-[2px_2px_0px_0px_#000] hover:bg-[#FAF5E6] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75 cursor-pointer ${
+                isCollapsed
+                  ? 'justify-center w-11 h-11 mx-auto'
+                  : 'space-x-2.5 px-3 py-2 w-full'
+              }`}
+            >
+              <div className="w-6 h-6 shrink-0 border-2 border-black bg-[#70E000] flex items-center justify-center text-black font-mono text-xs font-black">
+                {initial}
+              </div>
+              {!isCollapsed && (
+                <div className="min-w-0 flex-1 text-left">
+                  <div className="text-xs font-mono font-bold text-black truncate leading-tight">
+                    {user.name}
+                  </div>
+                </div>
+              )}
+            </Link>
+          </div>
+        )}
       </aside>
     </>
   );

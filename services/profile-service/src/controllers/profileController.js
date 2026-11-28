@@ -18,6 +18,14 @@ async function getMe(req, res, next) {
 
     let profile = await Profile.findOne({ userId });
 
+    if (!profile && req.user.email) {
+      profile = await Profile.findOne({ email: req.user.email.toLowerCase() });
+      if (profile) {
+        profile.userId = userId;
+        await profile.save();
+      }
+    }
+
     if (!profile) {
       // Auto-bootstrap profile with available identity metadata from JWT
       profile = await Profile.create({
@@ -56,7 +64,10 @@ async function updateMe(req, res, next) {
       goals,
       projects,
       certifications,
-      linked_accounts
+      linked_accounts,
+      github_data,
+      leetcode_data,
+      dismissed_skills
     } = req.body;
 
     let profile = await Profile.findOne({ userId });
@@ -82,6 +93,9 @@ async function updateMe(req, res, next) {
         ...linked_accounts
       };
     }
+    if (github_data !== undefined) profile.github_data = github_data;
+    if (leetcode_data !== undefined) profile.leetcode_data = leetcode_data;
+    if (dismissed_skills !== undefined) profile.dismissed_skills = dismissed_skills;
 
     await profile.save();
 

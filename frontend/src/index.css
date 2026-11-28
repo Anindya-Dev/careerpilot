@@ -55,24 +55,32 @@
 /* Infinite Marquee Animation for Neo-Brutalist Banner */
 @keyframes marquee {
   0% {
-    transform: translateX(0%);
+    transform: translate3d(0%, 0, 0);
+    -webkit-transform: translate3d(0%, 0, 0);
   }
-
   100% {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
+    -webkit-transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@-webkit-keyframes marquee {
+  0% {
+    -webkit-transform: translate3d(0%, 0, 0);
+  }
+  100% {
+    -webkit-transform: translate3d(-50%, 0, 0);
   }
 }
 
 .animate-marquee {
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
-  width: max-content;
-  animation: marquee 30s linear infinite;
-}
-
-.animate-marquee:hover {
-  animation-play-state: paused;
+  display: flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  width: max-content !important;
+  animation: marquee 28s linear infinite !important;
+  -webkit-animation: marquee 28s linear infinite !important;
+  will-change: transform;
 }
 
 /* Scroll reveal utility states */
@@ -93,16 +101,56 @@
     transform: none;
     transition: none;
   }
-
-  .animate-marquee {
-    animation: none;
-    width: 100%;
-  }
 }
 
 /* Neo-brutalism reusable utilities */
 .neo-box {
   @apply bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000];
+}
+
+/* Shiny animated theme yellow gradient text effect */
+@keyframes shinyThemeShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@-webkit-keyframes shinyThemeShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.shiny-theme-text {
+  background: linear-gradient(
+    135deg,
+    #FFB703 0%,
+    #FFE600 24%,
+    #FFFDF0 46%,
+    #FFFFFF 50%,
+    #FFFDF0 54%,
+    #FFE600 76%,
+    #E5A100 100%
+  );
+  background-size: 260% 260%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shinyThemeShimmer 3.5s ease-in-out infinite;
+  -webkit-animation: shinyThemeShimmer 3.5s ease-in-out infinite;
+  filter: drop-shadow(2px 0px 0px #000000) drop-shadow(-2px 0px 0px #000000) drop-shadow(0px 2px 0px #000000) drop-shadow(0px -2px 0px #000000) drop-shadow(6px 6px 0px #000000);
 }
 
 .neo-box-lg {

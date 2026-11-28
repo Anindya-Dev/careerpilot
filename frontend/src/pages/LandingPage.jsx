@@ -292,7 +292,7 @@ export default function LandingPage() {
         {/* NEO-BRUTALIST INFINITE RUNNING MARQUEE BANNER */}
         <div className="w-full overflow-hidden bg-[#FFE600] border-y-2 border-black py-2.5 select-none">
           <div className="animate-marquee font-mono font-black text-xs sm:text-sm tracking-wider uppercase text-black whitespace-nowrap flex items-center">
-            {[1, 2].map((set) => (
+            {[1, 2, 3, 4].map((set) => (
               <React.Fragment key={set}>
                 <span className="shrink-0 flex items-center">
                   <span>7 AUTONOMOUS AGENT NODES</span>
@@ -483,12 +483,12 @@ export default function LandingPage() {
         </section>
 
         {/* SECTION 5: FINAL ACTION BANNER - Scale Reveal */}
-        <section className="pt-2 sm:pt-3 pb-12 sm:pb-16 px-4 sm:px-8 lg:px-12 bg-[#FFE600] text-center border-t-2 border-black">
+        <section className="pt-2 sm:pt-3 pb-12 sm:pb-16 px-4 sm:px-8 lg:px-12 bg-[#FFE600] text-center border-t-2 border-black overflow-hidden">
           <Reveal delay={0} className="w-full max-w-[1500px] mx-auto space-y-4">
-            <div className="min-h-[1.3em] flex items-center justify-center">
-              <h2 className="whitespace-nowrap text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight text-black leading-none pt-1 inline-flex items-center justify-center">
+            <div className="min-h-[2.6em] sm:min-h-[1.5em] flex items-center justify-center">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-black leading-tight pt-1 inline-flex flex-wrap items-center justify-center max-w-5xl mx-auto break-words">
                 <span>{bannerDisplayText}</span>
-                <span className="inline-block w-2.5 sm:w-3.5 md:w-4 h-[0.85em] ml-1.5 sm:ml-2.5 bg-black align-middle animate-pulse" />
+                <span className="inline-block w-2.5 sm:w-3.5 md:w-4 h-[0.85em] ml-1.5 sm:ml-2.5 bg-black align-middle animate-pulse shrink-0" />
               </h2>
             </div>
             <p className="text-base sm:text-lg md:text-xl font-normal text-black max-w-2xl mx-auto leading-relaxed">

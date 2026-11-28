@@ -8,7 +8,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import CareerPilotLogo from './CareerPilotLogo';
 
 export default function Navbar() {
@@ -32,20 +32,6 @@ export default function Navbar() {
           {/* User Profile & Logout */}
           {user && (
             <div className="flex items-center space-x-3">
-              <Link
-                to="/profile"
-                className="flex items-center space-x-2.5 px-3 py-1.5 border-2 border-black bg-white shadow-[2px_2px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-75"
-              >
-                <div className="w-6 h-6 border-2 border-black bg-[#70E000] flex items-center justify-center text-black font-mono text-xs font-black">
-                  {user.name ? user.name.charAt(0).toUpperCase() : <UserIcon className="w-3 h-3 stroke-[2.5]" />}
-                </div>
-                <div className="hidden sm:block text-left">
-                  <div className="text-xs font-mono font-bold text-black leading-none">
-                    {user.name}
-                  </div>
-                </div>
-              </Link>
-
               <button
                 type="button"
                 onClick={handleLogout}
