@@ -7,18 +7,9 @@
 
 import React, { useState } from 'react';
 import { Activity, TrendingUp, TrendingDown, Minus, HelpCircle } from 'lucide-react';
+import { computeHealthGrade, GRADING_TIERS } from '../../config/gradingSystem';
 
-export function computeHealthGrade(score) {
-  const s = Number(score) || 0;
-  if (s <= 0) return 'N/A';
-  if (s >= 93) return 'A+';
-  if (s >= 88) return 'A';
-  if (s >= 82) return 'A-';
-  if (s >= 75) return 'B+';
-  if (s >= 68) return 'B';
-  if (s >= 55) return 'C+';
-  return 'C';
-}
+export { computeHealthGrade, GRADING_TIERS };
 
 export default function CareerHealthDial({ score = 0, grade, dimensions = [] }) {
   const [showRubric, setShowRubric] = useState(false);
@@ -111,13 +102,15 @@ export default function CareerHealthDial({ score = 0, grade, dimensions = [] }) 
           <div className="font-black uppercase text-black border-b border-black pb-1">
             Grading Scale & Score Formula
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 text-center font-bold">
-            <span className="bg-[#70E000] border border-black px-1 py-0.5">A+: 93+</span>
-            <span className="bg-[#70E000]/70 border border-black px-1 py-0.5">A: 88-92</span>
-            <span className="bg-[#38B6FF]/60 border border-black px-1 py-0.5">A-: 82-87</span>
-            <span className="bg-[#FFE600] border border-black px-1 py-0.5">B+: 75-81</span>
-            <span className="bg-[#FFE600]/60 border border-black px-1 py-0.5">B: 68-74</span>
-            <span className="bg-[#FF70A6]/60 border border-black px-1 py-0.5">C: &lt;68</span>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 text-center font-bold">
+            {GRADING_TIERS.map((tier) => (
+              <span
+                key={tier.grade}
+                className={`${tier.badgeBg} border border-black px-1 py-0.5 text-black`}
+              >
+                {tier.grade}: {tier.minScore}+
+              </span>
+            ))}
           </div>
           <p className="text-slate-700 font-bold leading-snug">
             Computed from Skill-Market Fit (30%), Goal Alignment (25%), Profile Completeness (20%), GitHub Evidence (15%), and Recent Activity (10%).

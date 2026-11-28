@@ -20,6 +20,7 @@ import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Card from '../components/Card';
 import VerificationBadge from '../components/VerificationBadge';
+import { computeHealthGrade } from '../config/gradingSystem';
 import {
   CareerHealthDial,
   SkillRadarChart,
@@ -49,23 +50,7 @@ export default function DashboardPage() {
 
   const isFreshProfile = !user?.isDemoSession && skillsCount === 0 && !profile?.target_role;
   const healthScore = isFreshProfile ? 0 : (profile?.career_health_score || telemetry?.healthScore || 0);
-  const healthGrade = isFreshProfile
-    ? 'N/A'
-    : healthScore >= 93
-    ? 'A+'
-    : healthScore >= 88
-    ? 'A'
-    : healthScore >= 82
-    ? 'A-'
-    : healthScore >= 75
-    ? 'B+'
-    : healthScore >= 68
-    ? 'B'
-    : healthScore >= 55
-    ? 'C+'
-    : healthScore > 0
-    ? 'C'
-    : 'N/A';
+  const healthGrade = isFreshProfile ? 'N/A' : computeHealthGrade(healthScore);
   const dimensions = isFreshProfile
     ? [
         { name: 'Skill Alignment', score: 0, status: 'Pending' },

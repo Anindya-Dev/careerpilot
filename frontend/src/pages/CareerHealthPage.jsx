@@ -15,6 +15,7 @@ import { useDashboardTelemetry } from '../hooks';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Card from '../components/Card';
+import { computeHealthGrade } from '../config/gradingSystem';
 import {
   CareerHealthDial,
   HealthTrendChart,
@@ -39,23 +40,7 @@ export default function CareerHealthPage() {
 
   const isFreshProfile = !user?.isDemoSession && (profile?.skills?.length || 0) === 0 && !profile?.target_role;
   const healthScore = isFreshProfile ? 0 : (profile?.career_health_score || telemetry?.healthScore || 0);
-  const healthGrade = isFreshProfile
-    ? 'N/A'
-    : healthScore >= 93
-    ? 'A+'
-    : healthScore >= 88
-    ? 'A'
-    : healthScore >= 82
-    ? 'A-'
-    : healthScore >= 75
-    ? 'B+'
-    : healthScore >= 68
-    ? 'B'
-    : healthScore >= 55
-    ? 'C+'
-    : healthScore > 0
-    ? 'C'
-    : 'N/A';
+  const healthGrade = isFreshProfile ? 'N/A' : computeHealthGrade(healthScore);
   const dimensions = isFreshProfile
     ? [
         { name: 'Technical Depth', score: 0, status: 'Pending' },
