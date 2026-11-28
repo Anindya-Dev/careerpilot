@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../context/ProfileContext';
 import { useDashboardTelemetry } from '../hooks';
 import { orchestratorClient } from '../api/client';
+import { synthesizeDynamicRoadmap } from '../utils/roadmapGenerator';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Card from '../components/Card';
@@ -30,60 +31,20 @@ import {
   ArrowRight,
   ShieldCheck,
   Zap,
-  Server
+  Server,
+  BookOpen,
+  FolderGit2,
+  Award,
+  Target
 } from 'lucide-react';
 
-export function generateDefaultMilestones(targetRole = 'Software Engineer', userSkills = []) {
-  const role = targetRole || 'Software Engineer';
-  const skillList = (userSkills || []).map((s) => (typeof s === 'string' ? s : s?.name)).filter(Boolean);
-  const knownLower = new Set(skillList.map((s) => s.toLowerCase()));
-
-  const roleReqMap = {
-    'AI/ML Engineer': ['Docker', 'Kubernetes', 'MLOps', 'Model Packaging'],
-    'Full Stack Engineer': ['PostgreSQL', 'Docker', 'Redis', 'GraphQL'],
-    'DevOps & Cloud Engineer': ['Go', 'Prometheus', 'Grafana', 'CI/CD Security'],
-    'Data Scientist': ['SQL', 'PyTorch', 'Feature Engineering', 'A/B Testing'],
-    'Software Engineer': ['Docker', 'System Design', 'CI/CD', 'Distributed Systems'],
-    'Frontend Engineer': ['TypeScript', 'Next.js', 'State Management', 'Jest'],
-    'Backend Engineer': ['Kafka', 'Microservices Design', 'Redis', 'Docker']
-  };
-
-  const matchedKey = Object.keys(roleReqMap).find(
-    (k) => k.toLowerCase().includes(role.toLowerCase()) || role.toLowerCase().includes(k.toLowerCase())
-  );
-  const prereqs = roleReqMap[matchedKey] || ['Docker', 'Kubernetes', 'System Design', 'Cloud Infrastructure'];
-  const missingPrereqs = prereqs.filter((p) => !knownLower.has(p.toLowerCase()));
-
-  return {
-    target_role: role,
-    current_match_score: Math.min(95, Math.max(50, 60 + skillList.length * 3 - missingPrereqs.length * 4)),
-    verified_skills_count: skillList.length || 5,
-    missing_prerequisites: missingPrereqs.length ? missingPrereqs : ['System Architecture', 'Cloud Deployment'],
-    milestones: [
-      {
-        timeframe: 'Year 1',
-        target_title: `Junior ${role}`,
-        key_competencies: missingPrereqs.slice(0, 2).concat(['Clean Architecture', 'CI/CD Pipelines']),
-        recommended_projects: [`Full-Stack ${role} Production Portfolio`, 'Automated CI/CD Pipeline Integration'],
-        key_deliverables: ['Production service deployed to cloud', 'Clean code review with >85% test coverage']
-      },
-      {
-        timeframe: 'Year 3',
-        target_title: `Mid-Level ${role}`,
-        key_competencies: ['Distributed Systems', 'Performance Profiling & Observability', 'Database Sharding & Caching'],
-        recommended_projects: [`High-Throughput ${role} Platform`, 'Microservices Service Mesh Architecture'],
-        key_deliverables: ['Industry Certification attained', 'Cross-service observability dashboard live']
-      },
-      {
-        timeframe: 'Year 5',
-        target_title: `Senior ${role} / Tech Lead`,
-        key_competencies: ['Enterprise System Design', 'Technical Leadership', 'Infrastructure as Code & Security'],
-        recommended_projects: ['Enterprise Distributed Platform Lead', 'Autonomous Multi-Agent AI System'],
-        key_deliverables: ['Architectural Decision Records (ADRs)', 'Production SLOs at 99.99% availability']
-      }
-    ],
-    strategic_advice: `Focus on mastering production deployment, automated testing, and distributed architecture patterns to accelerate your transition to Senior ${role}.`
-  };
+export function generateDefaultMilestones(targetRole = 'Software Engineer', userSkills = [], userProjects = [], userGoals = []) {
+  return synthesizeDynamicRoadmap({
+    targetRole,
+    userSkills,
+    userProjects,
+    userGoals
+  });
 }
 
 export default function AgentPipelinePage() {
@@ -184,11 +145,48 @@ export default function AgentPipelinePage() {
   });
 
   const activeRoadmap = useMemo(() => {
+    const base = synthesizeDynamicRoadmap({
+      targetRole: profile?.target_role,
+      userSkills: profile?.skills || [],
+      userProjects: profile?.projects || [],
+      userGoals: profile?.goals || []
+    });
+
     if (pipelineResult?.vision?.milestones?.length > 0) {
-      return pipelineResult.vision;
+      const mergedMilestones = base.milestones.map((baseM, i) => {
+        const liveM = pipelineResult.vision.milestones[i];
+        if (!liveM) return baseM;
+        return {
+          ...baseM,
+          target_title: liveM.target_title || baseM.target_title,
+          timeframe: liveM.timeframe || baseM.timeframe,
+          key_competencies: Array.from(
+            new Set([...(liveM.key_competencies || []), ...(baseM.key_competencies || [])])
+          ),
+          recommended_projects: Array.from(
+            new Set([...(liveM.recommended_projects || []), ...(baseM.recommended_projects || [])])
+          ),
+          key_deliverables: Array.from(
+            new Set([...(liveM.key_deliverables || []), ...(baseM.key_deliverables || [])])
+          ),
+          study_plan: liveM.study_plan?.length > 0 ? liveM.study_plan : baseM.study_plan
+        };
+      });
+
+      return {
+        ...base,
+        target_role: pipelineResult.vision.target_role || base.target_role,
+        current_match_score: pipelineResult.vision.current_match_score ?? base.current_match_score,
+        strategic_advice: pipelineResult.vision.strategic_advice || base.strategic_advice,
+        missing_prerequisites: pipelineResult.vision.missing_prerequisites?.length > 0
+          ? pipelineResult.vision.missing_prerequisites
+          : base.missing_prerequisites,
+        milestones: mergedMilestones
+      };
     }
-    return generateDefaultMilestones(profile?.target_role, profile?.skills);
-  }, [pipelineResult, profile?.target_role, profile?.skills]);
+
+    return base;
+  }, [pipelineResult, profile?.target_role, profile?.skills, profile?.projects, profile?.goals]);
 
   const userSkillSet = useMemo(
     () => new Set((profile?.skills || []).map((s) => (s.name || '').toLowerCase())),
@@ -682,10 +680,25 @@ export default function AgentPipelinePage() {
                       </div>
 
                       <div className="p-4 space-y-4 font-mono text-xs flex-1">
+                        {/* Milestone Mission & Objective */}
+                        {m.objective && (
+                          <div className="p-2.5 bg-[#FAF5E6] border border-black text-[11px] font-bold text-black/90 leading-snug">
+                            <span className="text-[#38B6FF] font-black mr-1">🎯 GOAL:</span>
+                            {m.objective}
+                          </div>
+                        )}
+
                         {/* Competencies with live acquired check */}
                         <div>
-                          <div className="text-[10px] font-black uppercase text-black/60 mb-1.5">
-                            Key Competencies
+                          <div className="text-[10px] font-black uppercase text-black/60 mb-1.5 flex items-center justify-between">
+                            <span className="flex items-center gap-1">
+                              <Target className="w-3 h-3 text-black" />
+                              Key Competencies
+                            </span>
+                            <span className="text-[9px] font-normal text-slate-600">
+                              {(m.key_competencies || []).filter((c) => userSkillSet.has(c.toLowerCase())).length}/
+                              {(m.key_competencies || []).length} Acquired
+                            </span>
                           </div>
                           <div className="flex flex-wrap gap-1.5">
                             {(m.key_competencies || []).map((comp) => {
@@ -697,30 +710,61 @@ export default function AgentPipelinePage() {
                                     acquired ? 'bg-[#70E000] text-black' : 'bg-[#FFF3B0] text-black'
                                   }`}
                                 >
-                                  {acquired ? `✓ ${comp}` : comp}
+                                  {acquired ? `✓ ${comp}` : `+ ${comp}`}
                                 </span>
                               );
                             })}
                           </div>
                         </div>
 
-                        {/* Recommended Projects */}
-                        <div>
-                          <div className="text-[10px] font-black uppercase text-black/60 mb-1.5">
-                            Recommended Builds
+                        {/* What to Study & Master */}
+                        {m.study_plan && m.study_plan.length > 0 && (
+                          <div>
+                            <div className="text-[10px] font-black uppercase text-black/60 mb-1.5 flex items-center gap-1">
+                              <BookOpen className="w-3 h-3 text-black" />
+                              What to Study & Master
+                            </div>
+                            <ul className="space-y-1.5 text-[11px]">
+                              {m.study_plan.map((item, sIdx) => (
+                                <li
+                                  key={sIdx}
+                                  className="p-2 bg-[#FAF5E6] border border-black font-bold flex items-start gap-1.5"
+                                >
+                                  <span className="text-[#38B6FF] font-black text-xs">§</span>
+                                  <span>{item}</span>
+                                </li>
+                              ))}
+                            </ul>
                           </div>
-                          <ul className="space-y-1 text-[11px]">
-                            {(m.recommended_projects || []).map((proj, pIdx) => (
-                              <li key={pIdx} className="p-2 bg-[#FAF5E6] border border-black font-bold">
-                                ▸ {proj}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                        )}
 
-                        {/* Key Deliverables */}
+                        {/* Recommended Project Builds */}
+                        {m.recommended_projects && m.recommended_projects.length > 0 && (
+                          <div>
+                            <div className="text-[10px] font-black uppercase text-black/60 mb-1.5 flex items-center gap-1">
+                              <FolderGit2 className="w-3 h-3 text-black" />
+                              Recommended Project Builds
+                            </div>
+                            <ul className="space-y-1.5 text-[11px]">
+                              {m.recommended_projects.map((proj, pIdx) => (
+                                <li
+                                  key={pIdx}
+                                  className="p-2 bg-white border border-black font-bold flex items-start gap-1.5 shadow-[1px_1px_0px_0px_#000]"
+                                >
+                                  <span className="text-[#FFE600] font-black bg-black px-1 py-0.2 text-[9px] uppercase shrink-0">
+                                    BUILD
+                                  </span>
+                                  <span>{proj}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {/* Verifiable Deliverables */}
                         <div>
-                          <div className="text-[10px] font-black uppercase text-black/60 mb-1.5">
+                          <div className="text-[10px] font-black uppercase text-black/60 mb-1.5 flex items-center gap-1">
+                            <Award className="w-3 h-3 text-black" />
                             Verifiable Deliverables
                           </div>
                           <ul className="space-y-1 text-[11px] text-black/80">
