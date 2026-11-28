@@ -98,9 +98,9 @@ function ClerkActiveAuthProvider({ children, state, dispatch }) {
       });
     } else {
       // Clerk finished loading and no active Clerk session exists;
-      // Only log out if not currently in Demo Sandbox mode
+      // Only clear if the current session was explicitly a Clerk session that has now ended
       const storedToken = localStorage.getItem('token');
-      if (storedToken !== 'demo-jwt-preview-token') {
+      if (storedToken && storedToken.startsWith('clerk-jwt-')) {
         localStorage.removeItem('token');
         localStorage.removeItem('clerk_user');
         dispatch({ type: 'AUTH_LOGOUT' });
@@ -110,58 +110,73 @@ function ClerkActiveAuthProvider({ children, state, dispatch }) {
 
   const login = async (email, password) => {
     dispatch({ type: 'SET_LOADING', payload: true });
-    try {
-      if (!isSignInLoaded) {
-        throw new Error('Clerk authentication service initializing. Please retry in a second.');
-      }
-      const result = await signIn.create({
-        identifier: email,
-        password: password,
-      });
 
-      if (result.status === 'complete') {
-        await setSignInActive({ session: result.createdSessionId });
-        const user = {
-          userId: result.createdUserId || result.createdSessionId,
-          name: email.split('@')[0],
-          email,
-          isClerkSession: true,
-          major: 'Computer Science & Engineering',
-          enrollmentYear: new Date().getFullYear()
-        };
-        const token = `clerk-jwt-${user.userId}`;
-        localStorage.setItem('token', token);
-        localStorage.setItem('clerk_user', JSON.stringify(user));
-        dispatch({
-          type: 'AUTH_SUCCESS',
-          payload: { user, token }
+    // 1. First attempt Clerk Cloud sign-in if initialized
+    if (isSignInLoaded) {
+      try {
+        const result = await signIn.create({
+          identifier: email,
+          password: password,
         });
-        return { success: true, user };
-      } else {
-        throw new Error(`Authentication requires additional verification: ${result.status}`);
+
+        if (result.status === 'complete') {
+          await setSignInActive({ session: result.createdSessionId });
+          const user = {
+            userId: result.createdUserId || result.createdSessionId,
+            name: email.split('@')[0],
+            email,
+            isClerkSession: true,
+            major: 'Computer Science & Engineering',
+            enrollmentYear: new Date().getFullYear()
+          };
+          const token = `clerk-jwt-${user.userId}`;
+          localStorage.setItem('token', token);
+          localStorage.setItem('clerk_user', JSON.stringify(user));
+          dispatch({
+            type: 'AUTH_SUCCESS',
+            payload: { user, token }
+          });
+          return { success: true, user };
+        }
+      } catch (clerkErr) {
+        if (
+          clerkErr.errors?.[0]?.code === 'session_exists' ||
+          clerkErr.message?.toLowerCase().includes('already signed in')
+        ) {
+          const cached = JSON.parse(localStorage.getItem('clerk_user') || 'null') || {
+            userId: 'clerk-authenticated-user',
+            name: email.split('@')[0],
+            email,
+            isClerkSession: true,
+            major: 'Computer Science & Engineering',
+            enrollmentYear: new Date().getFullYear()
+          };
+          dispatch({ type: 'AUTH_SUCCESS', payload: { user: cached, token: localStorage.getItem('token') || 'clerk-session' } });
+          return { success: true, user: cached };
+        }
+        // If not authenticated in Clerk, smoothly fall back to local microservice
       }
-    } catch (err) {
-      if (
-        err.errors?.[0]?.code === 'session_exists' ||
-        err.message?.toLowerCase().includes('already signed in')
-      ) {
-        // User already has an active session in Clerk; route directly to dashboard
-        const cached = JSON.parse(localStorage.getItem('clerk_user') || 'null') || {
-          userId: 'clerk-authenticated-user',
-          name: email.split('@')[0],
-          email,
-          isClerkSession: true,
-          major: 'Computer Science & Engineering',
-          enrollmentYear: new Date().getFullYear()
-        };
-        dispatch({ type: 'AUTH_SUCCESS', payload: { user: cached, token: localStorage.getItem('token') || 'clerk-session' } });
-        return { success: true, user: cached };
+    }
+
+    // 2. Fallback: Authenticate against local microservice Auth Service (MongoDB)
+    try {
+      const data = await authService.login(email, password);
+      localStorage.setItem('token', data.accessToken);
+      if (data.refreshToken) {
+        localStorage.setItem('refreshToken', data.refreshToken);
       }
-      const errorMsg =
-        err.errors?.[0]?.longMessage ||
-        err.errors?.[0]?.message ||
-        err.message ||
-        'Invalid email or password';
+      dispatch({
+        type: 'AUTH_SUCCESS',
+        payload: { user: data.user, token: data.accessToken }
+      });
+      return { success: true, user: data.user };
+    } catch (localErr) {
+      let errorMsg = 'Invalid email or password.';
+      if (!localErr.response) {
+        errorMsg = 'Cannot connect to Auth Service (http://localhost:5001). Ensure the backend server and MongoDB are running.';
+      } else if (localErr.response?.data?.error?.message) {
+        errorMsg = localErr.response.data.error.message;
+      }
       dispatch({ type: 'SET_ERROR', payload: errorMsg });
       throw new Error(errorMsg);
     }
@@ -169,67 +184,81 @@ function ClerkActiveAuthProvider({ children, state, dispatch }) {
 
   const register = async (userData) => {
     dispatch({ type: 'SET_LOADING', payload: true });
-    try {
-      if (!isSignUpLoaded) {
-        throw new Error('Clerk registration service initializing. Please retry in a second.');
-      }
-      const result = await signUp.create({
-        emailAddress: userData.email,
-        password: userData.password,
-        firstName: userData.name,
-      });
 
-      if (result.status === 'complete') {
-        await setSignUpActive({ session: result.createdSessionId });
-        const user = {
-          userId: result.createdUserId || result.createdSessionId,
-          name: userData.name,
-          email: userData.email,
-          major: userData.major || 'Computer Science & Engineering',
-          enrollmentYear: userData.enrollmentYear || new Date().getFullYear(),
-          isClerkSession: true
-        };
-        const token = `clerk-jwt-${user.userId}`;
-        localStorage.setItem('token', token);
-        localStorage.setItem('clerk_user', JSON.stringify(user));
-        dispatch({
-          type: 'AUTH_SUCCESS',
-          payload: { user, token }
+    // 1. Attempt Clerk registration if available
+    if (isSignUpLoaded) {
+      try {
+        const result = await signUp.create({
+          emailAddress: userData.email,
+          password: userData.password,
+          firstName: userData.name,
         });
-        return { success: true, user };
-      } else if (result.status === 'missing_requirements') {
-        // Send email verification code if enabled in Clerk dashboard
-        await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-        return {
-          needsVerification: true,
-          email: userData.email,
-          message: 'A verification code has been sent to your email.'
-        };
-      } else {
-        throw new Error(`Registration status: ${result.status}`);
+
+        if (result.status === 'complete') {
+          await setSignUpActive({ session: result.createdSessionId });
+          const user = {
+            userId: result.createdUserId || result.createdSessionId,
+            name: userData.name,
+            email: userData.email,
+            major: userData.major || 'Computer Science & Engineering',
+            enrollmentYear: userData.enrollmentYear || new Date().getFullYear(),
+            isClerkSession: true
+          };
+          const token = `clerk-jwt-${user.userId}`;
+          localStorage.setItem('token', token);
+          localStorage.setItem('clerk_user', JSON.stringify(user));
+          dispatch({
+            type: 'AUTH_SUCCESS',
+            payload: { user, token }
+          });
+          return { success: true, user };
+        } else if (result.status === 'missing_requirements') {
+          await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+          return {
+            needsVerification: true,
+            email: userData.email,
+            message: 'A verification code has been sent to your email.'
+          };
+        }
+      } catch (clerkErr) {
+        if (
+          clerkErr.errors?.[0]?.code === 'session_exists' ||
+          clerkErr.message?.toLowerCase().includes('already signed in')
+        ) {
+          const cached = JSON.parse(localStorage.getItem('clerk_user') || 'null') || {
+            userId: 'clerk-authenticated-user',
+            name: userData.name || userData.email.split('@')[0],
+            email: userData.email,
+            major: userData.major || 'Computer Science & Engineering',
+            enrollmentYear: userData.enrollmentYear || new Date().getFullYear(),
+            isClerkSession: true
+          };
+          dispatch({ type: 'AUTH_SUCCESS', payload: { user: cached, token: localStorage.getItem('token') || 'clerk-session' } });
+          return { success: true, user: cached };
+        }
+        // Fall back to local microservice
       }
-    } catch (err) {
-      if (
-        err.errors?.[0]?.code === 'session_exists' ||
-        err.message?.toLowerCase().includes('already signed in')
-      ) {
-        // User already has an active session in Clerk; route directly to dashboard
-        const cached = JSON.parse(localStorage.getItem('clerk_user') || 'null') || {
-          userId: 'clerk-authenticated-user',
-          name: userData.name || userData.email.split('@')[0],
-          email: userData.email,
-          major: userData.major || 'Computer Science & Engineering',
-          enrollmentYear: userData.enrollmentYear || new Date().getFullYear(),
-          isClerkSession: true
-        };
-        dispatch({ type: 'AUTH_SUCCESS', payload: { user: cached, token: localStorage.getItem('token') || 'clerk-session' } });
-        return { success: true, user: cached };
+    }
+
+    // 2. Fallback: Authenticate against local microservice Auth Service (MongoDB)
+    try {
+      const data = await authService.register(userData);
+      localStorage.setItem('token', data.accessToken);
+      if (data.refreshToken) {
+        localStorage.setItem('refreshToken', data.refreshToken);
       }
-      const errorMsg =
-        err.errors?.[0]?.longMessage ||
-        err.errors?.[0]?.message ||
-        err.message ||
-        'Registration failed. Please check your credentials.';
+      dispatch({
+        type: 'AUTH_SUCCESS',
+        payload: { user: data.user, token: data.accessToken }
+      });
+      return { success: true, user: data.user };
+    } catch (localErr) {
+      let errorMsg = 'Registration failed. Please check your details.';
+      if (!localErr.response) {
+        errorMsg = 'Cannot connect to Auth Service (http://localhost:5001). Ensure the backend server and MongoDB are running.';
+      } else if (localErr.response?.data?.error?.message) {
+        errorMsg = localErr.response.data.error.message;
+      }
       dispatch({ type: 'SET_ERROR', payload: errorMsg });
       throw new Error(errorMsg);
     }
@@ -431,13 +460,18 @@ export function AuthProvider({ children }) {
       }
 
       if (storedToken.startsWith('clerk-jwt-')) {
-        const savedClerkUser = safeJsonParse(localStorage.getItem('clerk_user'), null);
-        if (savedClerkUser) {
-          return dispatch({
-            type: 'AUTH_SUCCESS',
-            payload: { user: savedClerkUser, token: storedToken }
-          });
-        }
+        const savedClerkUser = safeJsonParse(localStorage.getItem('clerk_user'), null) || {
+          userId: storedToken.replace('clerk-jwt-', ''),
+          name: 'Student',
+          email: 'student@careerpilot.io',
+          isClerkSession: true,
+          major: 'Computer Science & Engineering',
+          enrollmentYear: new Date().getFullYear()
+        };
+        return dispatch({
+          type: 'AUTH_SUCCESS',
+          payload: { user: savedClerkUser, token: storedToken }
+        });
       }
 
       if (storedToken === 'demo-jwt-preview-token') {

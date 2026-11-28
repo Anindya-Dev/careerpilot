@@ -223,6 +223,22 @@ async function logout(req, res, next) {
  */
 async function getMe(req, res, next) {
   try {
+    if (req.user.isDemoSession || req.user.isClerkSession) {
+      return res.status(200).json({
+        success: true,
+        user: {
+          id: req.user.userId,
+          userId: req.user.userId,
+          email: req.user.email || 'student@careerpilot.io',
+          name: req.user.name || 'Student',
+          major: req.user.major || 'Computer Science & Engineering',
+          enrollmentYear: 2024,
+          isActive: true,
+          createdAt: new Date()
+        }
+      });
+    }
+
     const user = await User.findById(req.user.userId);
     if (!user) {
       return next(new AppError('USER_NOT_FOUND', 'User record could not be found', 404));

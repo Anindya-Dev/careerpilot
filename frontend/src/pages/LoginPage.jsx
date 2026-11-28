@@ -13,17 +13,20 @@ import SocialAuthButtons from '../components/SocialAuthButtons';
 import { Compass, ArrowRight, Shield, Terminal, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
-  const { user, login, enterDemoMode } = useAuth();
+  const { user, login, enterDemoMode, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   // Auto-redirect to dashboard if already authenticated
   useEffect(() => {
-    if (user) {
-      const destination = location.state?.from?.pathname || '/dashboard';
+    if (user && !isLoading) {
+      const rawTarget = location.state?.from?.pathname;
+      const destination = rawTarget && rawTarget !== '/login' && rawTarget !== '/register'
+        ? rawTarget
+        : '/dashboard';
       navigate(destination, { replace: true });
     }
-  }, [user, navigate, location]);
+  }, [user, isLoading, navigate, location]);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -57,7 +60,10 @@ export default function LoginPage() {
     setIsSubmitting(true);
     try {
       await login(email, password);
-      const destination = location.state?.from?.pathname || '/dashboard';
+      const rawTarget = location.state?.from?.pathname;
+      const destination = rawTarget && rawTarget !== '/login' && rawTarget !== '/register'
+        ? rawTarget
+        : '/dashboard';
       navigate(destination, { replace: true });
     } catch (err) {
       setServerError(err.message || 'Invalid email or password');

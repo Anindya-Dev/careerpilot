@@ -95,6 +95,18 @@ const handleAuthErrorWithRefresh = async (error, clientInstance) => {
       return Promise.reject(error);
     }
 
+    const token = localStorage.getItem('token');
+    // If it's a demo or clerk session token, there is no refresh token on local auth server
+    if (!token || token === 'demo-jwt-preview-token' || token.startsWith('clerk-jwt-')) {
+      return Promise.reject(error);
+    }
+
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      // Reject gracefully so calling hooks/contexts can handle fallback without forcing a hard page reload
+      return Promise.reject(error);
+    }
+
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
         failedQueue.push({
@@ -113,11 +125,6 @@ const handleAuthErrorWithRefresh = async (error, clientInstance) => {
     isRefreshing = true;
 
     try {
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (!refreshToken) {
-        throw new Error('No refresh token available');
-      }
-
       const res = await axios.post(`${AUTH_BASE_URL}/refresh`, { refreshToken });
       const newToken = res.data.token;
       const newRefresh = res.data.refreshToken;
@@ -137,7 +144,7 @@ const handleAuthErrorWithRefresh = async (error, clientInstance) => {
       processQueue(refreshErr, null);
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
-      window.location.href = '/login';
+      // Do NOT trigger window.location.href = '/login' here to prevent ping-pong redirect loops
       return Promise.reject(refreshErr);
     } finally {
       isRefreshing = false;
